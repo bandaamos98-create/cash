@@ -11,6 +11,8 @@
         body { font-family: 'Inter', system-ui, sans-serif; }
         .modal { animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .blink-red { animation: blink 1.5s infinite; }
+        @keyframes blink { 0%, 100% { color: #ef4444; } 50% { color: #f87171; } }
         .live-clock { font-variant-numeric: tabular-nums; }
     </style>
 </head>
@@ -66,6 +68,11 @@
 
             <!-- CASHIER VIEW -->
             <div id="cashierView" class="hidden">
+                <!-- Blinking Warning -->
+                <div id="nonEditableWarning" class="hidden bg-red-900 border border-red-600 text-red-200 p-4 rounded-2xl mb-6 text-center font-medium blink-red">
+                    ⚠️ Once submitted, cash positions <strong>cannot be edited or deleted</strong>
+                </div>
+
                 <div class="flex justify-between mb-8">
                     <div>
                         <h2 class="text-3xl font-semibold">Welcome, <span id="cashierName" class="text-emerald-400"></span></h2>
@@ -141,7 +148,7 @@
     <script>
         let currentUser = null;
         let reportsDB = JSON.parse(localStorage.getItem('cactusReports')) || [];
-        let remindedSlots = new Set(); // prevent multiple reminders
+        let remindedSlots = new Set();
 
         const staffDB = {
             "amos01": { password: "1234", role: "cashier", fullName: "Amos Banda", branch: "Kabwe Main" },
@@ -159,7 +166,7 @@
             { label: "Closing Balance", time: "17:30", key: "closing" }
         ];
 
-        const reminderHours = [10, 12, 14, 16]; // exact hours for pop-up
+        const reminderHours = [10, 12, 14, 16];
 
         function getToday() { return new Date().toISOString().split('T')[0]; }
 
@@ -198,7 +205,6 @@
             `;
         }
 
-        // ==================== LIVE CLOCK ====================
         function startLiveClock() {
             const clockEl = document.getElementById('liveClock');
             setInterval(() => {
@@ -207,7 +213,6 @@
             }, 1000);
         }
 
-        // ==================== REMINDER SYSTEM ====================
         function checkForReminder() {
             if (currentUser.role !== 'cashier') return;
             const now = new Date();
@@ -215,7 +220,7 @@
             const minute = now.getMinutes();
 
             if (reminderHours.includes(hour) && minute === 0) {
-                const slotKey = `${hour}hrs`;
+                const slotKey = hour === 10 ? "10hrs" : hour === 12 ? "12hrs" : hour === 14 ? "14hrs" : "16hrs";
                 const today = getToday();
                 const alreadySubmitted = reportsDB.some(r => r.date === today && r.username === currentUser.username && r.timeKey === slotKey);
 
@@ -231,13 +236,16 @@
             document.getElementById('reminderModal').classList.add('hidden');
         }
 
-        // ==================== CASHIER VIEW ====================
+        // CASHIER VIEW with blinking warning
         function renderCashierView() {
             document.getElementById('cashierView').classList.remove('hidden');
             document.getElementById('managerView').classList.add('hidden');
             document.getElementById('cashierName').textContent = currentUser.fullName;
             document.getElementById('cashierBranch').textContent = currentUser.branch;
             document.getElementById('todayDate').textContent = new Date().toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+
+            // Show blinking red warning for cashiers
+            document.getElementById('nonEditableWarning').classList.remove('hidden');
 
             renderTimeButtons();
             renderTodayReports();
@@ -269,12 +277,14 @@
 
         function submitReport() {
             if (!selectedTimeKey) return alert("Please select a time slot");
+
             const amount = parseFloat(document.getElementById('cashAmount').value);
             if (isNaN(amount)) return alert("Please enter a valid cash amount");
 
             const today = getToday();
             const slot = reportTimes.find(t => t.key === selectedTimeKey);
 
+            // Remove any previous entry for this slot today (prevents duplicate)
             reportsDB = reportsDB.filter(r => !(r.date === today && r.username === currentUser.username && r.timeKey === selectedTimeKey));
 
             reportsDB.unshift({
@@ -298,7 +308,7 @@
             selectedTimeKey = null;
             document.getElementById('submitBtn').disabled = true;
 
-            alert(`✅ ${slot.label} submitted successfully!`);
+            alert(`✅ ${slot.label} submitted successfully!\n\nNote: This record cannot be edited later.`);
         }
 
         function renderTodayReports() {
@@ -323,7 +333,7 @@
             });
         }
 
-        // ==================== MANAGER DASHBOARD ====================
+        // Manager Dashboard (same as before)
         function populateMonthSelector() {
             const select = document.getElementById('monthSelector');
             select.innerHTML = '';
@@ -458,7 +468,7 @@
             renderUserInfo();
             populateMonthSelector();
             startLiveClock();
-            setInterval(checkForReminder, 60000); // check every minute
+            setInterval(checkForReminder, 30000); // check every 30 seconds
 
             if (currentUser.role === 'cashier') {
                 renderCashierView();
@@ -467,7 +477,7 @@
             }
         }
 
-        // Clean demo data (no closing balance pre-filled)
+        // Clean demo data
         function addDemoData() {
             if (reportsDB.length > 0) return;
             const today = getToday();
