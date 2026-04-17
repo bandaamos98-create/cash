@@ -30,14 +30,18 @@
             <div class="space-y-6">
                 <div>
                     <label class="block text-sm font-medium mb-2">Username / Employee ID</label>
-                    <input id="username" type="text" placeholder="e.g. amos01" class="w-full bg-gray-800 border border-gray-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-emerald-500">
+                    <input id="username" type="text" placeholder="e.g. amos01" 
+                           class="w-full bg-gray-800 border border-gray-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-emerald-500">
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-2">Password</label>
-                    <input id="password" type="password" placeholder="••••••••" class="w-full bg-gray-800 border border-gray-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-emerald-500">
+                    <input id="password" type="password" placeholder="••••••••" 
+                           class="w-full bg-gray-800 border border-gray-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-emerald-500">
                 </div>
-                <button onclick="handleLogin()" class="w-full bg-emerald-500 hover:bg-emerald-600 py-4 rounded-2xl font-semibold text-lg">SIGN IN</button>
-                <p class="text-center text-gray-400 text-sm">Demo: amos01 / 1234 or manager / 1234</p>
+                <button onclick="handleLogin()" 
+                        class="w-full bg-emerald-500 hover:bg-emerald-600 py-4 rounded-2xl font-semibold text-lg">
+                    SIGN IN
+                </button>
             </div>
         </div>
     </div>
@@ -68,7 +72,6 @@
 
             <!-- CASHIER VIEW -->
             <div id="cashierView" class="hidden">
-                <!-- Blinking red warning -->
                 <div class="bg-red-900 border border-red-600 text-red-200 p-4 rounded-2xl mb-6 text-center font-medium blink-red flex items-center justify-center gap-3">
                     <i class="fa-solid fa-lock"></i>
                     Once submitted, cash positions <strong>cannot be edited or deleted</strong>
@@ -76,7 +79,7 @@
 
                 <div class="flex justify-between mb-8">
                     <div>
-                        <h2 class="text-3xl font-semibold">Welcome, <span id="cashierName" class="text-emerald-400"></span></h2>
+                        <h2 class="text-3xl font-semibold">Welcome FLAs</h2>
                         <p id="cashierBranch" class="text-emerald-400 text-lg"></p>
                     </div>
                     <div class="text-right">
@@ -85,7 +88,6 @@
                     </div>
                 </div>
 
-                <!-- Today's Submissions – ALWAYS shows all 6 slots with default 0.00 -->
                 <div class="bg-gray-900 rounded-3xl p-8 mb-8">
                     <h3 class="text-xl font-semibold mb-6">Today's Cash Positions</h3>
                     <div id="todayReports" class="grid grid-cols-6 gap-4"></div>
@@ -102,9 +104,11 @@
                             <label class="block text-sm font-medium mb-3">Cash at Hand (ZMW)</label>
                             <div class="relative">
                                 <span class="absolute left-6 top-1/2 -translate-y-1/2 text-3xl text-gray-400">K</span>
-                                <input id="cashAmount" type="number" step="0.01" placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-2xl px-14 py-6 text-4xl font-medium focus:outline-none focus:border-emerald-500">
+                                <input id="cashAmount" type="number" step="0.01" placeholder="0.00" 
+                                       class="w-full bg-gray-800 border border-gray-700 rounded-2xl px-14 py-6 text-4xl font-medium focus:outline-none focus:border-emerald-500">
                             </div>
-                            <button onclick="submitReport()" id="submitBtn" disabled class="mt-8 w-full bg-emerald-500 hover:bg-emerald-600 py-6 rounded-2xl font-semibold text-xl flex items-center justify-center gap-2">
+                            <button onclick="submitReport()" id="submitBtn" disabled 
+                                    class="mt-8 w-full bg-emerald-500 hover:bg-emerald-600 py-6 rounded-2xl font-semibold text-xl flex items-center justify-center gap-2">
                                 <i class="fa-solid fa-paper-plane"></i> SUBMIT NOW
                             </button>
                         </div>
@@ -149,23 +153,23 @@
 
     <script>
         let currentUser = null;
-        let reportsDB = JSON.parse(localStorage.getItem('cactusReports')) || [];
+        let reportsDB = [];   // Fresh start - no previous data
         let remindedSlots = new Set();
 
         const staffDB = {
-            "amos01": { password: "1234", role: "cashier", fullName: "Amos Banda", branch: "Kabwe Main" },
-            "sarah01": { password: "1234", role: "cashier", fullName: "Sarah Mwamba", branch: "Lusaka Woodlands" },
-            "john01":  { password: "1234", role: "cashier", fullName: "John Phiri", branch: "Kabwe Mall" },
-            "manager": { password: "1234", role: "manager", fullName: "Management", branch: "Head Office" }
+            "amos01":   { password: "1234", role: "cashier", fullName: "Amos Banda",      branch: "Kabwe Main",     email: "kabwemain@cactus.com" },
+            "mukuyu01": { password: "1234", role: "cashier", fullName: "Mukuyu Mall Staff", branch: "Mukuyu Mall",   email: "mukuyumall@cactus.com" },
+            "kabwe01":  { password: "1234", role: "cashier", fullName: "Kabwe Mall Staff",  branch: "Kabwe Mall",    email: "kabwemall@cactus.com" },
+            "manager":  { password: "1234", role: "manager", fullName: "Management",       branch: "Head Office",   email: "management@cactus.com" }
         };
 
         const reportTimes = [
-            { label: "Opening Balance", time: "08:00", key: "opening" },
-            { label: "10:00 hrs",       time: "10:00", key: "10hrs" },
-            { label: "12:00 hrs",       time: "12:00", key: "12hrs" },
-            { label: "14:00 hrs",       time: "14:00", key: "14hrs" },
-            { label: "16:00 hrs",       time: "16:00", key: "16hrs" },
-            { label: "Closing Balance", time: "17:30", key: "closing" }
+            { label: "Opening",   time: "08:00", key: "opening" },
+            { label: "10:00 hrs", time: "10:00", key: "10hrs" },
+            { label: "12:00 hrs", time: "12:00", key: "12hrs" },
+            { label: "14:00 hrs", time: "14:00", key: "14hrs" },
+            { label: "16:00 hrs", time: "16:00", key: "16hrs" },
+            { label: "Closing",   time: "17:30", key: "closing" }
         ];
 
         const reminderHours = [10, 12, 14, 16];
@@ -185,7 +189,7 @@
                 document.getElementById('mainApp').classList.remove('hidden');
                 renderApp();
             } else {
-                alert("Invalid credentials.\nTry: amos01 / 1234 or manager / 1234");
+                alert("Invalid username or password.");
             }
         }
 
@@ -222,7 +226,7 @@
             const minute = now.getMinutes();
 
             if (reminderHours.includes(hour) && minute === 0) {
-                const slotKey = hour === 10 ? "10hrs" : hour === 12 ? "12hrs" : hour === 14 ? "14hrs" : "16hrs";
+                let slotKey = hour === 10 ? "10hrs" : hour === 12 ? "12hrs" : hour === 14 ? "14hrs" : "16hrs";
                 const today = getToday();
                 const alreadySubmitted = reportsDB.some(r => r.date === today && r.username === currentUser.username && r.timeKey === slotKey);
 
@@ -242,12 +246,11 @@
         function renderCashierView() {
             document.getElementById('cashierView').classList.remove('hidden');
             document.getElementById('managerView').classList.add('hidden');
-            document.getElementById('cashierName').textContent = currentUser.fullName;
             document.getElementById('cashierBranch').textContent = currentUser.branch;
             document.getElementById('todayDate').textContent = new Date().toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
 
             renderTimeButtons();
-            renderTodayReports();   // now shows ALL slots with 0.00 by default
+            renderTodayReports();
         }
 
         function renderTimeButtons() {
@@ -285,10 +288,8 @@
             const today = getToday();
             const slot = reportTimes.find(t => t.key === selectedTimeKey);
 
-            // Remove any previous entry for this exact slot today
             reportsDB = reportsDB.filter(r => !(r.date === today && r.username === currentUser.username && r.timeKey === selectedTimeKey));
 
-            // Add the new submission
             reportsDB.unshift({
                 id: Date.now(),
                 date: today,
@@ -304,16 +305,15 @@
 
             saveReports();
             renderTimeButtons();
-            renderTodayReports();   // refresh the grid with real amount
+            renderTodayReports();
 
             document.getElementById('cashAmount').value = '';
             selectedTimeKey = null;
             document.getElementById('submitBtn').disabled = true;
 
-            alert(`✅ ${slot.label} submitted successfully!\n\nNote: This record cannot be edited later.`);
+            alert(`✅ ${slot.label} submitted successfully!\n\nThis record cannot be edited later.`);
         }
 
-        // NEW: Always show all 6 slots – default 0.00 if not submitted yet
         function renderTodayReports() {
             const today = getToday();
             const container = document.getElementById('todayReports');
@@ -321,22 +321,22 @@
 
             reportTimes.forEach(slot => {
                 const report = reportsDB.find(r => r.date === today && r.username === currentUser.username && r.timeKey === slot.key);
-                const amount = report ? report.amount : 0;
-                const submittedTime = report ? new Date(report.submittedAt).toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'}) : '—';
+                const amount = report ? report.amount : 0.00;
+                const submittedTime = report ? new Date(report.submittedAt).toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'}) : 'Not submitted';
 
                 const div = document.createElement('div');
                 div.className = `rounded-3xl p-6 text-center ${report ? 'bg-emerald-900/30 border border-emerald-500' : 'bg-gray-800'}`;
                 div.innerHTML = `
                     <p class="text-emerald-400 text-sm">${slot.label}</p>
-                    <p class="text-4xl font-semibold mt-3">${Number(amount).toLocaleString('en-US')}</p>
-                    <p class="text-xs text-gray-400 mt-2">ZMW</p>
-                    <p class="text-[10px] text-gray-500 mt-1">Submitted: ${submittedTime}</p>
+                    <p class="text-4xl font-semibold mt-3">${amount.toLocaleString('en-US', {minimumFractionDigits: 2})}</p>
+                    <p class="text-xs text-gray-400 mt-1">ZMW</p>
+                    <p class="text-[10px] text-gray-500 mt-2">Submitted: ${submittedTime}</p>
                 `;
                 container.appendChild(div);
             });
         }
 
-        // MANAGER DASHBOARD (unchanged – shows only actual submissions)
+        // MANAGER DASHBOARD
         function populateMonthSelector() {
             const select = document.getElementById('monthSelector');
             select.innerHTML = '';
@@ -397,7 +397,7 @@
                                 ${dayReports.map(r => `
                                     <div class="bg-gray-800 rounded-2xl p-5 text-center">
                                         <p class="text-xs text-emerald-400">${r.label}</p>
-                                        <p class="text-3xl font-semibold mt-2">${Number(r.amount).toLocaleString('en-US')}</p>
+                                        <p class="text-3xl font-semibold mt-2">${Number(r.amount).toLocaleString('en-US', {minimumFractionDigits: 2})}</p>
                                         <p class="text-xs text-gray-400 mt-2">${r.time}<br><span class="text-emerald-500">Submitted: ${new Date(r.submittedAt).toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'})}</span></p>
                                     </div>
                                 `).join('')}
@@ -450,7 +450,7 @@
                             ${dayReports.map(r => `
                                 <div class="bg-gray-800 rounded-2xl p-6 text-center">
                                     <p class="text-xs text-emerald-400">${r.label}</p>
-                                    <p class="text-3xl font-semibold mt-3">${Number(r.amount).toLocaleString('en-US')}</p>
+                                    <p class="text-3xl font-semibold mt-3">${Number(r.amount).toLocaleString('en-US', {minimumFractionDigits: 2})}</p>
                                     <p class="text-xs text-gray-400 mt-3">${r.time}<br>Submitted: <span class="text-emerald-500">${new Date(r.submittedAt).toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'})}</span></p>
                                 </div>
                             `).join('')}
@@ -480,19 +480,9 @@
             }
         }
 
-        // Clean demo data – no pre-filled closing balance
-        function addDemoData() {
-            if (reportsDB.length > 0) return;
-            const today = getToday();
-            reportsDB = [
-                { id: 1001, date: today, username: "amos01", fullName: "Amos Banda", branch: "Kabwe Main", timeKey: "opening", time: "08:00", label: "Opening Balance", amount: 2850000, submittedAt: new Date(Date.now() - 3600000).toISOString() },
-                { id: 1002, date: today, username: "amos01", fullName: "Amos Banda", branch: "Kabwe Main", timeKey: "10hrs", time: "10:00", label: "10:00 hrs", amount: 3420000, submittedAt: new Date(Date.now() - 7200000).toISOString() }
-            ];
-            saveReports();
-        }
-
         window.onload = () => {
-            addDemoData();
+            reportsDB = [];        // Fresh start - no previous data
+            saveReports();
         };
     </script>
 </body>
