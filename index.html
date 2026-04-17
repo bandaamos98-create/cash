@@ -11,13 +11,10 @@
         body { font-family: 'Inter', system-ui, sans-serif; }
         .modal { animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-        .blink-red { animation: blink 1.2s infinite; }
-        @keyframes blink { 0%, 100% { color: #ef4444; } 50% { color: #f87171; } }
         .live-clock { font-variant-numeric: tabular-nums; }
     </style>
 </head>
 <body class="bg-gray-950 text-white">
-
     <!-- LOGIN SCREEN -->
     <div id="loginScreen" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-900 to-gray-950">
         <div class="max-w-md w-full bg-gray-900 rounded-3xl shadow-2xl p-8">
@@ -26,11 +23,10 @@
                 <h1 class="text-4xl font-bold">Cactus</h1>
             </div>
             <p class="text-center text-emerald-400 text-xl mb-8">Western Union • Staff Portal</p>
-           
             <div class="space-y-6">
                 <div>
                     <label class="block text-sm font-medium mb-2">Username / Employee ID</label>
-                    <input id="username" type="text" value="amos01" class="w-full bg-gray-800 border border-gray-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-emerald-500">
+                    <input id="username" type="text" value="manager" class="w-full bg-gray-800 border border-gray-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-emerald-500">
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-2">Password</label>
@@ -50,7 +46,7 @@
                     <div class="w-9 h-9 bg-emerald-500 rounded-2xl flex items-center justify-center text-2xl">🌵</div>
                     <div>
                         <h1 class="text-2xl font-bold">Cactus Money Transfers</h1>
-                        <p class="text-xs text-emerald-400">Western Union • Cash Position Tracking</p>
+                        <p class="text-xs text-emerald-400">Western Union • Real-time Branch Monitoring</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-8">
@@ -75,12 +71,10 @@
                         <i class="fa-solid fa-flag-checkered"></i> END DAY REPORT
                     </button>
                 </div>
-
                 <div class="bg-gray-900 rounded-3xl p-8 mb-8">
                     <h3 class="text-xl font-semibold mb-6">Today's Cash Positions</h3>
                     <div id="todayReports" class="grid grid-cols-6 gap-4"></div>
                 </div>
-
                 <div class="bg-gray-900 rounded-3xl p-8">
                     <h3 class="text-xl font-semibold mb-6">Submit Cash Position</h3>
                     <div class="grid grid-cols-2 gap-8">
@@ -104,16 +98,13 @@
 
             <!-- MANAGER VIEW -->
             <div id="managerView" class="hidden">
-                <div class="flex justify-between items-center mb-8">
-                    <h2 class="text-3xl font-semibold">Management Dashboard - All Branches</h2>
-                    <select id="monthSelector" onchange="renderManagerDashboard()" class="bg-gray-800 border border-gray-700 rounded-2xl px-5 py-3 text-white"></select>
-                </div>
-                <div id="managerDashboard" class="space-y-10"></div>
+                <h2 class="text-3xl font-semibold mb-8">Management Dashboard - All Branches Live Submissions</h2>
+                <div id="managerDashboard" class="space-y-12"></div>
             </div>
         </div>
     </div>
 
-    <!-- END DAY MODAL -->
+    <!-- END DAY MODAL (Cashier) -->
     <div id="endDayModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[100]">
         <div class="modal bg-gray-900 rounded-3xl w-full max-w-7xl max-h-[95vh] overflow-hidden flex flex-col">
             <div class="p-6 border-b border-gray-700 flex justify-between items-center">
@@ -128,6 +119,34 @@
                 <button onclick="closeEndDayModal()" class="px-8 py-4 text-gray-400 hover:text-white">Cancel</button>
                 <button onclick="submitEndDayReport()" class="bg-emerald-500 hover:bg-emerald-600 px-10 py-4 rounded-3xl font-semibold">SUBMIT END DAY REPORT</button>
             </div>
+        </div>
+    </div>
+
+    <!-- END DAY REPORTS LIST MODAL -->
+    <div id="endDayListModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[100]">
+        <div class="modal bg-gray-900 rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+            <div class="p-6 border-b border-gray-700 flex justify-between items-center">
+                <div>
+                    <p class="text-amber-400 font-medium">End Day Reports</p>
+                    <p id="endDayListHeader" class="text-2xl font-semibold"></p>
+                </div>
+                <button onclick="closeEndDayListModal()" class="text-4xl text-gray-400 hover:text-white">&times;</button>
+            </div>
+            <div class="flex-1 p-6 overflow-auto" id="endDayListContent"></div>
+        </div>
+    </div>
+
+    <!-- CASH POSITION DATES MODAL (Monthly) -->
+    <div id="cashPositionModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[100]">
+        <div class="modal bg-gray-900 rounded-3xl w-full max-w-6xl max-h-[95vh] overflow-hidden flex flex-col">
+            <div class="p-6 border-b border-gray-700 flex justify-between items-center">
+                <div>
+                    <p class="text-emerald-400 font-medium">Monthly Cash Position Reports</p>
+                    <p id="cashPositionHeader" class="text-2xl font-semibold"></p>
+                </div>
+                <button onclick="closeCashPositionModal()" class="text-4xl text-gray-400 hover:text-white">&times;</button>
+            </div>
+            <div class="flex-1 p-6 overflow-auto" id="cashPositionContent"></div>
         </div>
     </div>
 
@@ -198,6 +217,7 @@
             }, 1000);
         }
 
+        // ===================== CASHIER FUNCTIONS =====================
         function renderCashierView() {
             document.getElementById('cashierView').classList.remove('hidden');
             document.getElementById('managerView').classList.add('hidden');
@@ -235,10 +255,8 @@
             if (!amountStr) return alert("Please enter the cash amount");
             const amount = parseFloat(amountStr);
             if (isNaN(amount)) return alert("Please enter a valid number");
-
             const today = getToday();
             const slot = reportTimes.find(t => t.key === selectedTimeKey);
-
             reportsDB = reportsDB.filter(r => !(r.date === today && r.username === currentUser.username && r.timeKey === selectedTimeKey));
             reportsDB.unshift({
                 id: Date.now(),
@@ -252,7 +270,6 @@
                 amount: amount,
                 submittedAt: new Date().toISOString()
             });
-
             saveReports();
             renderTimeButtons();
             renderTodayReports();
@@ -286,7 +303,6 @@
             if (currentUser.role !== 'cashier') return alert("Only cashiers can submit End Day reports.");
             const today = getToday();
             document.getElementById('endDayBranch').textContent = `${currentUser.branch} • ${today}`;
-
             const content = document.getElementById('endDayContent');
             content.innerHTML = `
                 <div class="space-y-12">
@@ -328,14 +344,12 @@
                             <span id="wu_closing" class="text-emerald-400">0.00</span>
                         </div>
                     </div>
-
                     <div>
                         <h3 class="text-2xl font-bold mb-6">OTHER SERVICES</h3>
                         <div id="otherServicesContainer" class="grid grid-cols-3 gap-6"></div>
                     </div>
                 </div>
             `;
-
             let html = '';
             otherServices.forEach(svc => {
                 const key = svc.toLowerCase().replace(/ /g, '');
@@ -368,9 +382,7 @@
             document.getElementById('wu_closing').textContent = closing.toLocaleString('en-US', {minimumFractionDigits: 2});
         }
 
-        function closeEndDayModal() {
-            document.getElementById('endDayModal').classList.add('hidden');
-        }
+        function closeEndDayModal() { document.getElementById('endDayModal').classList.add('hidden'); }
 
         function submitEndDayReport() {
             const today = getToday();
@@ -387,54 +399,137 @@
             closeEndDayModal();
         }
 
+        // ===================== MANAGER DASHBOARD =====================
         function renderManagerDashboard() {
             document.getElementById('managerView').classList.remove('hidden');
             document.getElementById('cashierView').classList.add('hidden');
             const container = document.getElementById('managerDashboard');
             container.innerHTML = '';
 
-            const grouped = {};
-            endDayReports.forEach(r => {
-                if (!grouped[r.branch]) grouped[r.branch] = [];
-                grouped[r.branch].push(r);
-            });
+            const allBranches = new Set();
+            reportsDB.forEach(r => allBranches.add(r.branch));
+            endDayReports.forEach(r => allBranches.add(r.branch));
 
-            Object.keys(grouped).forEach(branch => {
+            if (allBranches.size === 0) {
+                container.innerHTML = `<div class="text-center py-20 text-gray-400">No submissions from branches yet.</div>`;
+                return;
+            }
+
+            Array.from(allBranches).sort().forEach(branch => {
+                const today = getToday();
+                const todayReports = reportsDB.filter(r => r.branch === branch && r.date === today);
+
+                let todayHTML = '';
+                if (todayReports.length > 0) {
+                    todayHTML = `<div class="mt-6"><p class="text-emerald-400 mb-3 font-medium">Today's Cash Positions</p><div class="grid grid-cols-6 gap-3">`;
+                    reportTimes.forEach(slot => {
+                        const rep = todayReports.find(r => r.timeKey === slot.key);
+                        const amount = rep ? rep.amount.toLocaleString('en-US', {minimumFractionDigits: 2}) : '—';
+                        todayHTML += `
+                            <div class="bg-gray-800 rounded-2xl p-4 text-center">
+                                <p class="text-xs text-gray-400">${slot.label}</p>
+                                <p class="text-xl font-semibold mt-1">${amount}</p>
+                            </div>`;
+                    });
+                    todayHTML += `</div></div>`;
+                } else {
+                    todayHTML = `<p class="text-gray-400 mt-6">No cash positions submitted today</p>`;
+                }
+
                 const card = document.createElement('div');
                 card.className = "bg-gray-900 rounded-3xl p-8";
                 card.innerHTML = `
-                    <div class="flex justify-between items-center mb-6">
+                    <div class="flex justify-between items-start">
                         <div>
-                            <p class="text-emerald-400 font-medium">Branch: ${branch}</p>
+                            <p class="text-2xl font-semibold">${branch}</p>
+                            <p class="text-emerald-400 text-sm">Live Cash Position Monitoring</p>
                         </div>
-                        <button onclick="showBranchEndDay('${branch}')" class="bg-amber-600 hover:bg-amber-700 px-5 py-2 rounded-2xl text-sm font-medium flex items-center gap-2">
-                            <i class="fa-solid fa-flag-checkered"></i> View End Day Reports
-                        </button>
+                        <div class="flex gap-3">
+                            <button onclick="showEndDayDates('${branch}')" class="bg-amber-600 hover:bg-amber-700 px-6 py-3 rounded-2xl font-medium flex items-center gap-2">
+                                <i class="fa-solid fa-flag-checkered"></i> End Day Reports
+                            </button>
+                            <button onclick="showCashPositionDates('${branch}')" class="bg-emerald-600 hover:bg-emerald-700 px-6 py-3 rounded-2xl font-medium flex items-center gap-2">
+                                <i class="fa-solid fa-chart-bar"></i> Monthly Cash Positions
+                            </button>
+                        </div>
                     </div>
+                    ${todayHTML}
                 `;
                 container.appendChild(card);
             });
-
-            if (Object.keys(grouped).length === 0) {
-                container.innerHTML = `<div class="text-center py-20 text-gray-400">No End Day Reports submitted yet.</div>`;
-            }
         }
 
-        function showBranchEndDay(branch) {
+        function showEndDayDates(branch) {
             const filtered = endDayReports.filter(r => r.branch === branch).sort((a,b) => new Date(b.date) - new Date(a.date));
-            let html = '<div class="space-y-4">';
-            filtered.forEach(r => {
-                html += `
-                    <div class="bg-gray-800 p-6 rounded-3xl flex justify-between items-center">
-                        <div>
-                            <p class="text-2xl">${r.date}</p>
+            let html = `<div class="grid grid-cols-4 gap-4">`;
+            if (filtered.length === 0) html += `<p class="col-span-4 text-center py-12 text-gray-400">No End Day Reports yet.</p>`;
+            else {
+                filtered.forEach(r => {
+                    html += `
+                        <div onclick="viewEndDayReport('${r.id}')" class="bg-gray-800 hover:bg-gray-700 cursor-pointer rounded-2xl p-6 text-center">
+                            <p class="text-2xl font-semibold">${r.date}</p>
                             <p class="text-sm text-gray-400">${r.fullName}</p>
-                        </div>
-                        <p class="text-emerald-400">Submitted</p>
+                        </div>`;
+                });
+            }
+            html += `</div>`;
+            document.getElementById('endDayListHeader').innerHTML = `${branch} - End Day Reports`;
+            document.getElementById('endDayListContent').innerHTML = html;
+            document.getElementById('endDayListModal').classList.remove('hidden');
+        }
+
+        function viewEndDayReport(id) {
+            const report = endDayReports.find(r => r.id === parseInt(id));
+            if (report) alert(`End Day Report\nBranch: ${report.branch}\nDate: ${report.date}\nSubmitted by: ${report.fullName}`);
+        }
+
+        function closeEndDayListModal() {
+            document.getElementById('endDayListModal').classList.add('hidden');
+        }
+
+        function showCashPositionDates(branch) {
+            const dates = [...new Set(reportsDB.filter(r => r.branch === branch).map(r => r.date))].sort((a,b) => new Date(b) - new Date(a));
+            let html = `<div class="grid grid-cols-5 gap-4">`;
+            if (dates.length === 0) {
+                html += `<p class="col-span-5 text-center py-12 text-gray-400">No cash positions submitted yet.</p>`;
+            } else {
+                dates.forEach(date => {
+                    html += `
+                        <div onclick="viewDailyCashPositions('${branch}', '${date}')" class="bg-gray-800 hover:bg-gray-700 cursor-pointer rounded-2xl p-6 text-center transition-all">
+                            <p class="text-2xl font-semibold">${date}</p>
+                            <p class="text-emerald-400 text-sm mt-2">View Details →</p>
+                        </div>`;
+                });
+            }
+            html += `</div>`;
+            document.getElementById('cashPositionHeader').innerHTML = `${branch} - All Cash Position Dates`;
+            document.getElementById('cashPositionContent').innerHTML = html;
+            document.getElementById('cashPositionModal').classList.remove('hidden');
+        }
+
+        function viewDailyCashPositions(branch, date) {
+            const dayReports = reportsDB.filter(r => r.branch === branch && r.date === date)
+                .sort((a,b) => reportTimes.map(t=>t.key).indexOf(a.timeKey) - reportTimes.map(t=>t.key).indexOf(b.timeKey));
+
+            let html = `<h3 class="text-2xl font-semibold mb-6">${date} - ${branch}</h3><div class="grid grid-cols-6 gap-4">`;
+            reportTimes.forEach(slot => {
+                const rep = dayReports.find(r => r.timeKey === slot.key);
+                const amount = rep ? rep.amount.toLocaleString('en-US', {minimumFractionDigits: 2}) : '—';
+                const time = rep ? new Date(rep.submittedAt).toLocaleTimeString('en-GB',{hour:'2-digit', minute:'2-digit'}) : '—';
+                html += `
+                    <div class="rounded-3xl p-6 text-center ${rep ? 'bg-emerald-900/30 border border-emerald-500' : 'bg-gray-800'}">
+                        <p class="text-emerald-400 text-sm">${slot.label}</p>
+                        <p class="text-4xl font-semibold mt-4">${amount}</p>
+                        <p class="text-xs text-gray-400">ZMW</p>
+                        <p class="text-[10px] text-gray-500 mt-4">${time}</p>
                     </div>`;
             });
-            html += '</div>';
-            alert(`End Day Reports for ${branch}\n\n${filtered.length} reports found.`);
+            html += `</div>`;
+            document.getElementById('cashPositionContent').innerHTML = html;
+        }
+
+        function closeCashPositionModal() {
+            document.getElementById('cashPositionModal').classList.add('hidden');
         }
 
         function renderApp() {
