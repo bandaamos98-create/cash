@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cactus Money Transfers • Staff Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        .modal { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .live-clock { font-variant-numeric: tabular-nums; }
+    </style>
+</head>
+<body class="bg-gray-950 text-white">
+
+    <!-- LOGIN SCREEN -->
+    <div id="loginScreen" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-900 to-gray-950">
+        <div class="max-w-md w-full bg-gray-900 rounded-3xl shadow-2xl p-8">
+            <div class="flex items-center justify-center gap-3 mb-8">
+                <div class="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center text-3xl">🌵</div>
+                <h1 class="text-4xl font-bold">Cactus</h1>
+            </div>
+            <p class="text-center text-emerald-400 text-xl mb-8">Western Union • Staff Portal</p>
+            
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Username / Employee ID</label>
+                    <input id="username" type="text" placeholder="e.g. amos01" class="w-full bg-gray-800 border border-gray-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Password</label>
+                    <input id="password" type="password" placeholder="••••••••" class="w-full bg-gray-800 border border-gray-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-emerald-500">
+                </div>
+                <button onclick="handleLogin()" class="w-full bg-emerald-500 hover:bg-emerald-600 py-4 rounded-2xl font-semibold text-lg">SIGN IN</button>
+                <p class="text-center text-gray-400 text-sm">Demo: amos01 / 1234 or manager / 1234</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div id="mainApp" class="hidden min-h-screen">
+        <nav class="bg-gray-900 border-b border-gray-800 sticky top-0 z-50">
+            <div class="max-w-screen-2xl mx-auto px-8 py-5 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 bg-emerald-500 rounded-2xl flex items-center justify-center text-2xl">🌵</div>
+                    <div>
+                        <h1 class="text-2xl font-bold">Cactus Money Transfers</h1>
+                        <p class="text-xs text-emerald-400">Western Union • Cash Position Tracking</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-8">
+                    <div id="liveClock" class="live-clock text-xl font-mono bg-gray-800 px-5 py-2 rounded-2xl text-emerald-400"></div>
+                    <div id="userInfo" class="flex items-center gap-3"></div>
+                    <button onclick="logout()" class="flex items-center gap-2 text-gray-400 hover:text-white">
+                        <i class="fa-solid fa-right-from-bracket"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="max-w-screen-2xl mx-auto px-8 py-8">
+
+            <!-- CASHIER VIEW -->
+            <div id="cashierView" class="hidden">
+                <div class="flex justify-between mb-8">
+                    <div>
+                        <h2 class="text-3xl font-semibold">Welcome, <span id="cashierName" class="text-emerald-400"></span></h2>
+                        <p id="cashierBranch" class="text-emerald-400 text-lg"></p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm text-gray-400">Today</p>
+                        <p id="todayDate" class="text-2xl font-semibold"></p>
+                    </div>
+                </div>
+
+                <div class="bg-gray-900 rounded-3xl p-8 mb-8">
+                    <h3 class="text-xl font-semibold mb-6">Today's Submissions</h3>
+                    <div id="todayReports" class="grid grid-cols-6 gap-4"></div>
+                </div>
+
+                <div class="bg-gray-900 rounded-3xl p-8">
+                    <h3 class="text-xl font-semibold mb-6">Submit Cash Position</h3>
+                    <div class="grid grid-cols-2 gap-8">
+                        <div>
+                            <label class="block text-sm font-medium mb-3">Time Slot</label>
+                            <div id="timeButtons" class="grid grid-cols-6 gap-3"></div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-3">Cash at Hand (ZMW)</label>
+                            <div class="relative">
+                                <span class="absolute left-6 top-1/2 -translate-y-1/2 text-3xl text-gray-400">K</span>
+                                <input id="cashAmount" type="number" step="0.01" placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-2xl px-14 py-6 text-4xl font-medium focus:outline-none focus:border-emerald-500">
+                            </div>
+                            <button onclick="submitReport()" id="submitBtn" disabled class="mt-8 w-full bg-emerald-500 hover:bg-emerald-600 py-6 rounded-2xl font-semibold text-xl flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-paper-plane"></i> SUBMIT NOW
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MANAGER DASHBOARD -->
+            <div id="managerView" class="hidden">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-3xl font-semibold">Management Dashboard - All Branches</h2>
+                    <select id="monthSelector" onchange="renderManagerDashboard()" class="bg-gray-800 border border-gray-700 rounded-2xl px-5 py-3 text-white"></select>
+                </div>
+                <div id="managerDashboard" class="space-y-10"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- REMINDER MODAL -->
+    <div id="reminderModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[100]">
+        <div class="modal bg-emerald-600 text-white rounded-3xl p-8 max-w-md w-full text-center">
+            <i class="fa-solid fa-bell text-6xl mb-4"></i>
+            <h3 id="reminderTitle" class="text-3xl font-bold mb-2"></h3>
+            <p class="text-emerald-100 mb-8">Please submit your cash position now</p>
+            <button onclick="dismissReminder()" class="w-full bg-white text-emerald-600 py-4 rounded-2xl font-semibold">I will submit now</button>
+        </div>
+    </div>
+
+    <!-- MONTHLY MODAL -->
+    <div id="monthlyModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+        <div class="modal bg-gray-900 rounded-3xl w-full max-w-5xl max-h-[90vh] overflow-hidden">
+            <div class="p-6 border-b border-gray-700 flex justify-between items-center">
+                <div>
+                    <p id="modalBranch" class="text-emerald-400 font-medium"></p>
+                    <p id="modalFLA" class="text-2xl font-semibold"></p>
+                </div>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-white text-3xl">&times;</button>
+            </div>
+            <div class="p-8 overflow-auto max-h-[calc(90vh-80px)]" id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let reportsDB = JSON.parse(localStorage.getItem('cactusReports')) || [];
+        let remindedSlots = new Set(); // prevent multiple reminders
+
+        const staffDB = {
+            "amos01": { password: "1234", role: "cashier", fullName: "Amos Banda", branch: "Kabwe Main" },
+            "sarah01": { password: "1234", role: "cashier", fullName: "Sarah Mwamba", branch: "Lusaka Woodlands" },
+            "john01":  { password: "1234", role: "cashier", fullName: "John Phiri", branch: "Kabwe Mall" },
+            "manager": { password: "1234", role: "manager", fullName: "Management", branch: "Head Office" }
+        };
+
+        const reportTimes = [
+            { label: "Opening Balance", time: "08:00", key: "opening" },
+            { label: "10:00 hrs",       time: "10:00", key: "10hrs" },
+            { label: "12:00 hrs",       time: "12:00", key: "12hrs" },
+            { label: "14:00 hrs",       time: "14:00", key: "14hrs" },
+            { label: "16:00 hrs",       time: "16:00", key: "16hrs" },
+            { label: "Closing Balance", time: "17:30", key: "closing" }
+        ];
+
+        const reminderHours = [10, 12, 14, 16]; // exact hours for pop-up
+
+        function getToday() { return new Date().toISOString().split('T')[0]; }
+
+        function saveReports() {
+            localStorage.setItem('cactusReports', JSON.stringify(reportsDB));
+        }
+
+        function handleLogin() {
+            const username = document.getElementById('username').value.trim().toLowerCase();
+            const password = document.getElementById('password').value;
+            if (staffDB[username] && staffDB[username].password === password) {
+                currentUser = { username, ...staffDB[username] };
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                renderApp();
+            } else {
+                alert("Invalid credentials.\nTry: amos01 / 1234 or manager / 1234");
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('mainApp').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+        }
+
+        function renderUserInfo() {
+            document.getElementById('userInfo').innerHTML = `
+                <div class="bg-gray-800 rounded-3xl px-5 py-2 flex items-center gap-3">
+                    <div class="text-emerald-400">🌵</div>
+                    <div>
+                        <p class="font-semibold">${currentUser.fullName}</p>
+                        <p class="text-xs text-gray-400">${currentUser.branch}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ==================== LIVE CLOCK ====================
+        function startLiveClock() {
+            const clockEl = document.getElementById('liveClock');
+            setInterval(() => {
+                const now = new Date();
+                clockEl.textContent = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            }, 1000);
+        }
+
+        // ==================== REMINDER SYSTEM ====================
+        function checkForReminder() {
+            if (currentUser.role !== 'cashier') return;
+            const now = new Date();
+            const hour = now.getHours();
+            const minute = now.getMinutes();
+
+            if (reminderHours.includes(hour) && minute === 0) {
+                const slotKey = `${hour}hrs`;
+                const today = getToday();
+                const alreadySubmitted = reportsDB.some(r => r.date === today && r.username === currentUser.username && r.timeKey === slotKey);
+
+                if (!alreadySubmitted && !remindedSlots.has(slotKey)) {
+                    remindedSlots.add(slotKey);
+                    document.getElementById('reminderTitle').innerHTML = `🕒 It's ${hour}:00 hrs<br>Time to submit your cash position!`;
+                    document.getElementById('reminderModal').classList.remove('hidden');
+                }
+            }
+        }
+
+        function dismissReminder() {
+            document.getElementById('reminderModal').classList.add('hidden');
+        }
+
+        // ==================== CASHIER VIEW ====================
+        function renderCashierView() {
+            document.getElementById('cashierView').classList.remove('hidden');
+            document.getElementById('managerView').classList.add('hidden');
+            document.getElementById('cashierName').textContent = currentUser.fullName;
+            document.getElementById('cashierBranch').textContent = currentUser.branch;
+            document.getElementById('todayDate').textContent = new Date().toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+
+            renderTimeButtons();
+            renderTodayReports();
+        }
+
+        function renderTimeButtons() {
+            const container = document.getElementById('timeButtons');
+            container.innerHTML = '';
+            const today = getToday();
+
+            reportTimes.forEach(slot => {
+                const alreadySubmitted = reportsDB.some(r => r.date === today && r.username === currentUser.username && r.timeKey === slot.key);
+                const btn = document.createElement('button');
+                btn.className = `p-5 rounded-2xl border-2 text-center transition-all flex-1 ${alreadySubmitted ? 'border-emerald-600 bg-emerald-950/30 line-through opacity-75 cursor-not-allowed' : 'border-emerald-400 hover:border-emerald-500 hover:bg-emerald-950'}`;
+                btn.innerHTML = `<p class="font-medium">${slot.label}</p><p class="text-xs mt-1">${slot.time}</p>`;
+                btn.disabled = alreadySubmitted;
+                btn.onclick = () => selectTime(slot.key, btn);
+                container.appendChild(btn);
+            });
+        }
+
+        let selectedTimeKey = null;
+        function selectTime(key, btnElement) {
+            selectedTimeKey = key;
+            document.querySelectorAll('#timeButtons button').forEach(b => b.classList.remove('ring-2', 'ring-emerald-500'));
+            btnElement.classList.add('ring-2', 'ring-emerald-500');
+            document.getElementById('submitBtn').disabled = false;
+        }
+
+        function submitReport() {
+            if (!selectedTimeKey) return alert("Please select a time slot");
+            const amount = parseFloat(document.getElementById('cashAmount').value);
+            if (isNaN(amount)) return alert("Please enter a valid cash amount");
+
+            const today = getToday();
+            const slot = reportTimes.find(t => t.key === selectedTimeKey);
+
+            reportsDB = reportsDB.filter(r => !(r.date === today && r.username === currentUser.username && r.timeKey === selectedTimeKey));
+
+            reportsDB.unshift({
+                id: Date.now(),
+                date: today,
+                username: currentUser.username,
+                fullName: currentUser.fullName,
+                branch: currentUser.branch,
+                timeKey: selectedTimeKey,
+                time: slot.time,
+                label: slot.label,
+                amount: amount,
+                submittedAt: new Date().toISOString()
+            });
+
+            saveReports();
+            renderTimeButtons();
+            renderTodayReports();
+
+            document.getElementById('cashAmount').value = '';
+            selectedTimeKey = null;
+            document.getElementById('submitBtn').disabled = true;
+
+            alert(`✅ ${slot.label} submitted successfully!`);
+        }
+
+        function renderTodayReports() {
+            const today = getToday();
+            const myReports = reportsDB.filter(r => r.date === today && r.username === currentUser.username)
+                .sort((a,b) => reportTimes.findIndex(t=>t.key===a.timeKey) - reportTimes.findIndex(t=>t.key===b.timeKey));
+
+            const container = document.getElementById('todayReports');
+            container.innerHTML = myReports.length === 0 
+                ? `<div class="col-span-6 py-12 text-center text-gray-400">No submissions yet today</div>` 
+                : '';
+
+            myReports.forEach(r => {
+                const div = document.createElement('div');
+                div.className = "bg-gray-800 rounded-3xl p-6 text-center";
+                div.innerHTML = `
+                    <p class="text-emerald-400 text-sm">${r.label}</p>
+                    <p class="text-4xl font-semibold mt-2">${Number(r.amount).toLocaleString('en-US')}</p>
+                    <p class="text-xs text-gray-400 mt-1">ZMW • Submitted: ${new Date(r.submittedAt).toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'})}</p>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // ==================== MANAGER DASHBOARD ====================
+        function populateMonthSelector() {
+            const select = document.getElementById('monthSelector');
+            select.innerHTML = '';
+            const now = new Date();
+            for (let i = 0; i < 6; i++) {
+                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                const value = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+                const label = d.toLocaleString('default', { month: 'long', year: 'numeric' });
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = label;
+                if (i === 0) option.selected = true;
+                select.appendChild(option);
+            }
+        }
+
+        function renderManagerDashboard() {
+            document.getElementById('managerView').classList.remove('hidden');
+            document.getElementById('cashierView').classList.add('hidden');
+
+            const selectedMonth = document.getElementById('monthSelector').value;
+            const [year, month] = selectedMonth.split('-').map(Number);
+
+            const container = document.getElementById('managerDashboard');
+            container.innerHTML = '';
+
+            const monthReports = reportsDB.filter(r => {
+                const d = new Date(r.date);
+                return d.getFullYear() === year && (d.getMonth() + 1) === month;
+            });
+
+            const grouped = {};
+            monthReports.forEach(r => {
+                const key = `${r.branch}-${r.fullName}`;
+                if (!grouped[key]) grouped[key] = { branch: r.branch, fullName: r.fullName, days: {} };
+                if (!grouped[key].days[r.date]) grouped[key].days[r.date] = [];
+                grouped[key].days[r.date].push(r);
+            });
+
+            if (Object.keys(grouped).length === 0) {
+                container.innerHTML = `<div class="text-center py-20 text-gray-400">No reports found for this month.</div>`;
+                return;
+            }
+
+            Object.values(grouped).forEach(group => {
+                const card = document.createElement('div');
+                card.className = "bg-gray-900 rounded-3xl p-8";
+
+                let daysHTML = '';
+                const sortedDates = Object.keys(group.days).sort().reverse();
+
+                sortedDates.forEach(date => {
+                    const dayReports = group.days[date].sort((a,b) => reportTimes.findIndex(t => t.key === a.timeKey) - reportTimes.findIndex(t => t.key === b.timeKey));
+                    daysHTML += `
+                        <div class="mb-8">
+                            <p class="text-emerald-400 font-medium mb-3">${date}</p>
+                            <div class="grid grid-cols-6 gap-4">
+                                ${dayReports.map(r => `
+                                    <div class="bg-gray-800 rounded-2xl p-5 text-center">
+                                        <p class="text-xs text-emerald-400">${r.label}</p>
+                                        <p class="text-3xl font-semibold mt-2">${Number(r.amount).toLocaleString('en-US')}</p>
+                                        <p class="text-xs text-gray-400 mt-2">${r.time}<br><span class="text-emerald-500">Submitted: ${new Date(r.submittedAt).toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'})}</span></p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <p class="text-emerald-400 font-medium">Branch: ${group.branch}</p>
+                            <p class="text-2xl font-semibold">FLA: ${group.fullName}</p>
+                        </div>
+                        <button onclick="showMonthlyDetail('${group.branch}', '${group.fullName}', '${selectedMonth}')" 
+                                class="bg-gray-700 hover:bg-gray-600 transition px-5 py-2 rounded-2xl text-sm font-medium flex items-center gap-2">
+                            <i class="fa-solid fa-list"></i> View Full Monthly Submissions
+                        </button>
+                    </div>
+                    ${daysHTML}
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function showMonthlyDetail(branch, fullName, monthStr) {
+            const [year, month] = monthStr.split('-').map(Number);
+            const modal = document.getElementById('monthlyModal');
+            const content = document.getElementById('modalContent');
+
+            document.getElementById('modalBranch').textContent = `Branch: ${branch}`;
+            document.getElementById('modalFLA').textContent = `FLA: ${fullName}`;
+
+            const staffReports = reportsDB.filter(r => r.branch === branch && r.fullName === fullName &&
+                new Date(r.date).getFullYear() === year && new Date(r.date).getMonth() + 1 === month);
+
+            let html = '';
+            const groupedByDate = {};
+            staffReports.forEach(r => {
+                if (!groupedByDate[r.date]) groupedByDate[r.date] = [];
+                groupedByDate[r.date].push(r);
+            });
+
+            Object.keys(groupedByDate).sort().reverse().forEach(date => {
+                const dayReports = groupedByDate[date].sort((a,b) => reportTimes.findIndex(t => t.key === a.timeKey) - reportTimes.findIndex(t => t.key === b.timeKey));
+                html += `
+                    <div class="mb-10">
+                        <p class="text-emerald-400 font-medium mb-4">${date}</p>
+                        <div class="grid grid-cols-6 gap-4">
+                            ${dayReports.map(r => `
+                                <div class="bg-gray-800 rounded-2xl p-6 text-center">
+                                    <p class="text-xs text-emerald-400">${r.label}</p>
+                                    <p class="text-3xl font-semibold mt-3">${Number(r.amount).toLocaleString('en-US')}</p>
+                                    <p class="text-xs text-gray-400 mt-3">${r.time}<br>Submitted: <span class="text-emerald-500">${new Date(r.submittedAt).toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'})}</span></p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+
+            content.innerHTML = html || `<p class="text-center text-gray-400 py-12">No submissions found for this month.</p>`;
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('monthlyModal').classList.add('hidden');
+        }
+
+        function renderApp() {
+            renderUserInfo();
+            populateMonthSelector();
+            startLiveClock();
+            setInterval(checkForReminder, 60000); // check every minute
+
+            if (currentUser.role === 'cashier') {
+                renderCashierView();
+            } else {
+                renderManagerDashboard();
+            }
+        }
+
+        // Clean demo data (no closing balance pre-filled)
+        function addDemoData() {
+            if (reportsDB.length > 0) return;
+            const today = getToday();
+            reportsDB = [
+                { id: 1001, date: today, username: "amos01", fullName: "Amos Banda", branch: "Kabwe Main", timeKey: "opening", time: "08:00", label: "Opening Balance", amount: 2850000, submittedAt: new Date(Date.now() - 3600000).toISOString() },
+                { id: 1002, date: today, username: "amos01", fullName: "Amos Banda", branch: "Kabwe Main", timeKey: "10hrs", time: "10:00", label: "10:00 hrs", amount: 3420000, submittedAt: new Date(Date.now() - 7200000).toISOString() }
+            ];
+            saveReports();
+        }
+
+        window.onload = () => {
+            addDemoData();
+        };
+    </script>
+</body>
+</html>
