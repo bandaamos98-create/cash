@@ -37,7 +37,7 @@
                     <input id="password" type="password" value="1234" class="w-full bg-gray-800 border border-gray-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-emerald-500">
                 </div>
                 <button onclick="handleLogin()" class="w-full bg-emerald-500 hover:bg-emerald-600 py-4 rounded-2xl font-semibold text-lg">SIGN IN</button>
-                <p class="text-center text-xs text-gray-500 mt-4">Demo: amos01 / 1234</p>
+                <p class="text-center text-xs text-gray-500">Demo: amos01 / 1234 or manager / 1234</p>
             </div>
         </div>
     </div>
@@ -113,7 +113,7 @@
         </div>
     </div>
 
-    <!-- END DAY REPORT MODAL -->
+    <!-- END DAY MODAL -->
     <div id="endDayModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[100]">
         <div class="modal bg-gray-900 rounded-3xl w-full max-w-7xl max-h-[95vh] overflow-hidden flex flex-col">
             <div class="p-6 border-b border-gray-700 flex justify-between items-center">
@@ -123,9 +123,7 @@
                 </div>
                 <button onclick="closeEndDayModal()" class="text-4xl text-gray-400 hover:text-white">&times;</button>
             </div>
-            
             <div class="flex-1 p-8 overflow-auto" id="endDayContent"></div>
-            
             <div class="p-6 border-t border-gray-700 bg-gray-950 flex justify-end gap-4">
                 <button onclick="closeEndDayModal()" class="px-8 py-4 text-gray-400 hover:text-white">Cancel</button>
                 <button onclick="submitEndDayReport()" class="bg-emerald-500 hover:bg-emerald-600 px-10 py-4 rounded-3xl font-semibold">SUBMIT END DAY REPORT</button>
@@ -170,7 +168,7 @@
                 document.getElementById('mainApp').classList.remove('hidden');
                 renderApp();
             } else {
-                alert("Invalid credentials.\nDemo: amos01 / 1234");
+                alert("Invalid credentials.\nDemo: amos01 / 1234 or manager / 1234");
             }
         }
 
@@ -284,31 +282,22 @@
             });
         }
 
-        // ===================== END DAY REPORT =====================
         function openEndDayModal() {
             if (currentUser.role !== 'cashier') return alert("Only cashiers can submit End Day reports.");
-
             const today = getToday();
             document.getElementById('endDayBranch').textContent = `${currentUser.branch} • ${today}`;
 
             const content = document.getElementById('endDayContent');
             content.innerHTML = `
                 <div class="space-y-12">
-
-                    <!-- WESTERN UNION -->
                     <div class="bg-gray-800 rounded-3xl p-8">
                         <h3 class="text-2xl font-bold mb-8 text-amber-400">WESTERN UNION</h3>
-                        
                         <div class="grid grid-cols-2 gap-10">
                             <div class="space-y-8">
                                 <div>
                                     <label class="block text-sm font-medium mb-2">OPENING BALANCE</label>
-                                    <div class="relative">
-                                        <span class="absolute left-6 top-1/2 -translate-y-1/2 text-4xl text-gray-400">K</span>
-                                        <input id="wu_opening" type="number" step="0.01" value="0" oninput="calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-3xl pl-14 py-7 text-4xl font-medium">
-                                    </div>
+                                    <input id="wu_opening" type="number" step="0.01" value="0" oninput="calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-3xl pl-14 py-7 text-4xl font-medium">
                                 </div>
-
                                 <div>
                                     <label class="block text-lg font-semibold mb-4 text-emerald-400">SENT</label>
                                     <div class="space-y-4">
@@ -320,7 +309,6 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div>
                                 <label class="block text-lg font-semibold mb-4 text-red-400">PAID</label>
                                 <div class="space-y-4">
@@ -335,14 +323,12 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="mt-10 pt-8 border-t border-gray-700 flex justify-between items-center text-3xl font-bold">
                             <span>CLOSING BALANCE</span>
                             <span id="wu_closing" class="text-emerald-400">0.00</span>
                         </div>
                     </div>
 
-                    <!-- OTHER SERVICES -->
                     <div>
                         <h3 class="text-2xl font-bold mb-6">OTHER SERVICES</h3>
                         <div id="otherServicesContainer" class="grid grid-cols-3 gap-6"></div>
@@ -365,21 +351,19 @@
                     </div>`;
             });
             document.getElementById('otherServicesContainer').innerHTML = html;
-
             calculateEndDay();
             document.getElementById('endDayModal').classList.remove('hidden');
         }
 
         function calculateEndDay() {
             let opening = parseFloat(document.getElementById('wu_opening').value) || 0;
-            let sent = (parseFloat(document.getElementById('sent_bank').value)||0) + (parseFloat(document.getElementById('sent_c1').value)||0) + 
-                       (parseFloat(document.getElementById('sent_c2').value)||0) + (parseFloat(document.getElementById('sent_c4').value)||0) + 
+            let sent = (parseFloat(document.getElementById('sent_bank').value)||0) + (parseFloat(document.getElementById('sent_c1').value)||0) +
+                       (parseFloat(document.getElementById('sent_c2').value)||0) + (parseFloat(document.getElementById('sent_c4').value)||0) +
                        (parseFloat(document.getElementById('sent_zanaco').value)||0);
-            let paid = (parseFloat(document.getElementById('paid_c2').value)||0) + (parseFloat(document.getElementById('paid_c3').value)||0) + 
-                       (parseFloat(document.getElementById('paid_bank').value)||0) + (parseFloat(document.getElementById('petty_cash').value)||0) + 
-                       (parseFloat(document.getElementById('polish').value)||0) + (parseFloat(document.getElementById('sugar').value)||0) + 
+            let paid = (parseFloat(document.getElementById('paid_c2').value)||0) + (parseFloat(document.getElementById('paid_c3').value)||0) +
+                       (parseFloat(document.getElementById('paid_bank').value)||0) + (parseFloat(document.getElementById('petty_cash').value)||0) +
+                       (parseFloat(document.getElementById('polish').value)||0) + (parseFloat(document.getElementById('sugar').value)||0) +
                        (parseFloat(document.getElementById('taxi').value)||0) + (parseFloat(document.getElementById('to_airtel').value)||0);
-
             let closing = opening + sent - paid;
             document.getElementById('wu_closing').textContent = closing.toLocaleString('en-US', {minimumFractionDigits: 2});
         }
@@ -389,21 +373,78 @@
         }
 
         function submitEndDayReport() {
-            alert("✅ End Day Report Submitted Successfully!\nWestern Union Closing Balance has been auto-calculated.");
+            const today = getToday();
+            endDayReports.unshift({
+                id: Date.now(),
+                date: today,
+                username: currentUser.username,
+                fullName: currentUser.fullName,
+                branch: currentUser.branch,
+                submittedAt: new Date().toISOString()
+            });
+            saveReports();
+            alert("✅ End Day Report Submitted Successfully!");
             closeEndDayModal();
         }
 
         function renderManagerDashboard() {
             document.getElementById('managerView').classList.remove('hidden');
             document.getElementById('cashierView').classList.add('hidden');
-            document.getElementById('managerDashboard').innerHTML = `<div class="text-center py-20 text-gray-400 text-xl">Manager Dashboard - End Day Reports will appear here soon.</div>`;
+            const container = document.getElementById('managerDashboard');
+            container.innerHTML = '';
+
+            const grouped = {};
+            endDayReports.forEach(r => {
+                if (!grouped[r.branch]) grouped[r.branch] = [];
+                grouped[r.branch].push(r);
+            });
+
+            Object.keys(grouped).forEach(branch => {
+                const card = document.createElement('div');
+                card.className = "bg-gray-900 rounded-3xl p-8";
+                card.innerHTML = `
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <p class="text-emerald-400 font-medium">Branch: ${branch}</p>
+                        </div>
+                        <button onclick="showBranchEndDay('${branch}')" class="bg-amber-600 hover:bg-amber-700 px-5 py-2 rounded-2xl text-sm font-medium flex items-center gap-2">
+                            <i class="fa-solid fa-flag-checkered"></i> View End Day Reports
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            if (Object.keys(grouped).length === 0) {
+                container.innerHTML = `<div class="text-center py-20 text-gray-400">No End Day Reports submitted yet.</div>`;
+            }
+        }
+
+        function showBranchEndDay(branch) {
+            const filtered = endDayReports.filter(r => r.branch === branch).sort((a,b) => new Date(b.date) - new Date(a.date));
+            let html = '<div class="space-y-4">';
+            filtered.forEach(r => {
+                html += `
+                    <div class="bg-gray-800 p-6 rounded-3xl flex justify-between items-center">
+                        <div>
+                            <p class="text-2xl">${r.date}</p>
+                            <p class="text-sm text-gray-400">${r.fullName}</p>
+                        </div>
+                        <p class="text-emerald-400">Submitted</p>
+                    </div>`;
+            });
+            html += '</div>';
+            alert(`End Day Reports for ${branch}\n\n${filtered.length} reports found.`);
         }
 
         function renderApp() {
             renderUserInfo();
             startLiveClock();
-            if (currentUser.role === 'cashier') renderCashierView();
-            else renderManagerDashboard();
+            if (currentUser.role === 'cashier') {
+                renderCashierView();
+            } else {
+                renderManagerDashboard();
+            }
         }
 
         window.onload = () => {
