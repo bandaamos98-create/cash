@@ -11,7 +11,7 @@
         body { font-family: 'Inter', system-ui, sans-serif; }
         .modal { animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-        .blink-red { animation: blink 1.5s infinite; }
+        .blink-red { animation: blink 1.2s infinite; }
         @keyframes blink { 0%, 100% { color: #ef4444; } 50% { color: #f87171; } }
         .live-clock { font-variant-numeric: tabular-nums; }
     </style>
@@ -68,9 +68,10 @@
 
             <!-- CASHIER VIEW -->
             <div id="cashierView" class="hidden">
-                <!-- Blinking Warning -->
-                <div id="nonEditableWarning" class="hidden bg-red-900 border border-red-600 text-red-200 p-4 rounded-2xl mb-6 text-center font-medium blink-red">
-                    ⚠️ Once submitted, cash positions <strong>cannot be edited or deleted</strong>
+                <!-- Blinking red warning -->
+                <div class="bg-red-900 border border-red-600 text-red-200 p-4 rounded-2xl mb-6 text-center font-medium blink-red flex items-center justify-center gap-3">
+                    <i class="fa-solid fa-lock"></i>
+                    Once submitted, cash positions <strong>cannot be edited or deleted</strong>
                 </div>
 
                 <div class="flex justify-between mb-8">
@@ -84,8 +85,9 @@
                     </div>
                 </div>
 
+                <!-- Today's Submissions – ALWAYS shows all 6 slots with default 0.00 -->
                 <div class="bg-gray-900 rounded-3xl p-8 mb-8">
-                    <h3 class="text-xl font-semibold mb-6">Today's Submissions</h3>
+                    <h3 class="text-xl font-semibold mb-6">Today's Cash Positions</h3>
                     <div id="todayReports" class="grid grid-cols-6 gap-4"></div>
                 </div>
 
@@ -236,7 +238,7 @@
             document.getElementById('reminderModal').classList.add('hidden');
         }
 
-        // CASHIER VIEW with blinking warning
+        // CASHIER VIEW
         function renderCashierView() {
             document.getElementById('cashierView').classList.remove('hidden');
             document.getElementById('managerView').classList.add('hidden');
@@ -244,11 +246,8 @@
             document.getElementById('cashierBranch').textContent = currentUser.branch;
             document.getElementById('todayDate').textContent = new Date().toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
 
-            // Show blinking red warning for cashiers
-            document.getElementById('nonEditableWarning').classList.remove('hidden');
-
             renderTimeButtons();
-            renderTodayReports();
+            renderTodayReports();   // now shows ALL slots with 0.00 by default
         }
 
         function renderTimeButtons() {
@@ -278,15 +277,18 @@
         function submitReport() {
             if (!selectedTimeKey) return alert("Please select a time slot");
 
-            const amount = parseFloat(document.getElementById('cashAmount').value);
-            if (isNaN(amount)) return alert("Please enter a valid cash amount");
+            const amountStr = document.getElementById('cashAmount').value.trim();
+            if (!amountStr) return alert("Please enter the cash amount");
+            const amount = parseFloat(amountStr);
+            if (isNaN(amount)) return alert("Please enter a valid number");
 
             const today = getToday();
             const slot = reportTimes.find(t => t.key === selectedTimeKey);
 
-            // Remove any previous entry for this slot today (prevents duplicate)
+            // Remove any previous entry for this exact slot today
             reportsDB = reportsDB.filter(r => !(r.date === today && r.username === currentUser.username && r.timeKey === selectedTimeKey));
 
+            // Add the new submission
             reportsDB.unshift({
                 id: Date.now(),
                 date: today,
@@ -302,7 +304,7 @@
 
             saveReports();
             renderTimeButtons();
-            renderTodayReports();
+            renderTodayReports();   // refresh the grid with real amount
 
             document.getElementById('cashAmount').value = '';
             selectedTimeKey = null;
@@ -311,29 +313,30 @@
             alert(`✅ ${slot.label} submitted successfully!\n\nNote: This record cannot be edited later.`);
         }
 
+        // NEW: Always show all 6 slots – default 0.00 if not submitted yet
         function renderTodayReports() {
             const today = getToday();
-            const myReports = reportsDB.filter(r => r.date === today && r.username === currentUser.username)
-                .sort((a,b) => reportTimes.findIndex(t=>t.key===a.timeKey) - reportTimes.findIndex(t=>t.key===b.timeKey));
-
             const container = document.getElementById('todayReports');
-            container.innerHTML = myReports.length === 0 
-                ? `<div class="col-span-6 py-12 text-center text-gray-400">No submissions yet today</div>` 
-                : '';
+            container.innerHTML = '';
 
-            myReports.forEach(r => {
+            reportTimes.forEach(slot => {
+                const report = reportsDB.find(r => r.date === today && r.username === currentUser.username && r.timeKey === slot.key);
+                const amount = report ? report.amount : 0;
+                const submittedTime = report ? new Date(report.submittedAt).toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'}) : '—';
+
                 const div = document.createElement('div');
-                div.className = "bg-gray-800 rounded-3xl p-6 text-center";
+                div.className = `rounded-3xl p-6 text-center ${report ? 'bg-emerald-900/30 border border-emerald-500' : 'bg-gray-800'}`;
                 div.innerHTML = `
-                    <p class="text-emerald-400 text-sm">${r.label}</p>
-                    <p class="text-4xl font-semibold mt-2">${Number(r.amount).toLocaleString('en-US')}</p>
-                    <p class="text-xs text-gray-400 mt-1">ZMW • Submitted: ${new Date(r.submittedAt).toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'})}</p>
+                    <p class="text-emerald-400 text-sm">${slot.label}</p>
+                    <p class="text-4xl font-semibold mt-3">${Number(amount).toLocaleString('en-US')}</p>
+                    <p class="text-xs text-gray-400 mt-2">ZMW</p>
+                    <p class="text-[10px] text-gray-500 mt-1">Submitted: ${submittedTime}</p>
                 `;
                 container.appendChild(div);
             });
         }
 
-        // Manager Dashboard (same as before)
+        // MANAGER DASHBOARD (unchanged – shows only actual submissions)
         function populateMonthSelector() {
             const select = document.getElementById('monthSelector');
             select.innerHTML = '';
@@ -468,7 +471,7 @@
             renderUserInfo();
             populateMonthSelector();
             startLiveClock();
-            setInterval(checkForReminder, 30000); // check every 30 seconds
+            setInterval(checkForReminder, 30000);
 
             if (currentUser.role === 'cashier') {
                 renderCashierView();
@@ -477,7 +480,7 @@
             }
         }
 
-        // Clean demo data
+        // Clean demo data – no pre-filled closing balance
         function addDemoData() {
             if (reportsDB.length > 0) return;
             const today = getToday();
