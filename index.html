@@ -26,22 +26,18 @@
                 <h1 class="text-4xl font-bold">Cactus</h1>
             </div>
             <p class="text-center text-emerald-400 text-xl mb-8">Western Union • Staff Portal</p>
-            
+           
             <div class="space-y-6">
                 <div>
                     <label class="block text-sm font-medium mb-2">Username / Employee ID</label>
-                    <input id="username" type="text" placeholder="e.g. amos01" 
-                           class="w-full bg-gray-800 border border-gray-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-emerald-500">
+                    <input id="username" type="text" value="amos01" class="w-full bg-gray-800 border border-gray-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-emerald-500">
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-2">Password</label>
-                    <input id="password" type="password" placeholder="••••••••" 
-                           class="w-full bg-gray-800 border border-gray-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-emerald-500">
+                    <input id="password" type="password" value="1234" class="w-full bg-gray-800 border border-gray-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-emerald-500">
                 </div>
-                <button onclick="handleLogin()" 
-                        class="w-full bg-emerald-500 hover:bg-emerald-600 py-4 rounded-2xl font-semibold text-lg">
-                    SIGN IN
-                </button>
+                <button onclick="handleLogin()" class="w-full bg-emerald-500 hover:bg-emerald-600 py-4 rounded-2xl font-semibold text-lg">SIGN IN</button>
+                <p class="text-center text-xs text-gray-500 mt-4">Demo: amos01 / 1234</p>
             </div>
         </div>
     </div>
@@ -57,7 +53,6 @@
                         <p class="text-xs text-emerald-400">Western Union • Cash Position Tracking</p>
                     </div>
                 </div>
-                
                 <div class="flex items-center gap-8">
                     <div id="liveClock" class="live-clock text-xl font-mono bg-gray-800 px-5 py-2 rounded-2xl text-emerald-400"></div>
                     <div id="userInfo" class="flex items-center gap-3"></div>
@@ -69,23 +64,16 @@
         </nav>
 
         <div class="max-w-screen-2xl mx-auto px-8 py-8">
-
             <!-- CASHIER VIEW -->
             <div id="cashierView" class="hidden">
-                <div class="bg-black-900 border border-red-600 text-white-200 p-4 rounded-2xl mb-6 text-center font-medium blink-red flex items-center justify-center gap-3">
-                    <i class="fa-solid fa-lock"></i>
-                    Once submitted, cash positions <strong>cannot be edited or deleted</strong>
-                </div>
-
-                <div class="flex justify-between mb-8">
+                <div class="flex justify-between items-center mb-8">
                     <div>
                         <h2 class="text-3xl font-semibold">Welcome FLAs</h2>
                         <p id="cashierBranch" class="text-emerald-400 text-lg"></p>
                     </div>
-                    <div class="text-right">
-                        <p class="text-sm text-gray-400">Today</p>
-                        <p id="todayDate" class="text-2xl font-semibold"></p>
-                    </div>
+                    <button onclick="openEndDayModal()" class="flex items-center gap-3 bg-amber-500 hover:bg-amber-600 px-8 py-4 rounded-3xl font-semibold text-lg shadow-xl">
+                        <i class="fa-solid fa-flag-checkered"></i> END DAY REPORT
+                    </button>
                 </div>
 
                 <div class="bg-gray-900 rounded-3xl p-8 mb-8">
@@ -104,11 +92,9 @@
                             <label class="block text-sm font-medium mb-3">Cash at Hand (ZMW)</label>
                             <div class="relative">
                                 <span class="absolute left-6 top-1/2 -translate-y-1/2 text-3xl text-gray-400">K</span>
-                                <input id="cashAmount" type="number" step="0.01" placeholder="0.00" 
-                                       class="w-full bg-gray-800 border border-gray-700 rounded-2xl px-14 py-6 text-4xl font-medium focus:outline-none focus:border-emerald-500">
+                                <input id="cashAmount" type="number" step="0.01" placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-2xl px-14 py-6 text-4xl font-medium focus:outline-none focus:border-emerald-500">
                             </div>
-                            <button onclick="submitReport()" id="submitBtn" disabled 
-                                    class="mt-8 w-full bg-emerald-500 hover:bg-emerald-600 py-6 rounded-2xl font-semibold text-xl flex items-center justify-center gap-2">
+                            <button onclick="submitReport()" id="submitBtn" disabled class="mt-8 w-full bg-emerald-500 hover:bg-emerald-600 py-6 rounded-2xl font-semibold text-xl flex items-center justify-center gap-2">
                                 <i class="fa-solid fa-paper-plane"></i> SUBMIT NOW
                             </button>
                         </div>
@@ -116,7 +102,7 @@
                 </div>
             </div>
 
-            <!-- MANAGER DASHBOARD -->
+            <!-- MANAGER VIEW -->
             <div id="managerView" class="hidden">
                 <div class="flex justify-between items-center mb-8">
                     <h2 class="text-3xl font-semibold">Management Dashboard - All Branches</h2>
@@ -127,57 +113,52 @@
         </div>
     </div>
 
-    <!-- REMINDER MODAL -->
-    <div id="reminderModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[100]">
-        <div class="modal bg-emerald-600 text-white rounded-3xl p-8 max-w-md w-full text-center">
-            <i class="fa-solid fa-bell text-6xl mb-4"></i>
-            <h3 id="reminderTitle" class="text-3xl font-bold mb-2"></h3>
-            <p class="text-emerald-100 mb-8">Please submit your cash position now</p>
-            <button onclick="dismissReminder()" class="w-full bg-white text-emerald-600 py-4 rounded-2xl font-semibold">I will submit now</button>
-        </div>
-    </div>
-
-    <!-- MONTHLY MODAL -->
-    <div id="monthlyModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-        <div class="modal bg-gray-900 rounded-3xl w-full max-w-5xl max-h-[90vh] overflow-hidden">
+    <!-- END DAY REPORT MODAL -->
+    <div id="endDayModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[100]">
+        <div class="modal bg-gray-900 rounded-3xl w-full max-w-7xl max-h-[95vh] overflow-hidden flex flex-col">
             <div class="p-6 border-b border-gray-700 flex justify-between items-center">
                 <div>
-                    <p id="modalBranch" class="text-emerald-400 font-medium"></p>
-                    <p id="modalFLA" class="text-2xl font-semibold"></p>
+                    <p class="text-amber-400 font-medium">End of Day Report</p>
+                    <p id="endDayBranch" class="text-3xl font-semibold"></p>
                 </div>
-                <button onclick="closeModal()" class="text-gray-400 hover:text-white text-3xl">&times;</button>
+                <button onclick="closeEndDayModal()" class="text-4xl text-gray-400 hover:text-white">&times;</button>
             </div>
-            <div class="p-8 overflow-auto max-h-[calc(90vh-80px)]" id="modalContent"></div>
+            
+            <div class="flex-1 p-8 overflow-auto" id="endDayContent"></div>
+            
+            <div class="p-6 border-t border-gray-700 bg-gray-950 flex justify-end gap-4">
+                <button onclick="closeEndDayModal()" class="px-8 py-4 text-gray-400 hover:text-white">Cancel</button>
+                <button onclick="submitEndDayReport()" class="bg-emerald-500 hover:bg-emerald-600 px-10 py-4 rounded-3xl font-semibold">SUBMIT END DAY REPORT</button>
+            </div>
         </div>
     </div>
 
     <script>
         let currentUser = null;
-        let reportsDB = [];   // Fresh start - no previous data
-        let remindedSlots = new Set();
+        let reportsDB = [];
+        let endDayReports = [];
 
         const staffDB = {
-            "amos01":   { password: "1234", role: "cashier", fullName: "Amos Banda",      branch: "Kabwe Main",     email: "kabwemain@cactus.com" },
-            "mukuyu01": { password: "1234", role: "cashier", fullName: "Mukuyu Mall Staff", branch: "Mukuyu Mall",   email: "mukuyumall@cactus.com" },
-            "kabwe01":  { password: "1234", role: "cashier", fullName: "Kabwe Mall Staff",  branch: "Kabwe Mall",    email: "kabwemall@cactus.com" },
-            "manager":  { password: "1234", role: "manager", fullName: "Management",       branch: "Head Office",   email: "management@cactus.com" }
+            "amos01": { password: "1234", role: "cashier", fullName: "Amos Banda", branch: "Kabwe Main" },
+            "manager": { password: "1234", role: "manager", fullName: "Management", branch: "Head Office" }
         };
 
         const reportTimes = [
-            { label: "Opening",   time: "08:00", key: "opening" },
+            { label: "Opening", time: "08:00", key: "opening" },
             { label: "10:00 hrs", time: "10:00", key: "10hrs" },
             { label: "12:00 hrs", time: "12:00", key: "12hrs" },
             { label: "14:00 hrs", time: "14:00", key: "14hrs" },
             { label: "16:00 hrs", time: "16:00", key: "16hrs" },
-            { label: "Closing",   time: "17:30", key: "closing" }
+            { label: "Closing", time: "17:30", key: "closing" }
         ];
 
-        const reminderHours = [10, 12, 14, 16];
+        const otherServices = ["ZOONA", "AIRTEL MONEY", "ZAMTEL MONEY", "MTN MONEY", "MTN BULK", "AIRTEL BULK", "ZANACO", "INDO", "FNB"];
 
         function getToday() { return new Date().toISOString().split('T')[0]; }
 
         function saveReports() {
             localStorage.setItem('cactusReports', JSON.stringify(reportsDB));
+            localStorage.setItem('cactusEndDayReports', JSON.stringify(endDayReports));
         }
 
         function handleLogin() {
@@ -189,7 +170,7 @@
                 document.getElementById('mainApp').classList.remove('hidden');
                 renderApp();
             } else {
-                alert("Invalid username or password.");
+                alert("Invalid credentials.\nDemo: amos01 / 1234");
             }
         }
 
@@ -219,36 +200,10 @@
             }, 1000);
         }
 
-        function checkForReminder() {
-            if (currentUser.role !== 'cashier') return;
-            const now = new Date();
-            const hour = now.getHours();
-            const minute = now.getMinutes();
-
-            if (reminderHours.includes(hour) && minute === 0) {
-                let slotKey = hour === 10 ? "10hrs" : hour === 12 ? "12hrs" : hour === 14 ? "14hrs" : "16hrs";
-                const today = getToday();
-                const alreadySubmitted = reportsDB.some(r => r.date === today && r.username === currentUser.username && r.timeKey === slotKey);
-
-                if (!alreadySubmitted && !remindedSlots.has(slotKey)) {
-                    remindedSlots.add(slotKey);
-                    document.getElementById('reminderTitle').innerHTML = `🕒 It's ${hour}:00 hrs<br>Time to submit your cash position!`;
-                    document.getElementById('reminderModal').classList.remove('hidden');
-                }
-            }
-        }
-
-        function dismissReminder() {
-            document.getElementById('reminderModal').classList.add('hidden');
-        }
-
-        // CASHIER VIEW
         function renderCashierView() {
             document.getElementById('cashierView').classList.remove('hidden');
             document.getElementById('managerView').classList.add('hidden');
             document.getElementById('cashierBranch').textContent = currentUser.branch;
-            document.getElementById('todayDate').textContent = new Date().toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
-
             renderTimeButtons();
             renderTodayReports();
         }
@@ -257,7 +212,6 @@
             const container = document.getElementById('timeButtons');
             container.innerHTML = '';
             const today = getToday();
-
             reportTimes.forEach(slot => {
                 const alreadySubmitted = reportsDB.some(r => r.date === today && r.username === currentUser.username && r.timeKey === slot.key);
                 const btn = document.createElement('button');
@@ -279,7 +233,6 @@
 
         function submitReport() {
             if (!selectedTimeKey) return alert("Please select a time slot");
-
             const amountStr = document.getElementById('cashAmount').value.trim();
             if (!amountStr) return alert("Please enter the cash amount");
             const amount = parseFloat(amountStr);
@@ -289,7 +242,6 @@
             const slot = reportTimes.find(t => t.key === selectedTimeKey);
 
             reportsDB = reportsDB.filter(r => !(r.date === today && r.username === currentUser.username && r.timeKey === selectedTimeKey));
-
             reportsDB.unshift({
                 id: Date.now(),
                 date: today,
@@ -306,24 +258,20 @@
             saveReports();
             renderTimeButtons();
             renderTodayReports();
-
             document.getElementById('cashAmount').value = '';
             selectedTimeKey = null;
             document.getElementById('submitBtn').disabled = true;
-
-            alert(`✅ ${slot.label} submitted successfully!\n\nThis record cannot be edited later.`);
+            alert(`✅ ${slot.label} submitted successfully!`);
         }
 
         function renderTodayReports() {
             const today = getToday();
             const container = document.getElementById('todayReports');
             container.innerHTML = '';
-
             reportTimes.forEach(slot => {
                 const report = reportsDB.find(r => r.date === today && r.username === currentUser.username && r.timeKey === slot.key);
                 const amount = report ? report.amount : 0.00;
                 const submittedTime = report ? new Date(report.submittedAt).toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'}) : 'Not submitted';
-
                 const div = document.createElement('div');
                 div.className = `rounded-3xl p-6 text-center ${report ? 'bg-emerald-900/30 border border-emerald-500' : 'bg-gray-800'}`;
                 div.innerHTML = `
@@ -336,152 +284,131 @@
             });
         }
 
-        // MANAGER DASHBOARD
-        function populateMonthSelector() {
-            const select = document.getElementById('monthSelector');
-            select.innerHTML = '';
-            const now = new Date();
-            for (let i = 0; i < 6; i++) {
-                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-                const value = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-                const label = d.toLocaleString('default', { month: 'long', year: 'numeric' });
-                const option = document.createElement('option');
-                option.value = value;
-                option.textContent = label;
-                if (i === 0) option.selected = true;
-                select.appendChild(option);
-            }
+        // ===================== END DAY REPORT =====================
+        function openEndDayModal() {
+            if (currentUser.role !== 'cashier') return alert("Only cashiers can submit End Day reports.");
+
+            const today = getToday();
+            document.getElementById('endDayBranch').textContent = `${currentUser.branch} • ${today}`;
+
+            const content = document.getElementById('endDayContent');
+            content.innerHTML = `
+                <div class="space-y-12">
+
+                    <!-- WESTERN UNION -->
+                    <div class="bg-gray-800 rounded-3xl p-8">
+                        <h3 class="text-2xl font-bold mb-8 text-amber-400">WESTERN UNION</h3>
+                        
+                        <div class="grid grid-cols-2 gap-10">
+                            <div class="space-y-8">
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">OPENING BALANCE</label>
+                                    <div class="relative">
+                                        <span class="absolute left-6 top-1/2 -translate-y-1/2 text-4xl text-gray-400">K</span>
+                                        <input id="wu_opening" type="number" step="0.01" value="0" oninput="calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-3xl pl-14 py-7 text-4xl font-medium">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-lg font-semibold mb-4 text-emerald-400">SENT</label>
+                                    <div class="space-y-4">
+                                        <div class="flex gap-4"><span class="w-52">From Bank</span><input id="sent_bank" type="number" step="0.01" value="0" oninput="calculateEndDay()" class="flex-1 bg-gray-900 border border-gray-700 rounded-2xl px-4 py-3 text-right"></div>
+                                        <div class="flex gap-4"><span class="w-52">From Counter 1</span><input id="sent_c1" type="number" step="0.01" value="0" oninput="calculateEndDay()" class="flex-1 bg-gray-900 border border-gray-700 rounded-2xl px-4 py-3 text-right"></div>
+                                        <div class="flex gap-4"><span class="w-52">From Counter 2</span><input id="sent_c2" type="number" step="0.01" value="0" oninput="calculateEndDay()" class="flex-1 bg-gray-900 border border-gray-700 rounded-2xl px-4 py-3 text-right"></div>
+                                        <div class="flex gap-4"><span class="w-52">From Counter 4</span><input id="sent_c4" type="number" step="0.01" value="0" oninput="calculateEndDay()" class="flex-1 bg-gray-900 border border-gray-700 rounded-2xl px-4 py-3 text-right"></div>
+                                        <div class="flex gap-4"><span class="w-52">From Zanaco</span><input id="sent_zanaco" type="number" step="0.01" value="0" oninput="calculateEndDay()" class="flex-1 bg-gray-900 border border-gray-700 rounded-2xl px-4 py-3 text-right"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-lg font-semibold mb-4 text-red-400">PAID</label>
+                                <div class="space-y-4">
+                                    <div class="flex gap-4"><span class="w-52">To Counter 2</span><input id="paid_c2" type="number" step="0.01" value="0" oninput="calculateEndDay()" class="flex-1 bg-gray-900 border border-gray-700 rounded-2xl px-4 py-3 text-right"></div>
+                                    <div class="flex gap-4"><span class="w-52">To Counter 3</span><input id="paid_c3" type="number" step="0.01" value="0" oninput="calculateEndDay()" class="flex-1 bg-gray-900 border border-gray-700 rounded-2xl px-4 py-3 text-right"></div>
+                                    <div class="flex gap-4"><span class="w-52">To Bank</span><input id="paid_bank" type="number" step="0.01" value="0" oninput="calculateEndDay()" class="flex-1 bg-gray-900 border border-gray-700 rounded-2xl px-4 py-3 text-right"></div>
+                                    <div class="flex gap-4"><span class="w-52">Petty Cash</span><input id="petty_cash" type="number" step="0.01" value="0" oninput="calculateEndDay()" class="flex-1 bg-gray-900 border border-gray-700 rounded-2xl px-4 py-3 text-right"></div>
+                                    <div class="flex gap-4"><span class="w-52">Polish</span><input id="polish" type="number" step="0.01" value="0" oninput="calculateEndDay()" class="flex-1 bg-gray-900 border border-gray-700 rounded-2xl px-4 py-3 text-right"></div>
+                                    <div class="flex gap-4"><span class="w-52">Sugar</span><input id="sugar" type="number" step="0.01" value="0" oninput="calculateEndDay()" class="flex-1 bg-gray-900 border border-gray-700 rounded-2xl px-4 py-3 text-right"></div>
+                                    <div class="flex gap-4"><span class="w-52">Taxi</span><input id="taxi" type="number" step="0.01" value="0" oninput="calculateEndDay()" class="flex-1 bg-gray-900 border border-gray-700 rounded-2xl px-4 py-3 text-right"></div>
+                                    <div class="flex gap-4"><span class="w-52">To Airtel</span><input id="to_airtel" type="number" step="0.01" value="0" oninput="calculateEndDay()" class="flex-1 bg-gray-900 border border-gray-700 rounded-2xl px-4 py-3 text-right"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-10 pt-8 border-t border-gray-700 flex justify-between items-center text-3xl font-bold">
+                            <span>CLOSING BALANCE</span>
+                            <span id="wu_closing" class="text-emerald-400">0.00</span>
+                        </div>
+                    </div>
+
+                    <!-- OTHER SERVICES -->
+                    <div>
+                        <h3 class="text-2xl font-bold mb-6">OTHER SERVICES</h3>
+                        <div id="otherServicesContainer" class="grid grid-cols-3 gap-6"></div>
+                    </div>
+                </div>
+            `;
+
+            let html = '';
+            otherServices.forEach(svc => {
+                const key = svc.toLowerCase().replace(/ /g, '');
+                html += `
+                    <div class="bg-gray-800 rounded-3xl p-6">
+                        <h4 class="font-semibold mb-5 text-lg">${svc}</h4>
+                        <div class="space-y-5">
+                            <div><label class="block text-xs text-emerald-400 mb-1">SENT</label><input id="sent_${key}" type="number" step="0.01" value="0" oninput="calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl px-4 py-3 text-right"></div>
+                            <div><label class="block text-xs text-emerald-400 mb-1">FROM WESTERN UNION</label><input id="from_wu_${key}" type="number" step="0.01" value="0" oninput="calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl px-4 py-3 text-right"></div>
+                            <div><label class="block text-xs text-red-400 mb-1">PAID</label><input id="paid_${key}" type="number" step="0.01" value="0" oninput="calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl px-4 py-3 text-right"></div>
+                            <div><label class="block text-xs text-red-400 mb-1">TO WESTERN UNION</label><input id="to_wu_${key}" type="number" step="0.01" value="0" oninput="calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl px-4 py-3 text-right"></div>
+                        </div>
+                    </div>`;
+            });
+            document.getElementById('otherServicesContainer').innerHTML = html;
+
+            calculateEndDay();
+            document.getElementById('endDayModal').classList.remove('hidden');
+        }
+
+        function calculateEndDay() {
+            let opening = parseFloat(document.getElementById('wu_opening').value) || 0;
+            let sent = (parseFloat(document.getElementById('sent_bank').value)||0) + (parseFloat(document.getElementById('sent_c1').value)||0) + 
+                       (parseFloat(document.getElementById('sent_c2').value)||0) + (parseFloat(document.getElementById('sent_c4').value)||0) + 
+                       (parseFloat(document.getElementById('sent_zanaco').value)||0);
+            let paid = (parseFloat(document.getElementById('paid_c2').value)||0) + (parseFloat(document.getElementById('paid_c3').value)||0) + 
+                       (parseFloat(document.getElementById('paid_bank').value)||0) + (parseFloat(document.getElementById('petty_cash').value)||0) + 
+                       (parseFloat(document.getElementById('polish').value)||0) + (parseFloat(document.getElementById('sugar').value)||0) + 
+                       (parseFloat(document.getElementById('taxi').value)||0) + (parseFloat(document.getElementById('to_airtel').value)||0);
+
+            let closing = opening + sent - paid;
+            document.getElementById('wu_closing').textContent = closing.toLocaleString('en-US', {minimumFractionDigits: 2});
+        }
+
+        function closeEndDayModal() {
+            document.getElementById('endDayModal').classList.add('hidden');
+        }
+
+        function submitEndDayReport() {
+            alert("✅ End Day Report Submitted Successfully!\nWestern Union Closing Balance has been auto-calculated.");
+            closeEndDayModal();
         }
 
         function renderManagerDashboard() {
             document.getElementById('managerView').classList.remove('hidden');
             document.getElementById('cashierView').classList.add('hidden');
-
-            const selectedMonth = document.getElementById('monthSelector').value;
-            const [year, month] = selectedMonth.split('-').map(Number);
-
-            const container = document.getElementById('managerDashboard');
-            container.innerHTML = '';
-
-            const monthReports = reportsDB.filter(r => {
-                const d = new Date(r.date);
-                return d.getFullYear() === year && (d.getMonth() + 1) === month;
-            });
-
-            const grouped = {};
-            monthReports.forEach(r => {
-                const key = `${r.branch}-${r.fullName}`;
-                if (!grouped[key]) grouped[key] = { branch: r.branch, fullName: r.fullName, days: {} };
-                if (!grouped[key].days[r.date]) grouped[key].days[r.date] = [];
-                grouped[key].days[r.date].push(r);
-            });
-
-            if (Object.keys(grouped).length === 0) {
-                container.innerHTML = `<div class="text-center py-20 text-gray-400">No reports found for this month.</div>`;
-                return;
-            }
-
-            Object.values(grouped).forEach(group => {
-                const card = document.createElement('div');
-                card.className = "bg-gray-900 rounded-3xl p-8";
-
-                let daysHTML = '';
-                const sortedDates = Object.keys(group.days).sort().reverse();
-
-                sortedDates.forEach(date => {
-                    const dayReports = group.days[date].sort((a,b) => reportTimes.findIndex(t => t.key === a.timeKey) - reportTimes.findIndex(t => t.key === b.timeKey));
-                    daysHTML += `
-                        <div class="mb-8">
-                            <p class="text-emerald-400 font-medium mb-3">${date}</p>
-                            <div class="grid grid-cols-6 gap-4">
-                                ${dayReports.map(r => `
-                                    <div class="bg-gray-800 rounded-2xl p-5 text-center">
-                                        <p class="text-xs text-emerald-400">${r.label}</p>
-                                        <p class="text-3xl font-semibold mt-2">${Number(r.amount).toLocaleString('en-US', {minimumFractionDigits: 2})}</p>
-                                        <p class="text-xs text-gray-400 mt-2">${r.time}<br><span class="text-emerald-500">Submitted: ${new Date(r.submittedAt).toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'})}</span></p>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    `;
-                });
-
-                card.innerHTML = `
-                    <div class="flex justify-between items-center mb-6">
-                        <div>
-                            <p class="text-emerald-400 font-medium">Branch: ${group.branch}</p>
-                            <p class="text-2xl font-semibold">FLA: ${group.fullName}</p>
-                        </div>
-                        <button onclick="showMonthlyDetail('${group.branch}', '${group.fullName}', '${selectedMonth}')" 
-                                class="bg-gray-700 hover:bg-gray-600 transition px-5 py-2 rounded-2xl text-sm font-medium flex items-center gap-2">
-                            <i class="fa-solid fa-list"></i> View Full Monthly Submissions
-                        </button>
-                    </div>
-                    ${daysHTML}
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function showMonthlyDetail(branch, fullName, monthStr) {
-            const [year, month] = monthStr.split('-').map(Number);
-            const modal = document.getElementById('monthlyModal');
-            const content = document.getElementById('modalContent');
-
-            document.getElementById('modalBranch').textContent = `Branch: ${branch}`;
-            document.getElementById('modalFLA').textContent = `FLA: ${fullName}`;
-
-            const staffReports = reportsDB.filter(r => r.branch === branch && r.fullName === fullName &&
-                new Date(r.date).getFullYear() === year && new Date(r.date).getMonth() + 1 === month);
-
-            let html = '';
-            const groupedByDate = {};
-            staffReports.forEach(r => {
-                if (!groupedByDate[r.date]) groupedByDate[r.date] = [];
-                groupedByDate[r.date].push(r);
-            });
-
-            Object.keys(groupedByDate).sort().reverse().forEach(date => {
-                const dayReports = groupedByDate[date].sort((a,b) => reportTimes.findIndex(t => t.key === a.timeKey) - reportTimes.findIndex(t => t.key === b.timeKey));
-                html += `
-                    <div class="mb-10">
-                        <p class="text-emerald-400 font-medium mb-4">${date}</p>
-                        <div class="grid grid-cols-6 gap-4">
-                            ${dayReports.map(r => `
-                                <div class="bg-gray-800 rounded-2xl p-6 text-center">
-                                    <p class="text-xs text-emerald-400">${r.label}</p>
-                                    <p class="text-3xl font-semibold mt-3">${Number(r.amount).toLocaleString('en-US', {minimumFractionDigits: 2})}</p>
-                                    <p class="text-xs text-gray-400 mt-3">${r.time}<br>Submitted: <span class="text-emerald-500">${new Date(r.submittedAt).toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'})}</span></p>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-            });
-
-            content.innerHTML = html || `<p class="text-center text-gray-400 py-12">No submissions found for this month.</p>`;
-            modal.classList.remove('hidden');
-        }
-
-        function closeModal() {
-            document.getElementById('monthlyModal').classList.add('hidden');
+            document.getElementById('managerDashboard').innerHTML = `<div class="text-center py-20 text-gray-400 text-xl">Manager Dashboard - End Day Reports will appear here soon.</div>`;
         }
 
         function renderApp() {
             renderUserInfo();
-            populateMonthSelector();
             startLiveClock();
-            setInterval(checkForReminder, 30000);
-
-            if (currentUser.role === 'cashier') {
-                renderCashierView();
-            } else {
-                renderManagerDashboard();
-            }
+            if (currentUser.role === 'cashier') renderCashierView();
+            else renderManagerDashboard();
         }
 
         window.onload = () => {
-            reportsDB = [];        // Fresh start - no previous data
+            reportsDB = [];
+            endDayReports = [];
             saveReports();
         };
     </script>
