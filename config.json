@@ -2,31 +2,28 @@
   "app": {
     "name": "Cactus Money Transfers",
     "tagline": "Western Union • Real-time Branch Monitoring",
-    "logoUrl": "https://raw.githubusercontent.com/bandaamos98-create/cash/main/images/cactus.png",
-    "primaryColor": "#10b981"
+    "logoUrl": "https://raw.githubusercontent.com/bandaamos98-create/cash/main/images/cactus.png"
   },
-  "announcements": [
+  "branchAnnouncements": [
     {
       "id": 1,
-      "title": "System Maintenance",
-      "message": "ALL BRANCHES that are not working on sundays to kindly deposit float into the main account 0979077079.",
+      "title": "Branch Notice",
+      "message": "All branches that are not working n public holidays, please ensure that you deposite all your remaining float to the main account.",
+      "type": "info",
+      "date": "2026-04-18"
+    }
+  ],
+  "managementAnnouncements": [
+    {
+      "id": 1,
+      "title": "Management Update",
+      "message": "Head Office: System reconciliation will be done at 18:00 today. Please submit all End Day reports on time.",
       "type": "warning",
       "date": "2026-04-18"
     }
   ],
   "liveUpdates": {
     "enabled": true,
-    "refreshIntervalSeconds": 30,
-    "showLiveClock": true
-  },
-  "branches": [
-    "Kabwe Main",
-    "Mukuyu Branch"
-  ],
-  "demoUsers": {
-    "manager": "Management",
-    "amos01": "Amos Banda - Kabwe Main",
-    "mukuyu01": "Mukuyu Operator",
-    "kabwe01": "Kabwe Operator"
+    "refreshIntervalSeconds": 30
   }
 }
