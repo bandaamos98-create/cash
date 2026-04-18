@@ -68,14 +68,28 @@
                         <h2 class="text-3xl font-semibold">Welcome FLAs</h2>
                         <p id="cashierBranch" class="text-emerald-400 text-lg"></p>
                     </div>
-                    <button onclick="openEndDayModal()" class="flex items-center gap-3 bg-amber-500 hover:bg-amber-600 px-8 py-4 rounded-3xl font-semibold text-lg shadow-xl">
-                        <i class="fa-solid fa-flag-checkered"></i> END DAY REPORT
-                    </button>
+                    <div class="flex items-center gap-3">
+                        <!-- NEW: Two buttons for past submissions (as requested) -->
+                        <button onclick="showMyPastCashPositions()" 
+                                class="nav-button flex items-center gap-3 bg-blue-600 hover:bg-blue-700 px-6 py-4 rounded-3xl font-semibold text-lg shadow-xl">
+                            <i class="fa-solid fa-history"></i> Past Cash Positions
+                        </button>
+                        <button onclick="showMyPastEndDayReports()" 
+                                class="nav-button flex items-center gap-3 bg-purple-600 hover:bg-purple-700 px-6 py-4 rounded-3xl font-semibold text-lg shadow-xl">
+                            <i class="fa-solid fa-flag-checkered"></i> Past End Day Reports
+                        </button>
+                        <button onclick="openEndDayModal()" 
+                                class="flex items-center gap-3 bg-amber-500 hover:bg-amber-600 px-8 py-4 rounded-3xl font-semibold text-lg shadow-xl">
+                            <i class="fa-solid fa-flag-checkered"></i> END DAY REPORT
+                        </button>
+                    </div>
                 </div>
+
                 <div class="bg-gray-900 rounded-3xl p-8 mb-8">
                     <h3 class="text-xl font-semibold mb-6">Today's Cash Positions</h3>
                     <div id="todayReports" class="grid grid-cols-6 gap-4"></div>
                 </div>
+
                 <div class="bg-gray-900 rounded-3xl p-8">
                     <h3 class="text-xl font-semibold mb-6">Submit Cash Position</h3>
                     <div class="grid grid-cols-2 gap-8">
@@ -100,7 +114,7 @@
             <!-- MANAGER VIEW -->
             <div id="managerView" class="hidden">
                 <h2 class="text-3xl font-semibold mb-8 flex items-center gap-3">
-                    Management Dashboard 
+                    Management Dashboard
                     <span class="text-emerald-400 text-base font-normal px-4 py-1 bg-emerald-900/30 rounded-3xl">All Branches • Live Western Union Monitoring</span>
                 </h2>
                 <div id="managerDashboard" class="space-y-12"></div>
@@ -108,7 +122,7 @@
         </div>
     </div>
 
-    <!-- END DAY MODAL -->
+    <!-- END DAY MODAL (with new Total Balance on left of Submit button) -->
     <div id="endDayModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[100]">
         <div class="modal bg-gray-900 rounded-3xl w-full max-w-7xl max-h-[95vh] overflow-hidden flex flex-col">
             <div class="p-6 border-b border-gray-700 flex justify-between items-center">
@@ -119,16 +133,78 @@
                 <button onclick="closeEndDayModal()" class="text-4xl text-gray-400 hover:text-white">&times;</button>
             </div>
             <div class="flex-1 p-8 overflow-auto" id="endDayContent"></div>
+            
+            <!-- UPDATED FOOTER: Total Balance (live) on LEFT + Submit Report button -->
+            <div class="p-6 border-t border-gray-700 bg-gray-950 flex items-center justify-between">
+                <div class="flex items-center gap-4 text-2xl font-semibold">
+                    <span class="text-amber-400">TOTAL CLOSING BALANCE</span>
+                    <span id="totalBalanceLive" class="text-emerald-400">K 0.00</span>
+                </div>
+                <div class="flex gap-4">
+                    <button onclick="closeEndDayModal()" class="px-8 py-4 text-gray-400 hover:text-white">Cancel</button>
+                    <button onclick="triggerCashBreakdown()" id="endDaySubmitBtn" 
+                            class="bg-emerald-500 hover:bg-emerald-600 px-10 py-4 rounded-3xl font-semibold flex items-center gap-2">
+                        <i class="fa-solid fa-paper-plane"></i> SUBMIT REPORT
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CASH BREAKDOWN MODAL (pops up when Submit Report is clicked) -->
+    <div id="cashBreakdownModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[110]">
+        <div class="modal bg-gray-900 rounded-3xl w-full max-w-3xl max-h-[95vh] overflow-hidden flex flex-col">
+            <div class="p-6 border-b border-gray-700 flex justify-between items-center">
+                <div>
+                    <p class="text-amber-400 font-medium">Cash Breakdown • Physical Count Verification</p>
+                    <p id="breakdownBranchDate" class="text-3xl font-semibold"></p>
+                </div>
+                <button onclick="closeCashBreakdownModal()" class="text-4xl text-gray-400 hover:text-white">&times;</button>
+            </div>
+            
+            <div class="flex-1 p-8 overflow-auto">
+                <div class="flex justify-between items-baseline mb-8 bg-gray-800 rounded-3xl p-6">
+                    <div>
+                        <span class="text-sm text-gray-400">Book Closing Balance</span>
+                        <div id="bookClosingDisplay" class="text-4xl font-bold text-emerald-400"></div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-sm text-gray-400">Physical Total</span>
+                        <div id="physicalTotalDisplay" class="text-4xl font-bold text-emerald-400">K 0.00</div>
+                    </div>
+                </div>
+
+                <h3 class="text-2xl font-semibold mb-6 flex items-center gap-3">
+                    <i class="fa-solid fa-coins"></i> Zambian Notes & Coins
+                </h3>
+                <div id="denominationsContainer" class="grid grid-cols-2 gap-6">
+                    <!-- Populated by JS -->
+                </div>
+
+                <!-- Live discrepancy section -->
+                <div id="discrepancyContainer" class="mt-12 bg-gray-800 rounded-3xl p-8">
+                    <!-- Populated live by JS -->
+                </div>
+
+                <div class="mt-10">
+                    <label class="block text-sm font-medium mb-3 text-gray-400">Reason for Surplus / Deficit (optional)</label>
+                    <textarea id="discrepancyReasonInput" rows="4" 
+                              class="w-full bg-gray-800 border border-gray-700 rounded-3xl px-6 py-5 text-white placeholder-gray-400 focus:border-emerald-500 focus:outline-none"
+                              placeholder="e.g. Short payment from customer, counting error, unrecorded transaction..."></textarea>
+                </div>
+            </div>
+
             <div class="p-6 border-t border-gray-700 bg-gray-950 flex justify-end gap-4">
-                <button onclick="closeEndDayModal()" class="px-8 py-4 text-gray-400 hover:text-white">Cancel</button>
-                <button onclick="submitEndDayReport()" class="bg-emerald-500 hover:bg-emerald-600 px-10 py-4 rounded-3xl font-semibold flex items-center gap-2">
-                    <i class="fa-solid fa-paper-plane"></i> SUBMIT END DAY REPORT
+                <button onclick="closeCashBreakdownModal()" class="px-8 py-4 text-gray-400 hover:text-white">Cancel</button>
+                <button onclick="submitWithBreakdown()" 
+                        class="bg-emerald-500 hover:bg-emerald-600 px-10 py-4 rounded-3xl font-semibold flex items-center gap-2">
+                    <i class="fa-solid fa-check-circle"></i> DONE – SUBMIT REPORT
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- END DAY REPORT DETAIL MODAL (Manager) -->
+    <!-- END DAY REPORT DETAIL MODAL (Manager + Cashier) -->
     <div id="endDayListModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[100]">
         <div class="modal bg-gray-900 rounded-3xl w-full max-w-5xl max-h-[95vh] overflow-hidden flex flex-col">
             <div class="p-6 border-b border-gray-700 flex justify-between items-center" id="endDayListHeaderContainer"></div>
@@ -154,12 +230,16 @@
         let currentUser = null;
         let reportsDB = [];
         let endDayReports = [];
+        let pendingEndDayData = null;
+        let bookClosingVal = 0;
+
         const staffDB = {
             "amos01": { password: "1234", role: "cashier", fullName: "Amos Banda", branch: "Kabwe Main" },
             "mukuyu01": { password: "1234", role: "cashier", fullName: "Mukuyu Operator", branch: "Mukuyu Branch" },
             "kabwe01": { password: "1234", role: "cashier", fullName: "Kabwe Operator", branch: "Kabwe Main" },
             "manager": { password: "1234", role: "manager", fullName: "Management", branch: "Head Office" }
         };
+
         const reportTimes = [
             { label: "Opening", time: "08:00", key: "opening" },
             { label: "10:00 hrs", time: "10:00", key: "10hrs" },
@@ -168,6 +248,7 @@
             { label: "16:00 hrs", time: "16:00", key: "16hrs" },
             { label: "Closing", time: "17:30", key: "closing" }
         ];
+
         const otherServices = ["ZOONA", "AIRTEL MONEY", "ZAMTEL MONEY", "MTN MONEY", "MTN BULK", "AIRTEL BULK", "ZANACO", "INDO", "FNB"];
 
         function getToday() { return new Date().toISOString().split('T')[0]; }
@@ -183,6 +264,7 @@
             if (parts.length > 2) val = parts[0] + '.' + parts[1];
             e.target.value = val;
         }
+
         function applyCommaFormat(e) {
             let val = e.target.value.replace(/,/g, '');
             const num = parseFloat(val);
@@ -190,6 +272,7 @@
                 e.target.value = num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             }
         }
+
         function cleanMoney(val) {
             return parseFloat(String(val).replace(/,/g, '')) || 0;
         }
@@ -315,6 +398,78 @@
             });
         }
 
+        // ===================== NEW: Cashier Past Reports Buttons =====================
+        function showMyPastCashPositions() {
+            const filteredDates = [...new Set(reportsDB.filter(r => r.username === currentUser.username).map(r => r.date))].sort((a, b) => new Date(b) - new Date(a));
+            let html = `<div class="grid grid-cols-5 gap-4">`;
+            if (filteredDates.length === 0) {
+                html += `<p class="col-span-5 text-center py-12 text-gray-400">No past cash position reports yet.</p>`;
+            } else {
+                filteredDates.forEach(date => {
+                    html += `
+                        <div onclick="viewMyDailyCashPositions('${date}')" class="bg-gray-800 hover:bg-gray-700 cursor-pointer rounded-2xl p-6 text-center transition-all">
+                            <p class="text-2xl font-semibold">${date}</p>
+                            <p class="text-emerald-400 text-sm mt-2">View My Cash Positions →</p>
+                        </div>`;
+                });
+            }
+            html += `</div>`;
+            document.getElementById('cashPositionHeader').innerHTML = `My Cash Position Reports • ${currentUser.branch}`;
+            document.getElementById('cashPositionContent').innerHTML = html;
+            document.getElementById('cashPositionModal').classList.remove('hidden');
+        }
+
+        function viewMyDailyCashPositions(date) {
+            const dayReports = reportsDB.filter(r => r.username === currentUser.username && r.date === date)
+                .sort((a, b) => reportTimes.map(t => t.key).indexOf(a.timeKey) - reportTimes.map(t => t.key).indexOf(b.timeKey));
+            let html = `<h3 class="text-2xl font-semibold mb-6">${date} – My Cash Positions</h3><div class="grid grid-cols-6 gap-4">`;
+            reportTimes.forEach(slot => {
+                const rep = dayReports.find(r => r.timeKey === slot.key);
+                const amount = rep ? rep.amount : 0;
+                const time = rep ? new Date(rep.submittedAt).toLocaleTimeString('en-GB',{hour:'2-digit', minute:'2-digit'}) : '—';
+                html += `
+                    <div class="rounded-3xl p-6 text-center ${rep ? 'bg-emerald-900/30 border border-emerald-500' : 'bg-gray-800'}">
+                        <p class="text-emerald-400 text-sm">${slot.label}</p>
+                        <p class="text-4xl font-semibold mt-4">${amount.toLocaleString('en-US', {minimumFractionDigits: 2})}</p>
+                        <p class="text-xs text-gray-400">ZMW</p>
+                        <p class="text-[10px] text-gray-500 mt-4">${time}</p>
+                    </div>`;
+            });
+            html += `</div>`;
+            document.getElementById('cashPositionContent').innerHTML = html;
+        }
+
+        function showMyPastEndDayReports() {
+            const filtered = endDayReports.filter(r => r.username === currentUser.username).sort((a, b) => new Date(b.date) - new Date(a.date));
+            let html = `<div class="grid grid-cols-4 gap-4">`;
+            if (filtered.length === 0) {
+                html += `<p class="col-span-4 text-center py-12 text-gray-400">No End Day Reports submitted yet.</p>`;
+            } else {
+                filtered.forEach(r => {
+                    html += `
+                        <div onclick="viewEndDayReport(${r.id})" class="bg-gray-800 hover:bg-gray-700 cursor-pointer rounded-2xl p-6 text-center transition-all">
+                            <p class="text-2xl font-semibold">${r.date}</p>
+                            <p class="text-sm text-gray-400 mt-2">${r.fullName}</p>
+                            <p class="text-xs text-emerald-400 mt-1">Submitted • ${new Date(r.submittedAt).toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'})}</p>
+                        </div>`;
+                });
+            }
+            html += `</div>`;
+            document.getElementById('endDayListHeaderContainer').innerHTML = `
+                <div class="flex items-center gap-4">
+                    <button onclick="renderCashierView()" class="nav-button flex items-center gap-2 text-emerald-400 hover:text-white">
+                        <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+                    </button>
+                    <div>
+                        <p class="text-amber-400 font-medium">My End Day Reports</p>
+                        <p class="text-2xl font-semibold">${currentUser.branch}</p>
+                    </div>
+                </div>
+            `;
+            document.getElementById('endDayListContent').innerHTML = html;
+            document.getElementById('endDayListModal').classList.remove('hidden');
+        }
+
         // ===================== UPDATED END DAY MODAL =====================
         function openEndDayModal() {
             if (currentUser.role !== 'cashier') return alert("Only cashiers can submit End Day reports.");
@@ -390,15 +545,12 @@
                                             <input id="in_from_izb" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl pl-12 py-4 text-right text-2xl font-medium">
                                         </div>
                                     </div>
-
-                                    <!-- Additional Inflows Button (10 placeholders) -->
                                     <button id="additionalInflowsBtn" onclick="toggleAdditionalInflows()" class="nav-button w-full mt-8 bg-gray-700 hover:bg-emerald-600 text-white py-4 rounded-3xl font-semibold flex items-center justify-center gap-3 text-lg">
                                         <i class="fa-solid fa-chevron-down"></i> UNFOLD 10 ADDITIONAL CASH INFLOW PLACEHOLDERS
                                     </button>
                                     <div id="additionalInflowsSection" class="hidden mt-4 space-y-4 max-h-96 overflow-y-auto border border-gray-700 rounded-3xl p-6"></div>
                                 </div>
                             </div>
-
                             <!-- RIGHT: OUTFLOWS -->
                             <div>
                                 <h4 class="text-red-400 font-semibold mb-6 text-lg flex items-center gap-2">
@@ -454,8 +606,6 @@
                                             <input id="out_to_izb" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl pl-12 py-4 text-right text-2xl font-medium">
                                         </div>
                                     </div>
-
-                                    <!-- Additional Outflows Button (10 placeholders) -->
                                     <button id="additionalOutflowsBtn" onclick="toggleAdditionalOutflows()" class="nav-button w-full mt-8 bg-gray-700 hover:bg-red-600 text-white py-4 rounded-3xl font-semibold flex items-center justify-center gap-3 text-lg">
                                         <i class="fa-solid fa-chevron-down"></i> UNFOLD 10 ADDITIONAL CASH OUTFLOW PLACEHOLDERS
                                     </button>
@@ -463,14 +613,11 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Closing Balance -->
                         <div class="mt-12 pt-8 border-t border-gray-700 flex justify-between items-center text-3xl font-bold">
                             <span>CLOSING BALANCE</span>
                             <span id="wu_closing" class="text-emerald-400">0.00</span>
                         </div>
                     </div>
-
                     <!-- OTHER SERVICES -->
                     <div>
                         <h3 class="text-2xl font-bold mb-6 flex items-center gap-2">
@@ -542,7 +689,7 @@
             const section = document.getElementById('additionalInflowsSection');
             const btn = document.getElementById('additionalInflowsBtn');
             section.classList.toggle('hidden');
-            btn.innerHTML = section.classList.contains('hidden') 
+            btn.innerHTML = section.classList.contains('hidden')
                 ? `<i class="fa-solid fa-chevron-down"></i> UNFOLD 10 ADDITIONAL CASH INFLOW PLACEHOLDERS`
                 : `<i class="fa-solid fa-chevron-up"></i> HIDE ADDITIONAL CASH INFLOW PLACEHOLDERS`;
         }
@@ -551,11 +698,12 @@
             const section = document.getElementById('additionalOutflowsSection');
             const btn = document.getElementById('additionalOutflowsBtn');
             section.classList.toggle('hidden');
-            btn.innerHTML = section.classList.contains('hidden') 
+            btn.innerHTML = section.classList.contains('hidden')
                 ? `<i class="fa-solid fa-chevron-down"></i> UNFOLD 10 ADDITIONAL CASH OUTFLOW PLACEHOLDERS`
                 : `<i class="fa-solid fa-chevron-up"></i> HIDE ADDITIONAL CASH OUTFLOW PLACEHOLDERS`;
         }
 
+        // LIVE CALCULATION (now also updates the new Total Balance in footer)
         function calculateEndDay() {
             const opening = cleanMoney(document.getElementById('wu_opening').value);
             const fromCounter2 = cleanMoney(document.getElementById('in_from_counter2').value);
@@ -565,13 +713,11 @@
             const fromZanaco = cleanMoney(document.getElementById('in_from_zanaco').value);
             const fromFnb = cleanMoney(document.getElementById('in_from_fnb').value);
             const fromIzb = cleanMoney(document.getElementById('in_from_izb').value);
-
             let additionalInTotal = 0;
             for (let i = 1; i <= 10; i++) {
                 const el = document.getElementById(`add_in_amount_${i}`);
                 if (el) additionalInTotal += cleanMoney(el.value);
             }
-
             const paid = cleanMoney(document.getElementById('wu_paid').value);
             const toCounter2 = cleanMoney(document.getElementById('out_to_counter2').value);
             const toAirtel = cleanMoney(document.getElementById('out_to_airtel').value);
@@ -579,13 +725,11 @@
             const toMtn = cleanMoney(document.getElementById('out_to_mtn').value);
             const toZanaco = cleanMoney(document.getElementById('out_to_zanaco').value);
             const toIzb = cleanMoney(document.getElementById('out_to_izb').value);
-
             let additionalOutTotal = 0;
             for (let i = 1; i <= 10; i++) {
                 const el = document.getElementById(`add_out_amount_${i}`);
                 if (el) additionalOutTotal += cleanMoney(el.value);
             }
-
             let totalNetFromServices = 0;
             otherServices.forEach(svc => {
                 const key = svc.toLowerCase().replace(/ /g, '');
@@ -596,12 +740,19 @@
                 if (netEl) netEl.value = net.toLocaleString('en-US', {minimumFractionDigits: 2});
                 totalNetFromServices += net;
             });
-
             const totalIn = opening + fromCounter2 + fromAirtel + fromBank + fromMtn + fromZanaco + fromFnb + fromIzb + additionalInTotal + totalNetFromServices;
             const totalOut = paid + toCounter2 + toAirtel + toBank + toMtn + toZanaco + toIzb + additionalOutTotal;
             const closing = totalIn - totalOut;
 
-            document.getElementById('wu_closing').textContent = closing.toLocaleString('en-US', {minimumFractionDigits: 2});
+            // Update closing inside modal
+            const closingEl = document.getElementById('wu_closing');
+            if (closingEl) closingEl.textContent = closing.toLocaleString('en-US', {minimumFractionDigits: 2});
+
+            // Update TOTAL BALANCE in footer (live)
+            const footerBalance = document.getElementById('totalBalanceLive');
+            if (footerBalance) {
+                footerBalance.textContent = `K ${closing.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            }
         }
 
         function getEndDayData() {
@@ -628,21 +779,16 @@
                 },
                 services: {}
             };
-
-            // Additional Inflows (only non-zero)
             for (let i = 1; i <= 10; i++) {
                 const label = document.getElementById(`add_in_label_${i}`).value.trim() || `Additional Inflow ${i}`;
                 const amount = cleanMoney(document.getElementById(`add_in_amount_${i}`).value);
                 if (amount > 0) data.wu.additionalInflows.push({ label, amount });
             }
-
-            // Additional Outflows (only non-zero)
             for (let i = 1; i <= 10; i++) {
                 const label = document.getElementById(`add_out_label_${i}`).value.trim() || `Additional Outflow ${i}`;
                 const amount = cleanMoney(document.getElementById(`add_out_amount_${i}`).value);
                 if (amount > 0) data.wu.additionalOutflows.push({ label, amount });
             }
-
             otherServices.forEach(svc => {
                 const key = svc.toLowerCase().replace(/ /g, '');
                 const sent = cleanMoney(document.getElementById(`sent_${key}`).value);
@@ -650,32 +796,153 @@
                 const net = sent - paid;
                 data.services[svc] = { sent, paid, net };
             });
-
             return data;
         }
 
-        function submitEndDayReport() {
-            const today = getToday();
-            const reportData = getEndDayData();
+        // ===================== NEW: CASH BREAKDOWN FLOW =====================
+        function triggerCashBreakdown() {
+            pendingEndDayData = getEndDayData();
+            bookClosingVal = cleanMoney(document.getElementById('wu_closing').textContent);
+
+            document.getElementById('breakdownBranchDate').textContent = `${currentUser.branch} • ${getToday()}`;
+            document.getElementById('bookClosingDisplay').innerHTML = `K ${bookClosingVal.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+
+            // Zambian denominations
+            const denoms = [500, 200, 100, 50, 20, 10, 5, 2, 1, 0.5];
+            let denomHTML = '';
+            denoms.forEach(denom => {
+                const key = denom.toString().replace('.', '_');
+                denomHTML += `
+                    <div class="bg-gray-800 rounded-3xl p-6 flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <span class="text-5xl font-bold">K</span>
+                            <span class="text-5xl font-bold">${denom}</span>
+                        </div>
+                        <div class="flex items-center gap-6">
+                            <input id="denom_qty_${key}" type="number" min="0" value="0" 
+                                   oninput="calculatePhysicalBreakdown()" 
+                                   class="w-28 text-center bg-gray-900 border border-gray-600 rounded-2xl py-4 text-3xl font-medium focus:outline-none focus:border-emerald-500">
+                            <div class="text-right min-w-[110px]">
+                                <span id="denom_line_${key}" class="text-emerald-400 text-2xl font-medium">K 0.00</span>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+            document.getElementById('denominationsContainer').innerHTML = denomHTML;
+
+            calculatePhysicalBreakdown();
+            document.getElementById('cashBreakdownModal').classList.remove('hidden');
+        }
+
+        function calculatePhysicalBreakdown() {
+            const denoms = [500, 200, 100, 50, 20, 10, 5, 2, 1, 0.5];
+            let physical = 0;
+
+            denoms.forEach(denom => {
+                const key = denom.toString().replace('.', '_');
+                const qtyEl = document.getElementById(`denom_qty_${key}`);
+                if (!qtyEl) return;
+                const qty = parseFloat(qtyEl.value) || 0;
+                const lineTotal = denom * qty;
+                physical += lineTotal;
+
+                const lineEl = document.getElementById(`denom_line_${key}`);
+                if (lineEl) lineEl.textContent = `K ${lineTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            });
+
+            // Update physical total
+            document.getElementById('physicalTotalDisplay').textContent = `K ${physical.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+
+            // Live discrepancy
+            const discrepancy = physical - bookClosingVal;
+            let discHTML = `
+                <div class="flex items-center justify-between text-2xl font-medium">
+                    <span>Book Balance</span>
+                    <span class="font-bold text-emerald-400">K ${bookClosingVal.toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
+                </div>
+                <div class="flex items-center justify-between text-2xl font-medium mt-4">
+                    <span>Physical Count</span>
+                    <span class="font-bold text-emerald-400">K ${physical.toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
+                </div>
+                <div class="h-px bg-gray-700 my-8"></div>
+            `;
+
+            if (Math.abs(discrepancy) < 0.01) {
+                discHTML += `<div class="text-center py-6 text-4xl font-bold text-emerald-400 flex items-center justify-center gap-4"><i class="fa-solid fa-check-circle"></i> PERFECT MATCH</div>`;
+            } else {
+                const isSurplus = discrepancy > 0;
+                const colorClass = isSurplus ? 'text-emerald-400' : 'text-red-400';
+                const label = isSurplus ? 'SURPLUS' : 'DEFICIT';
+                discHTML += `
+                    <div class="flex items-center justify-between text-4xl font-bold ${colorClass}">
+                        <span>${label}</span>
+                        <span>K ${Math.abs(discrepancy).toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
+                    </div>
+                `;
+            }
+            document.getElementById('discrepancyContainer').innerHTML = discHTML;
+        }
+
+        function closeCashBreakdownModal() {
+            document.getElementById('cashBreakdownModal').classList.add('hidden');
+            pendingEndDayData = null;
+        }
+
+        function submitWithBreakdown() {
+            if (!pendingEndDayData) return alert("Something went wrong. Please try again.");
+
+            // Re-calculate physical total from inputs
+            const denoms = [500, 200, 100, 50, 20, 10, 5, 2, 1, 0.5];
+            let physical = 0;
+            const breakdownDenoms = {};
+
+            denoms.forEach(denom => {
+                const key = denom.toString().replace('.', '_');
+                const qtyEl = document.getElementById(`denom_qty_${key}`);
+                if (qtyEl) {
+                    const qty = parseFloat(qtyEl.value) || 0;
+                    const subtotal = denom * qty;
+                    physical += subtotal;
+                    if (qty > 0) breakdownDenoms[denom] = { qty, subtotal };
+                }
+            });
+
+            const reason = document.getElementById('discrepancyReasonInput').value.trim();
+
+            // Attach breakdown to the report data
+            pendingEndDayData.cashBreakdown = {
+                denominations: breakdownDenoms,
+                physicalTotal: physical,
+                bookClosing: bookClosingVal,
+                discrepancy: physical - bookClosingVal,
+                reason: reason || null
+            };
+
+            // Final submission
             endDayReports.unshift({
                 id: Date.now(),
-                date: today,
+                date: getToday(),
                 username: currentUser.username,
                 fullName: currentUser.fullName,
                 branch: currentUser.branch,
                 submittedAt: new Date().toISOString(),
-                data: reportData
+                data: pendingEndDayData
             });
+
             saveReports();
-            alert("✅ End Day Report Submitted Successfully!");
+            alert(`✅ End Day Report Submitted Successfully!${Math.abs(pendingEndDayData.cashBreakdown.discrepancy) >= 0.01 ? `\nNote: ${pendingEndDayData.cashBreakdown.discrepancy > 0 ? 'Surplus' : 'Deficit'} of K${Math.abs(pendingEndDayData.cashBreakdown.discrepancy).toLocaleString('en-US',{minimumFractionDigits:2})}` : ''}`);
+            
+            closeCashBreakdownModal();
             closeEndDayModal();
+            pendingEndDayData = null;
+            bookClosingVal = 0;
         }
 
         function closeEndDayModal() {
             document.getElementById('endDayModal').classList.add('hidden');
         }
 
-        // ===================== MANAGER DASHBOARD & REPORT VIEWING (shows only entered fields) =====================
+        // ===================== MANAGER DASHBOARD & REPORT VIEWING =====================
         function renderManagerDashboard() {
             document.getElementById('managerView').classList.remove('hidden');
             document.getElementById('cashierView').classList.add('hidden');
@@ -752,6 +1019,7 @@
             document.getElementById('endDayListModal').classList.remove('hidden');
         }
 
+        // UPDATED VIEW: now includes Cash Breakdown section
         function viewEndDayReport(id) {
             const report = endDayReports.find(r => r.id === id);
             if (!report || !report.data) return;
@@ -787,6 +1055,50 @@
                 wu.additionalOutflows.forEach(m => {
                     outflowsHTML += `<li class="flex justify-between"><span>${m.label}</span><span class="font-medium">K${m.amount.toLocaleString('en-US',{minimumFractionDigits:2})}</span></li>`;
                 });
+            }
+
+            // Cash Breakdown section (if exists)
+            let breakdownHTML = '';
+            if (d.cashBreakdown) {
+                const bd = d.cashBreakdown;
+                breakdownHTML = `
+                <div class="mt-12 bg-gray-800 rounded-3xl p-8">
+                    <h3 class="text-2xl font-semibold mb-6 flex items-center gap-3"><i class="fa-solid fa-coins"></i> CASH BREAKDOWN (Physical Count)</h3>
+                    <div class="grid grid-cols-5 gap-4 mb-8">`;
+                if (bd.denominations) {
+                    Object.keys(bd.denominations).sort((a, b) => parseFloat(b) - parseFloat(a)).forEach(den => {
+                        const info = bd.denominations[den];
+                        breakdownHTML += `
+                        <div class="bg-gray-900 rounded-2xl p-5 text-center">
+                            <div class="text-3xl font-bold">K${parseFloat(den)}</div>
+                            <div class="text-xl mt-2">${info.qty} pcs</div>
+                            <div class="text-emerald-400 font-medium mt-1">K${info.subtotal.toLocaleString('en-US',{minimumFractionDigits:2})}</div>
+                        </div>`;
+                    });
+                }
+                breakdownHTML += `</div>`;
+                breakdownHTML += `
+                    <div class="flex justify-between text-2xl font-medium">
+                        <span>Physical Total</span>
+                        <span class="font-bold">K ${bd.physicalTotal.toLocaleString('en-US',{minimumFractionDigits:2})}</span>
+                    </div>
+                    <div class="flex justify-between text-xl mt-3">
+                        <span>Book Closing</span>
+                        <span>K ${bd.bookClosing.toLocaleString('en-US',{minimumFractionDigits:2})}</span>
+                    </div>`;
+                if (Math.abs(bd.discrepancy) >= 0.01) {
+                    const type = bd.discrepancy > 0 ? 'SURPLUS' : 'DEFICIT';
+                    const color = bd.discrepancy > 0 ? 'emerald' : 'red';
+                    breakdownHTML += `
+                    <div class="mt-8 flex justify-between items-center text-4xl font-bold text-${color}-400">
+                        <span>${type}</span>
+                        <span>K ${Math.abs(bd.discrepancy).toLocaleString('en-US',{minimumFractionDigits:2})}</span>
+                    </div>`;
+                    if (bd.reason) breakdownHTML += `<p class="mt-6 text-gray-400 italic">"${bd.reason}"</p>`;
+                } else {
+                    breakdownHTML += `<div class="mt-8 text-center text-4xl font-bold text-emerald-400 flex items-center justify-center gap-4"><i class="fa-solid fa-check-circle"></i> PERFECT MATCH</div>`;
+                }
+                breakdownHTML += `</div>`;
             }
 
             let html = `
@@ -826,12 +1138,13 @@
                             }).join('')}
                         </div>
                     </div>
+                    ${breakdownHTML}
                 </div>
             `;
 
             document.getElementById('endDayListHeaderContainer').innerHTML = `
                 <div class="flex items-center gap-4">
-                    <button onclick="showEndDayDates('${report.branch}')" class="nav-button flex items-center gap-2 text-emerald-400 hover:text-white">
+                    <button onclick="${currentUser.role === 'manager' ? 'showEndDayDates(\'' + report.branch + '\')' : 'showMyPastEndDayReports()'}" class="nav-button flex items-center gap-2 text-emerald-400 hover:text-white">
                         <i class="fa-solid fa-arrow-left"></i> Back
                     </button>
                     <div>
@@ -898,6 +1211,7 @@
         }
 
         window.onload = () => {
+            // Clear demo data on every load (as before)
             reportsDB = [];
             endDayReports = [];
             saveReports();
