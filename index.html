@@ -17,6 +17,7 @@
     </style>
 </head>
 <body class="bg-gray-950 text-white">
+
     <!-- LOGIN SCREEN -->
     <div id="loginScreen" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-900 to-gray-950">
         <div class="max-w-md w-full bg-gray-900 rounded-3xl shadow-2xl p-8">
@@ -143,7 +144,7 @@
         </div>
     </div>
 
-    <!-- CASH BREAKDOWN MODAL (reduced size + cleaner view) -->
+    <!-- CASH BREAKDOWN MODAL -->
     <div id="cashBreakdownModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[110]">
         <div class="modal bg-gray-900 rounded-3xl w-full max-w-4xl max-h-[92vh] overflow-hidden flex flex-col">
             <div class="p-6 border-b border-gray-700 flex justify-between items-center">
@@ -476,6 +477,14 @@
                                             <input id="wu_opening" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl pl-12 py-4 text-right text-2xl font-medium">
                                         </div>
                                     </div>
+                                    <!-- NEW SENT FIELD -->
+                                    <div class="flex justify-between items-center">
+                                        <span class="font-medium">Sent</span>
+                                        <div class="relative w-64">
+                                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span>
+                                            <input id="wu_sent" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl pl-12 py-4 text-right text-2xl font-medium">
+                                        </div>
+                                    </div>
                                     <div class="flex justify-between items-center">
                                         <span class="font-medium">From Counter 2</span>
                                         <div class="relative w-64">
@@ -498,13 +507,6 @@
                                         </div>
                                     </div>
                                     <div class="flex justify-between items-center">
-                                        <span class="font-medium">From MTN</span>
-                                        <div class="relative w-64">
-                                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span>
-                                            <input id="in_from_mtn" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl pl-12 py-4 text-right text-2xl font-medium">
-                                        </div>
-                                    </div>
-                                    <div class="flex justify-between items-center">
                                         <span class="font-medium">From Zanaco</span>
                                         <div class="relative w-64">
                                             <span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span>
@@ -516,13 +518,6 @@
                                         <div class="relative w-64">
                                             <span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span>
                                             <input id="in_from_fnb" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl pl-12 py-4 text-right text-2xl font-medium">
-                                        </div>
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <span class="font-medium">From IZB</span>
-                                        <div class="relative w-64">
-                                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span>
-                                            <input id="in_from_izb" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl pl-12 py-4 text-right text-2xl font-medium">
                                         </div>
                                     </div>
                                     <button id="additionalInflowsBtn" onclick="toggleAdditionalInflows()" class="nav-button w-full mt-8 bg-gray-700 hover:bg-emerald-600 text-white py-4 rounded-3xl font-semibold flex items-center justify-center gap-3 text-lg">
@@ -598,17 +593,17 @@
                             <span id="wu_closing" class="text-emerald-400">0.00</span>
                         </div>
                     </div>
-                    <!-- OTHER SERVICES - RESTORED TO ORIGINAL SENT / PAID -->
+                    <!-- OTHER SERVICES -->
                     <div>
                         <h3 class="text-2xl font-bold mb-6 flex items-center gap-2">
-                            <i class="fa-solid fa-handshake"></i> OTHER SERVICES (Sent / Paid → auto net remittance to/from Western Union)
+                            <i class="fa-solid fa-handshake"></i> OTHER SERVICES (Sent / Paid → auto net remittance)
                         </h3>
                         <div id="otherServicesContainer" class="grid grid-cols-3 gap-6"></div>
                     </div>
                 </div>
             `;
 
-            // Populate Other Services - restored original SENT / PAID
+            // Populate Other Services
             let servicesHTML = '';
             otherServices.forEach(svc => {
                 const key = svc.toLowerCase().replace(/ /g, '');
@@ -624,16 +619,13 @@
                                 <label class="block text-xs text-red-400 mb-1">PAID</label>
                                 <input id="paid_${key}" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl px-4 py-3 text-right">
                             </div>
-                            <div>
-                                <label class="block text-xs text-amber-400 mb-1">NET REMITTANCE</label>
-                                <input id="net_${key}" type="text" value="0.00" readonly class="w-full bg-emerald-900/30 border border-emerald-500 rounded-2xl px-4 py-3 text-right font-medium">
-                            </div>
+                            <div id="serviceResult_${key}" class="pt-3 border-t border-gray-700 font-medium text-lg text-center"></div>
                         </div>
                     </div>`;
             });
             document.getElementById('otherServicesContainer').innerHTML = servicesHTML;
 
-            // Additional inflows / outflows (unchanged)
+            // Additional inflows / outflows
             let addInHTML = '';
             for (let i = 1; i <= 10; i++) {
                 addInHTML += `
@@ -682,16 +674,16 @@
                 : `<i class="fa-solid fa-chevron-up"></i> HIDE ADDITIONAL CASH OUTFLOW PLACEHOLDERS`;
         }
 
-        // CALCULATION - From Western Union increases, To Western Union decreases (original sent/paid logic restored)
+        // ===================== CALCULATION =====================
         function calculateEndDay() {
+            // Western Union
             const opening = cleanMoney(document.getElementById('wu_opening').value);
+            const sent = cleanMoney(document.getElementById('wu_sent').value);
             const fromCounter2 = cleanMoney(document.getElementById('in_from_counter2').value);
             const fromAirtel = cleanMoney(document.getElementById('in_from_airtel').value);
             const fromBank = cleanMoney(document.getElementById('in_from_bank').value);
-            const fromMtn = cleanMoney(document.getElementById('in_from_mtn').value);
             const fromZanaco = cleanMoney(document.getElementById('in_from_zanaco').value);
             const fromFnb = cleanMoney(document.getElementById('in_from_fnb').value);
-            const fromIzb = cleanMoney(document.getElementById('in_from_izb').value);
 
             let additionalInTotal = 0;
             for (let i = 1; i <= 10; i++) {
@@ -713,19 +705,29 @@
                 if (el) additionalOutTotal += cleanMoney(el.value);
             }
 
-            // Other Services - restored original SENT / PAID logic
+            // Other Services - Sent / Paid DO affect closing balance (net = sent - paid)
             let totalNetFromServices = 0;
             otherServices.forEach(svc => {
                 const key = svc.toLowerCase().replace(/ /g, '');
-                const sent = cleanMoney(document.getElementById(`sent_${key}`).value);
+                const sentSvc = cleanMoney(document.getElementById(`sent_${key}`).value);
                 const paidSvc = cleanMoney(document.getElementById(`paid_${key}`).value);
-                const net = sent - paidSvc;
-                const netEl = document.getElementById(`net_${key}`);
-                if (netEl) netEl.value = net.toLocaleString('en-US', {minimumFractionDigits: 2});
-                totalNetFromServices += net;   // From WU (sent) increases, To WU (paid) decreases
+                const net = sentSvc - paidSvc;
+                totalNetFromServices += net;
+
+                // Display From/To Western Union (display only - no effect on balance)
+                const resultEl = document.getElementById(`serviceResult_${key}`);
+                if (resultEl) {
+                    if (net > 0) {
+                        resultEl.innerHTML = `<span class="text-red-400">TO WESTERN UNION</span> <span class="font-bold">K${net.toLocaleString('en-US',{minimumFractionDigits:2})}</span>`;
+                    } else if (net < 0) {
+                        resultEl.innerHTML = `<span class="text-emerald-400">FROM WESTERN UNION</span> <span class="font-bold">K${Math.abs(net).toLocaleString('en-US',{minimumFractionDigits:2})}</span>`;
+                    } else {
+                        resultEl.innerHTML = `<span class="text-gray-400">NO REMITTANCE</span>`;
+                    }
+                }
             });
 
-            const totalIn = opening + fromCounter2 + fromAirtel + fromBank + fromMtn + fromZanaco + fromFnb + fromIzb + additionalInTotal + totalNetFromServices;
+            const totalIn = opening + sent + fromCounter2 + fromAirtel + fromBank + fromZanaco + fromFnb + additionalInTotal + totalNetFromServices;
             const totalOut = paid + toCounter2 + toAirtel + toBank + toMtn + toZanaco + toIzb + additionalOutTotal;
             const closing = totalIn - totalOut;
 
@@ -737,13 +739,12 @@
             const data = {
                 wu: {
                     opening: cleanMoney(document.getElementById('wu_opening').value),
+                    sent: cleanMoney(document.getElementById('wu_sent').value),
                     fromCounter2: cleanMoney(document.getElementById('in_from_counter2').value),
                     fromAirtel: cleanMoney(document.getElementById('in_from_airtel').value),
                     fromBank: cleanMoney(document.getElementById('in_from_bank').value),
-                    fromMtn: cleanMoney(document.getElementById('in_from_mtn').value),
                     fromZanaco: cleanMoney(document.getElementById('in_from_zanaco').value),
                     fromFnb: cleanMoney(document.getElementById('in_from_fnb').value),
-                    fromIzb: cleanMoney(document.getElementById('in_from_izb').value),
                     additionalInflows: [],
                     paid: cleanMoney(document.getElementById('wu_paid').value),
                     toCounter2: cleanMoney(document.getElementById('out_to_counter2').value),
@@ -769,13 +770,11 @@
                 if (amount > 0) data.wu.additionalOutflows.push({ label, amount });
             }
 
-            // Restored original services structure
             otherServices.forEach(svc => {
                 const key = svc.toLowerCase().replace(/ /g, '');
                 const sent = cleanMoney(document.getElementById(`sent_${key}`).value);
                 const paid = cleanMoney(document.getElementById(`paid_${key}`).value);
-                const net = sent - paid;
-                data.services[svc] = { sent, paid, net };
+                data.services[svc] = { sent, paid };
             });
             return data;
         }
@@ -988,13 +987,12 @@
 
             let inflowsHTML = '';
             if (wu.opening > 0) inflowsHTML += `<li class="flex justify-between"><span>Opening Balance</span><span class="font-medium">K${wu.opening.toLocaleString('en-US',{minimumFractionDigits:2})}</span></li>`;
+            if (wu.sent > 0) inflowsHTML += `<li class="flex justify-between"><span>Sent</span><span class="font-medium">K${wu.sent.toLocaleString('en-US',{minimumFractionDigits:2})}</span></li>`;
             if (wu.fromCounter2 > 0) inflowsHTML += `<li class="flex justify-between"><span>From Counter 2</span><span class="font-medium">K${wu.fromCounter2.toLocaleString('en-US',{minimumFractionDigits:2})}</span></li>`;
             if (wu.fromAirtel > 0) inflowsHTML += `<li class="flex justify-between"><span>From Airtel</span><span class="font-medium">K${wu.fromAirtel.toLocaleString('en-US',{minimumFractionDigits:2})}</span></li>`;
             if (wu.fromBank > 0) inflowsHTML += `<li class="flex justify-between"><span>From Bank</span><span class="font-medium">K${wu.fromBank.toLocaleString('en-US',{minimumFractionDigits:2})}</span></li>`;
-            if (wu.fromMtn > 0) inflowsHTML += `<li class="flex justify-between"><span>From MTN</span><span class="font-medium">K${wu.fromMtn.toLocaleString('en-US',{minimumFractionDigits:2})}</span></li>`;
             if (wu.fromZanaco > 0) inflowsHTML += `<li class="flex justify-between"><span>From Zanaco</span><span class="font-medium">K${wu.fromZanaco.toLocaleString('en-US',{minimumFractionDigits:2})}</span></li>`;
             if (wu.fromFnb > 0) inflowsHTML += `<li class="flex justify-between"><span>From FNB</span><span class="font-medium">K${wu.fromFnb.toLocaleString('en-US',{minimumFractionDigits:2})}</span></li>`;
-            if (wu.fromIzb > 0) inflowsHTML += `<li class="flex justify-between"><span>From IZB</span><span class="font-medium">K${wu.fromIzb.toLocaleString('en-US',{minimumFractionDigits:2})}</span></li>`;
             if (wu.additionalInflows && wu.additionalInflows.length > 0) {
                 inflowsHTML += `<li class="pt-4 border-t border-gray-700 text-emerald-400 font-medium">Additional Inflows:</li>`;
                 wu.additionalInflows.forEach(m => {
@@ -1065,12 +1063,17 @@
                 servicesHTML = `<div class="bg-gray-800 rounded-3xl p-6"><h3 class="text-xl font-semibold mb-6">OTHER SERVICES</h3><div class="grid grid-cols-3 gap-6">`;
                 Object.keys(d.services).forEach(svc => {
                     const s = d.services[svc];
+                    const diff = s.sent - s.paid;
+                    let label = '';
+                    if (diff > 0) label = `<span class="text-red-400">TO WESTERN UNION</span> K${diff.toLocaleString('en-US',{minimumFractionDigits:2})}`;
+                    else if (diff < 0) label = `<span class="text-emerald-400">FROM WESTERN UNION</span> K${Math.abs(diff).toLocaleString('en-US',{minimumFractionDigits:2})}`;
+                    else label = `<span class="text-gray-400">NO REMITTANCE</span>`;
                     servicesHTML += `
                         <div class="bg-gray-900 rounded-2xl p-5">
                             <p class="font-semibold mb-4">${svc}</p>
                             <div class="flex justify-between text-sm mb-2"><span>Sent</span><span class="text-emerald-400">K${s.sent.toLocaleString('en-US',{minimumFractionDigits:2})}</span></div>
                             <div class="flex justify-between text-sm mb-2"><span>Paid</span><span class="text-red-400">K${s.paid.toLocaleString('en-US',{minimumFractionDigits:2})}</span></div>
-                            <div class="flex justify-between text-sm border-t pt-3"><span class="text-amber-400">Net</span><span class="font-medium">${s.net >= 0 ? '+' : ''}K${s.net.toLocaleString('en-US',{minimumFractionDigits:2})}</span></div>
+                            <div class="flex justify-between text-sm border-t pt-3">${label}</div>
                         </div>`;
                 });
                 servicesHTML += `</div></div>`;
