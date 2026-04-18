@@ -7,8 +7,9 @@
   "branchAnnouncements": [
     {
       "id": 1,
-      "title": "Branch Notice",
-      "message": "All branches that are not working n public holidays, please ensure that you deposite all your remaining float to the main account.",
+      "enabled": true,
+      "title": "Branch Staff Notice",
+      "message": "All branches that do not open on public holidays to deposit the remaining float into the main account.",
       "type": "info",
       "date": "2026-04-18"
     }
@@ -16,14 +17,11 @@
   "managementAnnouncements": [
     {
       "id": 1,
+      "enabled": true,
       "title": "Management Update",
       "message": "Head Office: System reconciliation will be done at 18:00 today. Please submit all End Day reports on time.",
       "type": "warning",
       "date": "2026-04-18"
     }
-  ],
-  "liveUpdates": {
-    "enabled": true,
-    "refreshIntervalSeconds": 30
-  }
+  ]
 }
