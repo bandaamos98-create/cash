@@ -7,27 +7,31 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body { font-family: 'Inter', system-ui, sans-serif; }
-        .modal { animation: fadeIn 0.3s ease-out; }
+        .modal { animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         .live-clock { font-variant-numeric: tabular-nums; }
-        .nav-button { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
-        .nav-button:hover { transform: translateY(-1px); }
-       
-        .cactus-icon {
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-            image-rendering: crisp-edges;
-        }
-       
-        #announcementBanner {
-            animation: slideIn 0.4s ease-out;
-        }
+        .nav-button { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .nav-button:hover { transform: translateY(-2px); box-shadow: 0 20px 25px -5px rgb(16 185 129); }
+        .cactus-icon { background-size: contain; background-repeat: no-repeat; background-position: center; }
+        .cash-card { min-height: 178px; transition: all 0.3s ease; }
+        .cash-card:hover { transform: translateY(-4px); }
+        .amount-text { font-size: 1.75rem; line-height: 1.05; word-break: break-all; overflow-wrap: break-word; }
+        @media (max-width: 1400px) { .amount-text { font-size: 1.45rem; } }
+        .label-text { font-size: 0.875rem; line-height: 1.1; word-break: break-word; }
+        .chat-bubble { max-width: 75%; padding: 12px 18px; border-radius: 20px; margin-bottom: 8px; }
+        .chat-bubble.me { background: #10b981; color: white; border-bottom-right-radius: 4px; align-self: flex-end; }
+        .chat-bubble.them { background: #374151; color: white; border-bottom-left-radius: 4px; align-self: flex-start; }
+        .metric-card { transition: all 0.3s ease; }
+        .metric-card:hover { transform: translateY(-3px); }
+        .sidebar-link { transition: all 0.2s ease; }
+        .sidebar-link:hover { background: #10b981; color: white; }
+        table { border-collapse: collapse; }
+        th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #374151; }
     </style>
 </head>
-<body class="bg-gray-950 text-white">
+<body class="bg-gradient-to-br from-gray-950 via-emerald-950 to-gray-950 text-white">
     <!-- LOGIN SCREEN -->
     <div id="loginScreen" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-900 to-gray-950">
         <div class="max-w-md w-full bg-gray-900 rounded-3xl shadow-2xl p-8">
@@ -35,98 +39,168 @@
                 <div id="loginLogo" class="cactus-icon w-12 h-12"></div>
                 <h1 class="text-4xl font-bold">Cactus</h1>
             </div>
-            <p class="text-center text-emerald-400 text-xl mb-8" id="loginTagline">Western Union • Staff Portal</p>
+            <p class="text-center text-emerald-400 text-xl mb-8">Western Union • Staff Portal</p>
             <div class="space-y-6">
                 <div>
                     <label class="block text-sm font-medium mb-2">Username / Employee ID</label>
-                    <input id="username" type="text" value="manager" class="w-full bg-gray-800 border border-gray-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-emerald-500">
+                    <input id="username" type="text" value="topmgmt" class="w-full bg-gray-800 border border-gray-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-emerald-500">
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-2">Password</label>
                     <input id="password" type="password" value="1234" class="w-full bg-gray-800 border border-gray-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-emerald-500">
                 </div>
                 <button onclick="handleLogin()" class="w-full bg-emerald-500 hover:bg-emerald-600 py-4 rounded-2xl font-semibold text-lg">SIGN IN</button>
-                <p class="text-center text-xs text-gray-500">Demo accounts (password: 1234):<br>manager (Management)<br>amos01 (Kabwe Main)<br>mukuyu01 (Mukuyu Branch)<br>kabwe01 (Kabwe Main)</p>
+                <p class="text-center text-xs text-gray-500">Demo accounts (password: 1234):<br>topmgmt (Top Management)<br>manager (Branch Managers)<br>amos01 (Kabwe Main)<br>mukuyu01 (Mukuyu Branch)<br>kabwe01 (Kabwe Main)</p>
             </div>
         </div>
     </div>
 
     <!-- MAIN APP -->
-    <div id="mainApp" class="hidden min-h-screen">
-        <nav class="bg-gray-900 border-b border-gray-800 sticky top-0 z-50">
-            <div class="max-w-screen-2xl mx-auto px-8 py-5 flex justify-between items-center">
-                <div class="flex items-center gap-3">
-                    <div id="navLogo" class="cactus-icon w-9 h-9"></div>
-                    <div>
-                        <h1 id="appName" class="text-2xl font-bold">Cactus Money Transfers</h1>
-                        <p id="appTagline" class="text-xs text-emerald-400">Western Union • Real-time Branch Monitoring</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-8">
-                    <div id="liveClock" class="live-clock text-xl font-mono bg-gray-800 px-5 py-2 rounded-2xl text-emerald-400"></div>
-                    <div id="userInfo" class="flex items-center gap-3"></div>
-                    <button onclick="logout()" class="flex items-center gap-2 text-gray-400 hover:text-white">
-                        <i class="fa-solid fa-right-from-bracket"></i> Logout
-                    </button>
-                </div>
+    <div id="mainApp" class="hidden min-h-screen flex">
+        <!-- SIDEBAR NAVIGATION (for Manager & Top Management) -->
+        <div id="sidebar" class="hidden w-64 bg-gray-900 border-r border-gray-800 flex flex-col pt-16">
+            <div onclick="switchSection('dashboard')" class="sidebar-link flex items-center gap-3 px-6 py-4 text-white cursor-pointer">
+                <i class="fa-solid fa-gauge-high"></i>
+                <span class="font-medium">Dashboard</span>
             </div>
-        </nav>
-        <div class="max-w-screen-2xl mx-auto px-8 py-8">
-            <!-- CASHIER VIEW -->
-            <div id="cashierView" class="hidden">
-                <div class="flex justify-between items-center mb-8">
-                    <div>
-                        <h2 class="text-3xl font-semibold">Welcome FLAs</h2>
-                        <p id="cashierBranch" class="text-emerald-400 text-lg"></p>
-                    </div>
+            <div onclick="switchSection('reports')" class="sidebar-link flex items-center gap-3 px-6 py-4 text-white cursor-pointer">
+                <i class="fa-solid fa-file-lines"></i>
+                <span class="font-medium">All Reports</span>
+            </div>
+            <div onclick="switchSection('expenses')" class="sidebar-link flex items-center gap-3 px-6 py-4 text-white cursor-pointer">
+                <i class="fa-solid fa-sack-dollar"></i>
+                <span class="font-medium">Expenses Summary</span>
+            </div>
+            <div onclick="switchSection('alerts')" class="sidebar-link flex items-center gap-3 px-6 py-4 text-white cursor-pointer">
+                <i class="fa-solid fa-bell"></i>
+                <span class="font-medium">Alerts &amp; Missing Reports</span>
+            </div>
+            <div onclick="openManagerMessagesModal()" id="sidebarMessages" class="sidebar-link flex items-center gap-3 px-6 py-4 text-white cursor-pointer">
+                <i class="fa-solid fa-envelope"></i>
+                <span class="font-medium">Messages <span id="sidebarUnread" class="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5"></span></span>
+            </div>
+        </div>
+
+        <div class="flex-1">
+            <!-- Top Navigation -->
+            <nav class="bg-gray-900 border-b border-gray-800 sticky top-0 z-50">
+                <div class="max-w-screen-2xl mx-auto px-8 py-5 flex justify-between items-center">
                     <div class="flex items-center gap-3">
-                        <button onclick="showMyPastCashPositions()" class="nav-button flex items-center gap-3 bg-blue-600 hover:bg-blue-700 px-6 py-4 rounded-3xl font-semibold text-lg shadow-xl">
-                            <i class="fa-solid fa-history"></i> Past Cash Positions
-                        </button>
-                        <button onclick="showMyPastEndDayReports()" class="nav-button flex items-center gap-3 bg-purple-600 hover:bg-purple-700 px-6 py-4 rounded-3xl font-semibold text-lg shadow-xl">
-                            <i class="fa-solid fa-flag-checkered"></i> Past End Day Reports
-                        </button>
-                        <button onclick="openEndDayModal()" class="flex items-center gap-3 bg-amber-500 hover:bg-amber-600 px-8 py-4 rounded-3xl font-semibold text-lg shadow-xl">
-                            <i class="fa-solid fa-flag-checkered"></i> END DAY REPORT
+                        <div id="navLogo" class="cactus-icon w-9 h-9"></div>
+                        <div>
+                            <h1 id="appName" class="text-2xl font-bold">Cactus Money Transfers</h1>
+                            <p id="appTagline" class="text-xs text-emerald-400">Western Union • Real-time Branch Monitoring</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-8">
+                        <div id="liveClock" class="live-clock text-xl font-mono bg-gray-800 px-5 py-2 rounded-2xl text-emerald-400"></div>
+                        <div id="userInfo" class="flex items-center gap-3"></div>
+                        <button onclick="logout()" class="flex items-center gap-2 text-gray-400 hover:text-white">
+                            <i class="fa-solid fa-right-from-bracket"></i> Logout
                         </button>
                     </div>
                 </div>
-                <div class="bg-gray-900 rounded-3xl p-8 mb-8">
-                    <h3 class="text-xl font-semibold mb-6">Today's Cash Positions</h3>
-                    <div id="todayReports" class="grid grid-cols-6 gap-4"></div>
-                </div>
-                <div class="bg-gray-900 rounded-3xl p-8">
-                    <h3 class="text-xl font-semibold mb-6">Submit Cash Position</h3>
-                    <div class="grid grid-cols-2 gap-8">
+            </nav>
+
+            <div class="max-w-screen-2xl mx-auto px-8 py-8">
+
+                <!-- CASHIER VIEW -->
+                <div id="cashierView" class="hidden">
+                    <div class="flex justify-between items-center mb-8">
                         <div>
-                            <label class="block text-sm font-medium mb-3">Time Slot</label>
-                            <div id="timeButtons" class="grid grid-cols-6 gap-3"></div>
+                            <h2 class="text-3xl font-semibold">Welcome FLAs</h2>
+                            <p id="cashierBranch" class="text-emerald-400 text-lg"></p>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-3">Cash at Hand (ZMW)</label>
-                            <div class="relative">
-                                <span class="absolute left-6 top-1/2 -translate-y-1/2 text-3xl text-gray-400">K</span>
-                                <input id="cashAmount" type="text" placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-2xl px-14 py-6 text-4xl font-medium focus:outline-none focus:border-emerald-500" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event)">
-                            </div>
-                            <button onclick="submitReport()" id="submitBtn" disabled class="mt-8 w-full bg-emerald-500 hover:bg-emerald-600 py-6 rounded-2xl font-semibold text-xl flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-paper-plane"></i> SUBMIT NOW
+                        <div class="flex items-center gap-3">
+                            <button onclick="showMyPastCashPositions()" class="nav-button flex items-center gap-3 bg-blue-600 hover:bg-blue-700 px-6 py-4 rounded-3xl font-semibold text-lg shadow-xl">
+                                <i class="fa-solid fa-history"></i> Past Cash Positions
+                            </button>
+                            <button onclick="showMyPastEndDayReports()" class="nav-button flex items-center gap-3 bg-purple-600 hover:bg-purple-700 px-6 py-4 rounded-3xl font-semibold text-lg shadow-xl">
+                                <i class="fa-solid fa-flag-checkered"></i> Past End Day Reports
+                            </button>
+                            <button onclick="openEndDayModal()" class="flex items-center gap-3 bg-amber-500 hover:bg-amber-600 px-8 py-4 rounded-3xl font-semibold text-lg shadow-xl">
+                                <i class="fa-solid fa-flag-checkered"></i> END DAY REPORT
+                            </button>
+                            <button onclick="openCashierMessageModal()" class="nav-button flex items-center gap-3 bg-teal-600 hover:bg-teal-700 px-6 py-4 rounded-3xl font-semibold text-lg shadow-xl">
+                                <i class="fa-solid fa-envelope"></i> Message Management
                             </button>
                         </div>
                     </div>
+                    <div class="bg-gray-900 rounded-3xl p-8 mb-8">
+                        <h3 class="text-xl font-semibold mb-6">Today's Cash Positions</h3>
+                        <div id="todayReports" class="grid grid-cols-6 gap-4"></div>
+                    </div>
+                    <div class="bg-gray-900 rounded-3xl p-8">
+                        <h3 class="text-xl font-semibold mb-6">Submit Cash Position</h3>
+                        <div class="grid grid-cols-2 gap-8">
+                            <div>
+                                <label class="block text-sm font-medium mb-3">Time Slot</label>
+                                <div id="timeButtons" class="grid grid-cols-6 gap-3"></div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-3">Cash at Hand (ZMW)</label>
+                                <div class="relative">
+                                    <span class="absolute left-6 top-1/2 -translate-y-1/2 text-3xl text-gray-400">K</span>
+                                    <input id="cashAmount" type="text" placeholder="0.00" class="w-full bg-gray-800 border border-gray-700 rounded-2xl px-14 py-6 text-4xl font-medium focus:outline-none focus:border-emerald-500" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event)">
+                                </div>
+                                <button onclick="submitReport()" id="submitBtn" disabled class="mt-8 w-full bg-emerald-500 hover:bg-emerald-600 py-6 rounded-2xl font-semibold text-xl flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-paper-plane"></i> SUBMIT NOW
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <!-- MANAGER VIEW -->
-            <div id="managerView" class="hidden">
-                <h2 class="text-3xl font-semibold mb-8 flex items-center gap-3">
-                    Management Dashboard
-                    <span class="text-emerald-400 text-base font-normal px-4 py-1 bg-emerald-900/30 rounded-3xl">All Branches • Live Western Union Monitoring</span>
-                </h2>
-                <div id="managerDashboard" class="space-y-12"></div>
+
+                <!-- MANAGER VIEW -->
+                <div id="managerView" class="hidden">
+                    <div id="managerDashboardContent">
+                        <!-- Filled by renderManagerDashboard -->
+                    </div>
+                </div>
+
+                <!-- TOP MANAGEMENT VIEW -->
+                <div id="topManagementView" class="hidden">
+                    <div id="topDashboardContent">
+                        <!-- Filled by renderTopManagementView -->
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- END DAY MODAL -->
+    <!-- MESSAGE MODAL -->
+    <div id="messageModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[130]">
+        <div class="modal bg-gray-900 rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+            <div class="p-6 border-b border-gray-700 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div id="modalChatIcon" class="text-2xl"></div>
+                    <div>
+                        <p id="modalChatTitle" class="font-semibold text-lg"></p>
+                        <p id="modalChatSubtitle" class="text-sm text-gray-400"></p>
+                    </div>
+                </div>
+                <button onclick="closeMessageModal()" class="text-4xl text-gray-400 hover:text-white">×</button>
+            </div>
+            <div id="chatMessages" class="flex-1 p-6 overflow-auto flex flex-col gap-3 bg-gray-950"></div>
+            <div class="p-4 border-t border-gray-700 bg-gray-900 flex gap-3">
+                <input id="messageInput" type="text" placeholder="Type your message..." class="flex-1 bg-gray-800 border border-gray-700 rounded-3xl px-6 py-4 focus:outline-none focus:border-emerald-500">
+                <button onclick="sendMessage()" class="bg-emerald-500 hover:bg-emerald-600 px-8 rounded-3xl font-semibold">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BRANCH LIST MODAL -->
+    <div id="managerBranchListModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[140]">
+        <div class="modal bg-gray-900 rounded-3xl w-full max-w-lg p-8">
+            <div class="flex justify-between items-center mb-6">
+                <h3 id="branchListTitle" class="text-2xl font-semibold"></h3>
+                <button onclick="closeManagerBranchListModal()" class="text-4xl text-gray-400 hover:text-white">×</button>
+            </div>
+            <div id="branchListContainer" class="space-y-2 max-h-96 overflow-auto"></div>
+        </div>
+    </div>
+
+    <!-- END DAY MODAL (FULL RESTORED) -->
     <div id="endDayModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[100]">
         <div class="modal bg-gray-900 rounded-3xl w-full max-w-7xl max-h-[95vh] overflow-hidden flex flex-col">
             <div class="p-6 border-b border-gray-700 flex justify-between items-center">
@@ -134,7 +208,7 @@
                     <p class="text-amber-400 font-medium">End of Day Report • Western Union + Services</p>
                     <p id="endDayBranch" class="text-3xl font-semibold"></p>
                 </div>
-                <button onclick="closeEndDayModal()" class="text-4xl text-gray-400 hover:text-white">&times;</button>
+                <button onclick="closeEndDayModal()" class="text-4xl text-gray-400 hover:text-white">×</button>
             </div>
             <div class="flex-1 p-8 overflow-auto" id="endDayContent"></div>
             <div class="p-6 border-t border-gray-700 bg-gray-950 flex items-center justify-between">
@@ -152,7 +226,7 @@
         </div>
     </div>
 
-    <!-- CASH BREAKDOWN MODAL -->
+    <!-- CASH BREAKDOWN MODAL (FULL RESTORED) -->
     <div id="cashBreakdownModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[110]">
         <div class="modal bg-gray-900 rounded-3xl w-full max-w-4xl max-h-[92vh] overflow-hidden flex flex-col">
             <div class="p-6 border-b border-gray-700 flex justify-between items-center">
@@ -160,7 +234,7 @@
                     <p class="text-amber-400 font-medium">Cash Breakdown • Physical Count Verification</p>
                     <p id="breakdownBranchDate" class="text-3xl font-semibold"></p>
                 </div>
-                <button onclick="closeCashBreakdownModal()" class="text-4xl text-gray-400 hover:text-white">&times;</button>
+                <button onclick="closeCashBreakdownModal()" class="text-4xl text-gray-400 hover:text-white">×</button>
             </div>
             <div class="flex-1 p-8 overflow-auto">
                 <div class="flex justify-between items-baseline mb-8 bg-gray-800 rounded-3xl p-6">
@@ -173,9 +247,7 @@
                         <div id="physicalTotalDisplay" class="text-4xl font-bold text-emerald-400">K 0.00</div>
                     </div>
                 </div>
-                <h3 class="text-2xl font-semibold mb-6 flex items-center gap-3">
-                    <i class="fa-solid fa-coins"></i> Zambian Notes & Coins
-                </h3>
+                <h3 class="text-2xl font-semibold mb-6 flex items-center gap-3"><i class="fa-solid fa-coins"></i> Zambian Notes & Coins</h3>
                 <div id="denominationsContainer" class="grid grid-cols-2 gap-5"></div>
                 <div id="discrepancyContainer" class="mt-12 bg-gray-800 rounded-3xl p-8"></div>
                 <div class="mt-10">
@@ -192,7 +264,28 @@
         </div>
     </div>
 
-    <!-- END DAY REPORT DETAIL MODAL -->
+    <!-- EDIT CASH MODAL -->
+    <div id="editCashModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[120]">
+        <div class="modal bg-gray-900 rounded-3xl w-full max-w-lg p-8">
+            <div class="flex justify-between items-center mb-6">
+                <h3 id="editCashTitle" class="text-2xl font-semibold"></h3>
+                <button onclick="closeEditCashModal()" class="text-4xl text-gray-400 hover:text-white">×</button>
+            </div>
+            <div class="bg-gray-800 rounded-3xl p-8 mb-8">
+                <label class="block text-sm font-medium mb-3 text-gray-400">NEW CASH AMOUNT (ZMW)</label>
+                <div class="relative">
+                    <span class="absolute left-8 top-1/2 -translate-y-1/2 text-4xl text-emerald-400/70">K</span>
+                    <input id="editCashAmount" type="text" class="w-full bg-gray-900 border-2 border-gray-700 focus:border-emerald-500 rounded-3xl px-20 py-8 text-5xl font-semibold text-right focus:outline-none" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event)">
+                </div>
+            </div>
+            <div class="flex gap-4">
+                <button onclick="closeEditCashModal()" class="flex-1 py-4 text-gray-400 hover:bg-gray-800 rounded-3xl font-medium">Cancel</button>
+                <button onclick="saveEditedCashPosition()" class="flex-1 bg-emerald-500 hover:bg-emerald-600 py-4 rounded-3xl font-semibold text-xl">UPDATE & RE-SUBMIT</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- END DAY LIST MODAL -->
     <div id="endDayListModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[100]">
         <div class="modal bg-gray-900 rounded-3xl w-full max-w-5xl max-h-[95vh] overflow-hidden flex flex-col">
             <div class="p-6 border-b border-gray-700 flex justify-between items-center" id="endDayListHeaderContainer"></div>
@@ -200,7 +293,7 @@
         </div>
     </div>
 
-    <!-- CASH POSITION DATES MODAL -->
+    <!-- CASH POSITION MODAL -->
     <div id="cashPositionModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[100]">
         <div class="modal bg-gray-900 rounded-3xl w-full max-w-6xl max-h-[95vh] overflow-hidden flex flex-col">
             <div class="p-6 border-b border-gray-700 flex justify-between items-center">
@@ -208,7 +301,7 @@
                     <p class="text-emerald-400 font-medium">Monthly Cash Position Reports</p>
                     <p id="cashPositionHeader" class="text-2xl font-semibold"></p>
                 </div>
-                <button onclick="closeCashPositionModal()" class="text-4xl text-gray-400 hover:text-white">&times;</button>
+                <button onclick="closeCashPositionModal()" class="text-4xl text-gray-400 hover:text-white">×</button>
             </div>
             <div class="flex-1 p-6 overflow-auto" id="cashPositionContent"></div>
         </div>
@@ -221,12 +314,19 @@
         let endDayReports = [];
         let pendingEndDayData = null;
         let bookClosingVal = 0;
+        let editingCashDate = null;
+        let editingCashTimeKey = null;
+        let editingEndDayId = null;
+        let messagesDB = [];
+        let selectedTimeKey = null;
+        let currentSection = 'dashboard';
 
         const staffDB = {
             "amos01": { password: "1234", role: "cashier", fullName: "Amos Banda", branch: "Kabwe Main" },
             "mukuyu01": { password: "1234", role: "cashier", fullName: "Mukuyu Operator", branch: "Mukuyu Branch" },
             "kabwe01": { password: "1234", role: "cashier", fullName: "Kabwe Operator", branch: "Kabwe Main" },
-            "manager": { password: "1234", role: "manager", fullName: "Management", branch: "Head Office" }
+            "manager": { password: "1234", role: "manager", fullName: "Branch Managers", branch: "Head Office" },
+            "topmgmt": { password: "1234", role: "topmanagement", fullName: "Top Management", branch: "Head Office" }
         };
 
         const reportTimes = [
@@ -239,95 +339,46 @@
         ];
 
         const otherServices = ["ZOONA", "AIRTEL MONEY", "ZAMTEL MONEY", "MTN MONEY", "MTN BULK", "AIRTEL BULK", "ZANACO", "INDO", "FNB"];
+        const commonInflowSources = ["Counter 2 Transfer","Airtel Receipt","Bank Deposit","Zanaco Transfer","FNB Credit","Mobile Money Receipt","Customer Refund","Service Adjustment","Other"];
+        const commonOutflowSources = ["To Counter 2","To Airtel","To Bank","To MTN","To Zanaco","To IZB","Customer Payout","Bank Withdrawal","Expense","Other"];
 
-        // ===================== CONFIGURATION - TWO SEPARATE ANNOUNCEMENT KEYS =====================
-        let config = {
-            app: {
-                name: "Cactus Money Transfers",
-                tagline: "Western Union • Real-time Branch Monitoring",
-                logoUrl: "https://raw.githubusercontent.com/bandaamos98-create/cash/main/images/cactus.png"
-            },
-            branchAnnouncements: [],      // Only shown to cashiers / branch staff
-            managementAnnouncements: []   // Only shown to manager
-        };
+        const allBranches = ["Kabwe Main", "Mukuyu Branch", "Kitwe Branch", "Ndola Branch"];
 
-        async function loadConfig() {
-            try {
-                const response = await fetch('https://raw.githubusercontent.com/bandaamos98-create/cash/main/config.json');
-                if (!response.ok) throw new Error('Config file not found');
-                const loadedConfig = await response.json();
-                config = { ...config, ...loadedConfig };
-                applyConfigToUI();
-                if (currentUser) showRoleBasedAnnouncement();
-                console.log('✅ Config loaded from GitHub');
-            } catch (error) {
-                console.warn('⚠️ Using default config (config.json not found yet)', error);
-                applyConfigToUI();
+        // ===================== DATA =====================
+        function loadData() {
+            reportsDB = JSON.parse(localStorage.getItem('cactusReports') || '[]');
+            endDayReports = JSON.parse(localStorage.getItem('cactusEndDayReports') || '[]');
+            messagesDB = JSON.parse(localStorage.getItem('cactusMessages') || '[]');
+
+            if (reportsDB.length === 0) {
+                const today = getToday();
+                reportsDB = [
+                    { id: Date.now()-1000000, date: today, username: "amos01", fullName: "Amos Banda", branch: "Kabwe Main", timeKey: "opening", time: "08:00", label: "Opening", amount: 125000, submittedAt: new Date(Date.now()-7200000).toISOString() },
+                    { id: Date.now()-900000, date: today, username: "amos01", fullName: "Amos Banda", branch: "Kabwe Main", timeKey: "10hrs", time: "10:00", label: "10:00 hrs", amount: 98000, submittedAt: new Date(Date.now()-5400000).toISOString() },
+                    { id: Date.now()-800000, date: today, username: "amos01", fullName: "Amos Banda", branch: "Kabwe Main", timeKey: "14hrs", time: "14:00", label: "14:00 hrs", amount: 142000, submittedAt: new Date(Date.now()-1800000).toISOString() },
+                    { id: Date.now()-700000, date: today, username: "mukuyu01", fullName: "Mukuyu Operator", branch: "Mukuyu Branch", timeKey: "opening", time: "08:00", label: "Opening", amount: 67000, submittedAt: new Date(Date.now()-8100000).toISOString() },
+                    { id: Date.now()-600000, date: today, username: "dummy", fullName: "Kitwe Cashier", branch: "Kitwe Branch", timeKey: "10hrs", time: "10:00", label: "10:00 hrs", amount: 45000, submittedAt: new Date(Date.now()-3600000).toISOString() },
+                    { id: Date.now()-500000, date: today, username: "dummy", fullName: "Ndola Cashier", branch: "Ndola Branch", timeKey: "14hrs", time: "14:00", label: "14:00 hrs", amount: 112000, submittedAt: new Date(Date.now()-900000).toISOString() }
+                ];
+                endDayReports = [
+                    { id: Date.now()-300000, date: today, username: "amos01", fullName: "Amos Banda", branch: "Kabwe Main", submittedAt: new Date().toISOString(), data: { wu: { closing: 158000, paid: 45000, sent: 12000, toBank: 8000 }, cashBreakdown: { discrepancy: 1200, reason: "Counting error" } } },
+                    { id: Date.now()-200000, date: today, username: "dummy", fullName: "Ndola Cashier", branch: "Ndola Branch", submittedAt: new Date().toISOString(), data: { wu: { closing: 89000, paid: 32000 }, cashBreakdown: { discrepancy: -4500, reason: "Short payment" } } }
+                ];
             }
+            saveData();
         }
 
-        function applyConfigToUI() {
-            document.querySelectorAll('.cactus-icon').forEach(el => {
-                el.style.backgroundImage = `url('${config.app.logoUrl}')`;
-            });
-            const appNameEl = document.getElementById('appName');
-            const appTaglineEl = document.getElementById('appTagline');
-            if (appNameEl) appNameEl.textContent = config.app.name;
-            if (appTaglineEl) appTaglineEl.textContent = config.app.tagline;
-            const loginLogo = document.getElementById('loginLogo');
-            if (loginLogo) loginLogo.style.backgroundImage = `url('${config.app.logoUrl}')`;
-            const loginTagline = document.getElementById('loginTagline');
-            if (loginTagline) loginTagline.textContent = config.app.tagline;
-        }
-
-        function showRoleBasedAnnouncement() {
-            if (!currentUser) return;
-            let announcements = currentUser.role === "manager" 
-                ? (config.managementAnnouncements || []) 
-                : (config.branchAnnouncements || []);
-            if (announcements.length === 0) return;
-            const latest = announcements[0];
-            const borderColor = latest.type === "warning" ? "border-amber-500" : "border-emerald-500";
-            const titleColor = latest.type === "warning" ? "text-amber-400" : "text-emerald-400";
-            const html = `
-                <div id="announcementBanner" class="fixed top-4 right-4 bg-gray-900 ${borderColor} border rounded-3xl p-5 max-w-sm shadow-2xl z-[200] flex gap-4">
-                    <div class="text-3xl">📢</div>
-                    <div class="flex-1">
-                        <p class="font-semibold ${titleColor}">${latest.title}</p>
-                        <p class="text-sm text-gray-300 mt-1">${latest.message}</p>
-                        <p class="text-xs text-gray-500 mt-3">${latest.date || ''}</p>
-                        <button onclick="this.closest('#announcementBanner').remove()" class="mt-3 text-xs text-gray-400 hover:text-white">Dismiss</button>
-                    </div>
-                </div>`;
-            const existing = document.getElementById('announcementBanner');
-            if (existing) existing.remove();
-            const div = document.createElement('div');
-            div.innerHTML = html;
-            document.body.appendChild(div.firstElementChild);
-        }
-
-        // ===================== UTILITY FUNCTIONS =====================
-        function getToday() { return new Date().toISOString().split('T')[0]; }
-        function saveReports() {
+        function saveData() {
             localStorage.setItem('cactusReports', JSON.stringify(reportsDB));
             localStorage.setItem('cactusEndDayReports', JSON.stringify(endDayReports));
+            localStorage.setItem('cactusMessages', JSON.stringify(messagesDB));
         }
-        function formatMoneyInput(e) {
-            let val = e.target.value.replace(/[^0-9.]/g, '');
-            const parts = val.split('.');
-            if (parts.length > 2) val = parts[0] + '.' + parts[1];
-            e.target.value = val;
-        }
-        function applyCommaFormat(e) {
-            let val = e.target.value.replace(/,/g, '');
-            const num = parseFloat(val);
-            if (!isNaN(num)) {
-                e.target.value = num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            }
-        }
-        function cleanMoney(val) {
-            return parseFloat(String(val).replace(/,/g, '')) || 0;
-        }
+
+        // ===================== UTILITIES =====================
+        function getToday() { return new Date().toISOString().split('T')[0]; }
+        function formatMoneyInput(e) { let val = e.target.value.replace(/[^0-9.]/g, ''); const parts = val.split('.'); if (parts.length > 2) val = parts[0] + '.' + parts[1].slice(0,2); e.target.value = val; }
+        function applyCommaFormat(e) { let val = e.target.value.replace(/,/g, ''); const num = parseFloat(val); if (!isNaN(num)) e.target.value = num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+        function cleanMoney(val) { return parseFloat(String(val).replace(/,/g, '')) || 0; }
 
         // ===================== LOGIN =====================
         function handleLogin() {
@@ -337,43 +388,66 @@
                 currentUser = { username, ...staffDB[username] };
                 document.getElementById('loginScreen').classList.add('hidden');
                 document.getElementById('mainApp').classList.remove('hidden');
+                loadData();
                 renderApp();
-            } else {
-                alert("Invalid credentials.\nDemo accounts (password 1234):\nmanager, amos01, mukuyu01, kabwe01");
-            }
+            } else alert("Invalid credentials.\nDemo accounts (password 1234):\ntopmgmt, manager, amos01, mukuyu01, kabwe01");
         }
+
         function logout() {
             currentUser = null;
             document.getElementById('mainApp').classList.add('hidden');
             document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('sidebar').classList.add('hidden');
         }
+
         function renderUserInfo() {
-            document.getElementById('userInfo').innerHTML = `
-                <div class="bg-gray-800 rounded-3xl px-5 py-2 flex items-center gap-3">
-                    <div class="cactus-icon w-8 h-8"></div>
-                    <div>
-                        <p class="font-semibold">${currentUser.fullName}</p>
-                        <p class="text-xs text-gray-400">${currentUser.branch}</p>
-                    </div>
-                </div>
-            `;
+            document.getElementById('userInfo').innerHTML = `<div class="bg-gray-800 rounded-3xl px-5 py-2 flex items-center gap-3"><div class="cactus-icon w-8 h-8"></div><div><p class="font-semibold">${currentUser.fullName}</p><p class="text-xs text-gray-400">${currentUser.branch} • ${currentUser.role.toUpperCase()}</p></div></div>`;
         }
+
         function startLiveClock() {
             const clockEl = document.getElementById('liveClock');
-            setInterval(() => {
-                const now = new Date();
-                clockEl.textContent = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            }, 1000);
+            setInterval(() => clockEl.textContent = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' }), 1000);
+        }
+
+        // ===================== SIDEBAR NAVIGATION =====================
+        function switchSection(section) {
+            currentSection = section;
+            if (currentUser.role === 'manager') renderManagerDashboard();
+            else if (currentUser.role === 'topmanagement') renderTopManagementView();
+        }
+
+        // ===================== RENDER APP =====================
+        function renderApp() {
+            renderUserInfo();
+            startLiveClock();
+            loadData();
+
+            document.getElementById('cashierView').classList.add('hidden');
+            document.getElementById('managerView').classList.add('hidden');
+            document.getElementById('topManagementView').classList.add('hidden');
+            document.getElementById('sidebar').classList.add('hidden');
+
+            if (currentUser.role === 'cashier') {
+                renderCashierView();
+            } else if (currentUser.role === 'manager') {
+                document.getElementById('sidebar').classList.remove('hidden');
+                document.getElementById('managerView').classList.remove('hidden');
+                renderManagerDashboard();
+            } else if (currentUser.role === 'topmanagement') {
+                document.getElementById('sidebar').classList.remove('hidden');
+                document.getElementById('topManagementView').classList.remove('hidden');
+                renderTopManagementView();
+            }
         }
 
         // ===================== CASHIER VIEW =====================
         function renderCashierView() {
             document.getElementById('cashierView').classList.remove('hidden');
-            document.getElementById('managerView').classList.add('hidden');
             document.getElementById('cashierBranch').textContent = currentUser.branch;
             renderTimeButtons();
             renderTodayReports();
         }
+
         function renderTimeButtons() {
             const container = document.getElementById('timeButtons');
             container.innerHTML = '';
@@ -388,13 +462,14 @@
                 container.appendChild(btn);
             });
         }
-        let selectedTimeKey = null;
+
         function selectTime(key, btnElement) {
             selectedTimeKey = key;
             document.querySelectorAll('#timeButtons button').forEach(b => b.classList.remove('ring-2', 'ring-emerald-500'));
             btnElement.classList.add('ring-2', 'ring-emerald-500');
             document.getElementById('submitBtn').disabled = false;
         }
+
         function submitReport() {
             if (!selectedTimeKey) return alert("Please select a time slot");
             const amountStr = document.getElementById('cashAmount').value.replace(/,/g, '');
@@ -404,19 +479,9 @@
             const today = getToday();
             const slot = reportTimes.find(t => t.key === selectedTimeKey);
             reportsDB = reportsDB.filter(r => !(r.date === today && r.username === currentUser.username && r.timeKey === selectedTimeKey));
-            reportsDB.unshift({
-                id: Date.now(),
-                date: today,
-                username: currentUser.username,
-                fullName: currentUser.fullName,
-                branch: currentUser.branch,
-                timeKey: selectedTimeKey,
-                time: slot.time,
-                label: slot.label,
-                amount: amount,
-                submittedAt: new Date().toISOString()
-            });
-            saveReports();
+            reportsDB.unshift({ id: Date.now(), date: today, username: currentUser.username, fullName: currentUser.fullName, branch: currentUser.branch, timeKey: selectedTimeKey, time: slot.time, label: slot.label, amount: amount, submittedAt: new Date().toISOString() });
+            messagesDB.unshift({ id: Date.now(), fromRole: 'cashier', fromBranch: currentUser.branch, toRole: 'manager', toBranch: 'Head Office', message: `Cash position submitted for ${slot.label}`, timestamp: new Date().toISOString(), read: false });
+            saveData();
             renderTimeButtons();
             renderTodayReports();
             document.getElementById('cashAmount').value = '';
@@ -424,6 +489,7 @@
             document.getElementById('submitBtn').disabled = true;
             alert(`✅ ${slot.label} submitted successfully!`);
         }
+
         function renderTodayReports() {
             const today = getToday();
             const container = document.getElementById('todayReports');
@@ -433,213 +499,190 @@
                 const amount = report ? report.amount : 0;
                 const submittedTime = report ? new Date(report.submittedAt).toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'}) : 'Not submitted';
                 const div = document.createElement('div');
-                div.className = `rounded-3xl p-6 text-center ${report ? 'bg-emerald-900/30 border border-emerald-500' : 'bg-gray-800'}`;
-                div.innerHTML = `
-                    <p class="text-emerald-400 text-sm">${slot.label}</p>
-                    <p class="text-4xl font-semibold mt-3">${amount.toLocaleString('en-US', {minimumFractionDigits: 2})}</p>
-                    <p class="text-xs text-gray-400 mt-1">ZMW</p>
-                    <p class="text-[10px] text-gray-500 mt-2">Submitted: ${submittedTime}</p>
-                `;
+                div.className = `cash-card rounded-3xl p-6 text-center ${report ? 'bg-emerald-900/30 border border-emerald-500' : 'bg-gray-800'}`;
+                div.innerHTML = `<p class="label-text text-emerald-400">${slot.label}</p><p class="amount-text font-semibold mt-3">${amount.toLocaleString('en-US', {minimumFractionDigits: 2})}</p><p class="text-xs text-gray-400 mt-1">ZMW</p><p class="text-[10px] text-gray-500 mt-2">Submitted: ${submittedTime}</p>`;
                 container.appendChild(div);
             });
         }
-        function showMyPastCashPositions() {
-            const filteredDates = [...new Set(reportsDB.filter(r => r.username === currentUser.username).map(r => r.date))].sort((a, b) => new Date(b) - new Date(a));
-            let html = `<div class="grid grid-cols-5 gap-4">`;
-            if (filteredDates.length === 0) {
-                html += `<p class="col-span-5 text-center py-12 text-gray-400">No past cash position reports yet.</p>`;
-            } else {
-                filteredDates.forEach(date => {
-                    html += `
-                        <div onclick="viewMyDailyCashPositions('${date}')" class="bg-gray-800 hover:bg-gray-700 cursor-pointer rounded-2xl p-6 text-center transition-all">
-                            <p class="text-2xl font-semibold">${date}</p>
-                            <p class="text-emerald-400 text-sm mt-2">View My Cash Positions →</p>
-                        </div>`;
-                });
-            }
-            html += `</div>`;
-            document.getElementById('cashPositionHeader').innerHTML = `My Cash Position Reports • ${currentUser.branch}`;
-            document.getElementById('cashPositionContent').innerHTML = html;
-            document.getElementById('cashPositionModal').classList.remove('hidden');
-        }
-        function viewMyDailyCashPositions(date) {
-            const dayReports = reportsDB.filter(r => r.username === currentUser.username && r.date === date)
-                .sort((a, b) => reportTimes.map(t => t.key).indexOf(a.timeKey) - reportTimes.map(t => t.key).indexOf(b.timeKey));
-            let html = `<h3 class="text-2xl font-semibold mb-6">${date} – My Cash Positions</h3><div class="grid grid-cols-6 gap-4">`;
-            reportTimes.forEach(slot => {
-                const rep = dayReports.find(r => r.timeKey === slot.key);
-                const amount = rep ? rep.amount : 0;
-                const time = rep ? new Date(rep.submittedAt).toLocaleTimeString('en-GB',{hour:'2-digit', minute:'2-digit'}) : '—';
-                html += `
-                    <div class="rounded-3xl p-6 text-center ${rep ? 'bg-emerald-900/30 border border-emerald-500' : 'bg-gray-800'}">
-                        <p class="text-emerald-400 text-sm">${slot.label}</p>
-                        <p class="text-4xl font-semibold mt-4">${amount.toLocaleString('en-US', {minimumFractionDigits: 2})}</p>
-                        <p class="text-xs text-gray-400">ZMW</p>
-                        <p class="text-[10px] text-gray-500 mt-4">${time}</p>
-                    </div>`;
+
+        // ===================== MESSAGE SYSTEM =====================
+        function getConversationFilter(partner) {
+            const role = currentUser.role;
+            const branch = currentUser.branch;
+            return messagesDB.filter(m => {
+                if (role === 'cashier') {
+                    return (m.fromRole === 'cashier' && m.fromBranch === branch && m.toRole === 'manager') ||
+                           (m.fromRole === 'manager' && m.toBranch === branch);
+                }
+                if (role === 'manager') {
+                    if (partner === 'topmanagement') {
+                        return (m.fromRole === 'manager' && m.toRole === 'topmanagement') ||
+                               (m.fromRole === 'topmanagement' && m.toRole === 'manager');
+                    } else {
+                        return (m.fromRole === 'manager' && m.toBranch === partner) ||
+                               (m.fromRole === 'cashier' && m.fromBranch === partner && m.toRole === 'manager');
+                    }
+                }
+                if (role === 'topmanagement') {
+                    return (m.fromRole === 'topmanagement' && m.toRole === 'manager') ||
+                           (m.fromRole === 'manager' && m.toRole === 'topmanagement');
+                }
+                return false;
             });
-            html += `</div>`;
-            document.getElementById('cashPositionContent').innerHTML = html;
-        }
-        function showMyPastEndDayReports() {
-            const filtered = endDayReports.filter(r => r.username === currentUser.username).sort((a, b) => new Date(b.date) - new Date(a.date));
-            let html = `<div class="grid grid-cols-4 gap-4">`;
-            if (filtered.length === 0) {
-                html += `<p class="col-span-4 text-center py-12 text-gray-400">No End Day Reports submitted yet.</p>`;
-            } else {
-                filtered.forEach(r => {
-                    html += `
-                        <div onclick="viewEndDayReport(${r.id})" class="bg-gray-800 hover:bg-gray-700 cursor-pointer rounded-2xl p-6 text-center transition-all">
-                            <p class="text-2xl font-semibold">${r.date}</p>
-                            <p class="text-sm text-gray-400 mt-2">${r.fullName}</p>
-                            <p class="text-xs text-emerald-400 mt-1">Submitted • ${new Date(r.submittedAt).toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'})}</p>
-                        </div>`;
-                });
-            }
-            html += `</div>`;
-            document.getElementById('endDayListHeaderContainer').innerHTML = `
-                <div class="flex justify-between items-center">
-                    <div>
-                        <p class="text-amber-400 font-medium">My End Day Reports</p>
-                        <p class="text-2xl font-semibold">${currentUser.branch}</p>
-                    </div>
-                    <button onclick="closeEndDayListModal()" class="text-4xl text-gray-400 hover:text-white">&times;</button>
-                </div>
-            `;
-            document.getElementById('endDayListContent').innerHTML = html;
-            document.getElementById('endDayListModal').classList.remove('hidden');
         }
 
-        // ===================== END DAY MODAL =====================
-        function openEndDayModal() {
+        function markConversationAsRead(partner) {
+            getConversationFilter(partner).forEach(m => { if (!m.read) m.read = true; });
+            saveData();
+        }
+
+        function renderChatMessages(partner) {
+            const container = document.getElementById('chatMessages');
+            container.innerHTML = '';
+            const filtered = getConversationFilter(partner);
+            filtered.sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
+            filtered.forEach(msg => {
+                const isMe = msg.fromRole === currentUser.role;
+                const bubble = document.createElement('div');
+                bubble.className = `chat-bubble ${isMe ? 'me' : 'them'}`;
+                bubble.innerHTML = `<p>${msg.message}</p><p class="text-[10px] opacity-70 mt-1">${new Date(msg.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</p>`;
+                container.appendChild(bubble);
+            });
+            container.scrollTop = container.scrollHeight;
+            markConversationAsRead(partner);
+            updateUnreadCounts();
+        }
+
+        function updateUnreadCounts() {
+            if (!currentUser) return;
+            if (currentUser.role === 'manager' || currentUser.role === 'topmanagement') {
+                const unread = messagesDB.filter(m => (m.toRole === currentUser.role) && !m.read).length;
+                const el = document.getElementById('unreadCount') || document.getElementById('topUnreadCount') || document.getElementById('sidebarUnread');
+                if (el) el.textContent = unread > 0 ? unread : '';
+            }
+        }
+
+        function openCashierMessageModal() {
+            document.getElementById('modalChatTitle').textContent = "Chat with Management";
+            document.getElementById('modalChatSubtitle').textContent = "Branch Managers";
+            document.getElementById('modalChatIcon').innerHTML = `<i class="fa-solid fa-building-columns text-emerald-400"></i>`;
+            window.currentChatPartner = "manager";
+            renderChatMessages("manager");
+            document.getElementById('messageModal').classList.remove('hidden');
+        }
+
+        function openManagerMessagesModal() {
+            document.getElementById('branchListTitle').textContent = currentUser.role === 'manager' ? "Select Recipient" : "Communicate with Manager";
+            document.getElementById('managerBranchListModal').classList.remove('hidden');
+            if (currentUser.role === 'manager') renderBranchListForManager();
+            else renderBranchListForTop();
+        }
+
+        function openTopMessagesModal() {
+            openManagerMessagesModal();
+        }
+
+        function closeManagerBranchListModal() {
+            document.getElementById('managerBranchListModal').classList.add('hidden');
+        }
+
+        function renderBranchListForManager() {
+            const container = document.getElementById('branchListContainer');
+            container.innerHTML = '';
+            allBranches.forEach(branch => {
+                const unread = messagesDB.filter(m => (m.fromBranch === branch && m.toRole === 'manager') && !m.read).length;
+                const div = document.createElement('div');
+                div.className = "flex justify-between items-center bg-gray-800 hover:bg-gray-700 rounded-2xl p-4 cursor-pointer";
+                div.innerHTML = `<div><p class="font-medium">${branch}</p></div><div class="flex items-center gap-2">${unread ? `<span class="bg-red-500 text-white text-xs rounded-full px-3 py-1">${unread}</span>` : ''}<i class="fa-solid fa-chevron-right"></i></div>`;
+                div.onclick = () => { closeManagerBranchListModal(); openChatWithBranch(branch); };
+                container.appendChild(div);
+            });
+            const topDiv = document.createElement('div');
+            topDiv.className = "flex justify-between items-center bg-violet-900 hover:bg-violet-800 rounded-2xl p-4 cursor-pointer";
+            topDiv.innerHTML = `<div><p class="font-medium flex items-center gap-2"><i class="fa-solid fa-crown"></i> Top Management</p></div><div class="flex items-center gap-2"><i class="fa-solid fa-chevron-right"></i></div>`;
+            topDiv.onclick = () => { closeManagerBranchListModal(); openChatWithBranch('topmanagement'); };
+            container.appendChild(topDiv);
+        }
+
+        function renderBranchListForTop() {
+            const container = document.getElementById('branchListContainer');
+            container.innerHTML = `<div onclick="closeManagerBranchListModal(); openChatWithBranch('manager');" class="flex justify-between items-center bg-gray-800 hover:bg-gray-700 rounded-2xl p-4 cursor-pointer"><div><p class="font-medium">Branch Managers (single account)</p></div><div class="flex items-center gap-2"><i class="fa-solid fa-chevron-right"></i></div></div>`;
+        }
+
+        function openChatWithBranch(partner) {
+            let title = partner === 'topmanagement' ? "Chat with Top Management" : partner === 'manager' ? "Chat with Branch Managers" : `Chat with ${partner}`;
+            document.getElementById('modalChatTitle').textContent = title;
+            document.getElementById('modalChatSubtitle').textContent = partner === 'topmanagement' || partner === 'manager' ? "Head Office" : "Cashier";
+            document.getElementById('modalChatIcon').innerHTML = `<i class="fa-solid fa-building-columns text-emerald-400"></i>`;
+            window.currentChatPartner = partner;
+            renderChatMessages(partner);
+            document.getElementById('messageModal').classList.remove('hidden');
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const text = input.value.trim();
+            if (!text) return;
+            const now = new Date().toISOString();
+            let toRole = 'manager';
+            let toBranch = 'Head Office';
+
+            if (currentUser.role === 'cashier') { toRole = 'manager'; toBranch = 'Head Office'; }
+            else if (currentUser.role === 'manager') {
+                if (window.currentChatPartner === 'topmanagement') { toRole = 'topmanagement'; toBranch = 'Head Office'; }
+                else { toRole = 'cashier'; toBranch = window.currentChatPartner; }
+            } else if (currentUser.role === 'topmanagement') { toRole = 'manager'; toBranch = 'Head Office'; }
+
+            const msg = { id: Date.now(), fromRole: currentUser.role, fromBranch: currentUser.branch, toRole: toRole, toBranch: toBranch, message: text, timestamp: now, read: false };
+            messagesDB.unshift(msg);
+            saveData();
+            input.value = '';
+            renderChatMessages(window.currentChatPartner);
+        }
+
+        function closeMessageModal() {
+            document.getElementById('messageModal').classList.add('hidden');
+            window.currentChatPartner = null;
+            updateUnreadCounts();
+        }
+
+        // ===================== FULL END DAY REPORT FEATURE (RESTORED) =====================
+        function openEndDayModal(editId = null) {
             if (currentUser.role !== 'cashier') return alert("Only cashiers can submit End Day reports.");
+            editingEndDayId = editId;
             const today = getToday();
             document.getElementById('endDayBranch').textContent = `${currentUser.branch} • ${today}`;
             const content = document.getElementById('endDayContent');
             content.innerHTML = `
                 <div class="space-y-12">
                     <div class="bg-gray-800 rounded-3xl p-8">
-                        <h3 class="text-2xl font-bold mb-8 text-amber-400 flex items-center gap-3">
-                            <i class="fa-solid fa-cactus"></i> WESTERN UNION
-                        </h3>
+                        <h3 class="text-2xl font-bold mb-8 text-amber-400 flex items-center gap-3"><i class="fa-solid fa-cactus"></i> WESTERN UNION</h3>
                         <div class="grid grid-cols-2 gap-12">
                             <div>
-                                <h4 class="text-emerald-400 font-semibold mb-6 text-lg flex items-center gap-2">
-                                    <i class="fa-solid fa-arrow-down-to-line"></i> INFLOWS (Coming In)
-                                </h4>
+                                <h4 class="text-emerald-400 font-semibold mb-6 text-lg flex items-center gap-2"><i class="fa-solid fa-arrow-down-to-line"></i> INFLOWS</h4>
                                 <div class="space-y-6">
-                                    <div class="flex justify-between items-center">
-                                        <span class="font-medium">Opening Balance</span>
-                                        <div class="relative w-64">
-                                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span>
-                                            <input id="wu_opening" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl pl-12 py-4 text-right text-2xl font-medium">
-                                        </div>
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <span class="font-medium">Sent</span>
-                                        <div class="relative w-64">
-                                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span>
-                                            <input id="wu_sent" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl pl-12 py-4 text-right text-2xl font-medium">
-                                        </div>
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <span class="font-medium">From Counter 2</span>
-                                        <div class="relative w-64">
-                                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span>
-                                            <input id="in_from_counter2" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl pl-12 py-4 text-right text-2xl font-medium">
-                                        </div>
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <span class="font-medium">From Airtel</span>
-                                        <div class="relative w-64">
-                                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span>
-                                            <input id="in_from_airtel" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl pl-12 py-4 text-right text-2xl font-medium">
-                                        </div>
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <span class="font-medium">From Bank</span>
-                                        <div class="relative w-64">
-                                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span>
-                                            <input id="in_from_bank" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl pl-12 py-4 text-right text-2xl font-medium">
-                                        </div>
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <span class="font-medium">From Zanaco</span>
-                                        <div class="relative w-64">
-                                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span>
-                                            <input id="in_from_zanaco" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl pl-12 py-4 text-right text-2xl font-medium">
-                                        </div>
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <span class="font-medium">From FNB</span>
-                                        <div class="relative w-64">
-                                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span>
-                                            <input id="in_from_fnb" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl pl-12 py-4 text-right text-2xl font-medium">
-                                        </div>
-                                    </div>
-                                    <button id="additionalInflowsBtn" onclick="toggleAdditionalInflows()" class="nav-button w-full mt-8 bg-gray-700 hover:bg-emerald-600 text-white py-4 rounded-3xl font-semibold flex items-center justify-center gap-3 text-lg">
-                                        <i class="fa-solid fa-chevron-down"></i> UNFOLD 10 ADDITIONAL CASH INFLOW PLACEHOLDERS
-                                    </button>
+                                    <div class="flex justify-between items-center"><span class="font-medium">Opening Balance</span><div class="relative w-64"><span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span><input id="wu_opening" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl pl-12 py-4 text-right text-2xl font-medium"></div></div>
+                                    <div class="flex justify-between items-center"><span class="font-medium">Sent</span><div class="relative w-64"><span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span><input id="wu_sent" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl pl-12 py-4 text-right text-2xl font-medium"></div></div>
+                                    <div class="flex justify-between items-center"><span class="font-medium">From Counter 2</span><div class="relative w-64"><span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span><input id="in_from_counter2" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl pl-12 py-4 text-right text-2xl font-medium"></div></div>
+                                    <div class="flex justify-between items-center"><span class="font-medium">From Airtel</span><div class="relative w-64"><span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span><input id="in_from_airtel" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl pl-12 py-4 text-right text-2xl font-medium"></div></div>
+                                    <div class="flex justify-between items-center"><span class="font-medium">From Bank</span><div class="relative w-64"><span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span><input id="in_from_bank" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl pl-12 py-4 text-right text-2xl font-medium"></div></div>
+                                    <div class="flex justify-between items-center"><span class="font-medium">From Zanaco</span><div class="relative w-64"><span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span><input id="in_from_zanaco" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl pl-12 py-4 text-right text-2xl font-medium"></div></div>
+                                    <div class="flex justify-between items-center"><span class="font-medium">From FNB</span><div class="relative w-64"><span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span><input id="in_from_fnb" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl pl-12 py-4 text-right text-2xl font-medium"></div></div>
+                                    <button id="additionalInflowsBtn" onclick="toggleAdditionalInflows()" class="nav-button w-full mt-8 bg-gray-700 hover:bg-emerald-600 text-white py-4 rounded-3xl font-semibold flex items-center justify-center gap-3 text-lg"><i class="fa-solid fa-chevron-down"></i> UNFOLD 10 ADDITIONAL CASH INFLOW PLACEHOLDERS</button>
                                     <div id="additionalInflowsSection" class="hidden mt-4 space-y-4 max-h-96 overflow-y-auto border border-gray-700 rounded-3xl p-6"></div>
                                 </div>
                             </div>
                             <div>
-                                <h4 class="text-red-400 font-semibold mb-6 text-lg flex items-center gap-2">
-                                    <i class="fa-solid fa-arrow-up-from-line"></i> OUTFLOWS (Going Out)
-                                </h4>
+                                <h4 class="text-red-400 font-semibold mb-6 text-lg flex items-center gap-2"><i class="fa-solid fa-arrow-up-from-line"></i> OUTFLOWS</h4>
                                 <div class="space-y-6">
-                                    <div class="flex justify-between items-center">
-                                        <span class="font-medium">Paid (to customers)</span>
-                                        <div class="relative w-64">
-                                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span>
-                                            <input id="wu_paid" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl pl-12 py-4 text-right text-2xl font-medium">
-                                        </div>
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <span class="font-medium">To Counter 2</span>
-                                        <div class="relative w-64">
-                                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span>
-                                            <input id="out_to_counter2" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl pl-12 py-4 text-right text-2xl font-medium">
-                                        </div>
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <span class="font-medium">To Airtel</span>
-                                        <div class="relative w-64">
-                                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span>
-                                            <input id="out_to_airtel" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl pl-12 py-4 text-right text-2xl font-medium">
-                                        </div>
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <span class="font-medium">To Bank</span>
-                                        <div class="relative w-64">
-                                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span>
-                                            <input id="out_to_bank" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl pl-12 py-4 text-right text-2xl font-medium">
-                                        </div>
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <span class="font-medium">To MTN</span>
-                                        <div class="relative w-64">
-                                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span>
-                                            <input id="out_to_mtn" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl pl-12 py-4 text-right text-2xl font-medium">
-                                        </div>
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <span class="font-medium">To Zanaco</span>
-                                        <div class="relative w-64">
-                                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span>
-                                            <input id="out_to_zanaco" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl pl-12 py-4 text-right text-2xl font-medium">
-                                        </div>
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <span class="font-medium">To IZB</span>
-                                        <div class="relative w-64">
-                                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span>
-                                            <input id="out_to_izb" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl pl-12 py-4 text-right text-2xl font-medium">
-                                        </div>
-                                    </div>
-                                    <button id="additionalOutflowsBtn" onclick="toggleAdditionalOutflows()" class="nav-button w-full mt-8 bg-gray-700 hover:bg-red-600 text-white py-4 rounded-3xl font-semibold flex items-center justify-center gap-3 text-lg">
-                                        <i class="fa-solid fa-chevron-down"></i> UNFOLD 10 ADDITIONAL CASH OUTFLOW PLACEHOLDERS
-                                    </button>
+                                    <div class="flex justify-between items-center"><span class="font-medium">Paid (to customers)</span><div class="relative w-64"><span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span><input id="wu_paid" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl pl-12 py-4 text-right text-2xl font-medium"></div></div>
+                                    <div class="flex justify-between items-center"><span class="font-medium">To Counter 2</span><div class="relative w-64"><span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span><input id="out_to_counter2" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl pl-12 py-4 text-right text-2xl font-medium"></div></div>
+                                    <div class="flex justify-between items-center"><span class="font-medium">To Airtel</span><div class="relative w-64"><span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span><input id="out_to_airtel" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl pl-12 py-4 text-right text-2xl font-medium"></div></div>
+                                    <div class="flex justify-between items-center"><span class="font-medium">To Bank</span><div class="relative w-64"><span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span><input id="out_to_bank" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl pl-12 py-4 text-right text-2xl font-medium"></div></div>
+                                    <div class="flex justify-between items-center"><span class="font-medium">To MTN</span><div class="relative w-64"><span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span><input id="out_to_mtn" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl pl-12 py-4 text-right text-2xl font-medium"></div></div>
+                                    <div class="flex justify-between items-center"><span class="font-medium">To Zanaco</span><div class="relative w-64"><span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span><input id="out_to_zanaco" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl pl-12 py-4 text-right text-2xl font-medium"></div></div>
+                                    <div class="flex justify-between items-center"><span class="font-medium">To IZB</span><div class="relative w-64"><span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span><input id="out_to_izb" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl pl-12 py-4 text-right text-2xl font-medium"></div></div>
+                                    <button id="additionalOutflowsBtn" onclick="toggleAdditionalOutflows()" class="nav-button w-full mt-8 bg-gray-700 hover:bg-red-600 text-white py-4 rounded-3xl font-semibold flex items-center justify-center gap-3 text-lg"><i class="fa-solid fa-chevron-down"></i> UNFOLD 10 ADDITIONAL CASH OUTFLOW PLACEHOLDERS</button>
                                     <div id="additionalOutflowsSection" class="hidden mt-4 space-y-4 max-h-96 overflow-y-auto border border-gray-700 rounded-3xl p-6"></div>
                                 </div>
                             </div>
@@ -650,9 +693,7 @@
                         </div>
                     </div>
                     <div>
-                        <h3 class="text-2xl font-bold mb-6 flex items-center gap-2">
-                            <i class="fa-solid fa-handshake"></i> OTHER SERVICES (Sent / Paid → Automatic Remittance to/from WU • Service Cash Always Closes at 0.00)
-                        </h3>
+                        <h3 class="text-2xl font-bold mb-6 flex items-center gap-2"><i class="fa-solid fa-handshake"></i> OTHER SERVICES</h3>
                         <div id="otherServicesContainer" class="grid grid-cols-3 gap-6"></div>
                     </div>
                 </div>
@@ -660,67 +701,63 @@
             let servicesHTML = '';
             otherServices.forEach(svc => {
                 const key = svc.toLowerCase().replace(/ /g, '');
-                servicesHTML += `
-                    <div class="bg-gray-800 rounded-3xl p-6">
-                        <h4 class="font-semibold mb-5 text-lg">${svc}</h4>
-                        <div class="space-y-5">
-                            <div>
-                                <label class="block text-xs text-emerald-400 mb-1">SENT</label>
-                                <input id="sent_${key}" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl px-4 py-3 text-right">
-                            </div>
-                            <div>
-                                <label class="block text-xs text-red-400 mb-1">PAID</label>
-                                <input id="paid_${key}" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl px-4 py-3 text-right">
-                            </div>
-                            <div id="serviceNet_${key}" class="pt-3 border-t border-gray-700 font-medium text-lg text-center"></div>
-                        </div>
-                    </div>`;
+                servicesHTML += `<div class="bg-gray-800 rounded-3xl p-6"><h4 class="font-semibold mb-5 text-lg">${svc}</h4><div class="space-y-5"><div><label class="block text-xs text-emerald-400 mb-1">SENT</label><input id="sent_${key}" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl px-4 py-3 text-right"></div><div><label class="block text-xs text-red-400 mb-1">PAID</label><input id="paid_${key}" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl px-4 py-3 text-right"></div><div id="serviceNet_${key}" class="pt-3 border-t border-gray-700 font-medium text-lg text-center"></div></div></div>`;
             });
             document.getElementById('otherServicesContainer').innerHTML = servicesHTML;
+
             let addInHTML = '';
             for (let i = 1; i <= 10; i++) {
-                addInHTML += `
-                    <div class="flex items-center gap-4 bg-gray-900 rounded-3xl p-5">
-                        <input id="add_in_label_${i}" type="text" placeholder="Additional inflow source #${i}" class="flex-1 bg-transparent border-0 focus:outline-none text-white placeholder-gray-400 font-medium">
-                        <div class="relative w-52">
-                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span>
-                            <input id="add_in_amount_${i}" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-800 border border-gray-700 rounded-3xl pl-12 py-4 text-right text-2xl font-medium">
-                        </div>
-                    </div>`;
+                addInHTML += `<div class="flex items-center gap-4 bg-gray-900 rounded-3xl p-5"><select id="add_in_type_${i}" onchange="handleAdditionalTypeChange(${i}, 'in')" class="flex-1 bg-gray-900 border border-gray-700 rounded-3xl px-5 py-4"><option value="">Select source...</option>${commonInflowSources.map(opt => `<option value="${opt}">${opt}</option>`).join('')}</select><input id="add_in_label_${i}" type="text" placeholder="Custom description" class="hidden flex-1 bg-transparent border-0 focus:outline-none text-white placeholder-gray-400 font-medium"><div class="relative w-52"><span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span><input id="add_in_amount_${i}" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-800 border border-gray-700 rounded-3xl pl-12 py-4 text-right text-2xl font-medium"></div><button onclick="clearAdditionalRow(${i}, 'in')" class="text-gray-400 hover:text-red-400 p-2"><i class="fa-solid fa-trash"></i></button></div>`;
             }
             document.getElementById('additionalInflowsSection').innerHTML = addInHTML;
+
             let addOutHTML = '';
             for (let i = 1; i <= 10; i++) {
-                addOutHTML += `
-                    <div class="flex items-center gap-4 bg-gray-900 rounded-3xl p-5">
-                        <input id="add_out_label_${i}" type="text" placeholder="Additional outflow activity #${i}" class="flex-1 bg-transparent border-0 focus:outline-none text-white placeholder-gray-400 font-medium">
-                        <div class="relative w-52">
-                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span>
-                            <input id="add_out_amount_${i}" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-800 border border-gray-700 rounded-3xl pl-12 py-4 text-right text-2xl font-medium">
-                        </div>
-                    </div>`;
+                addOutHTML += `<div class="flex items-center gap-4 bg-gray-900 rounded-3xl p-5"><select id="add_out_type_${i}" onchange="handleAdditionalTypeChange(${i}, 'out')" class="flex-1 bg-gray-900 border border-gray-700 rounded-3xl px-5 py-4"><option value="">Select destination...</option>${commonOutflowSources.map(opt => `<option value="${opt}">${opt}</option>`).join('')}</select><input id="add_out_label_${i}" type="text" placeholder="Custom description" class="hidden flex-1 bg-transparent border-0 focus:outline-none text-white placeholder-gray-400 font-medium"><div class="relative w-52"><span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span><input id="add_out_amount_${i}" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-800 border border-gray-700 rounded-3xl pl-12 py-4 text-right text-2xl font-medium"></div><button onclick="clearAdditionalRow(${i}, 'out')" class="text-gray-400 hover:text-red-400 p-2"><i class="fa-solid fa-trash"></i></button></div>`;
             }
             document.getElementById('additionalOutflowsSection').innerHTML = addOutHTML;
-            calculateEndDay();
+
+            if (editId) populateEndDayForm(editId); else calculateEndDay();
             document.getElementById('endDayModal').classList.remove('hidden');
         }
+
         function toggleAdditionalInflows() {
             const section = document.getElementById('additionalInflowsSection');
             const btn = document.getElementById('additionalInflowsBtn');
             section.classList.toggle('hidden');
-            btn.innerHTML = section.classList.contains('hidden')
-                ? `<i class="fa-solid fa-chevron-down"></i> UNFOLD 10 ADDITIONAL CASH INFLOW PLACEHOLDERS`
-                : `<i class="fa-solid fa-chevron-up"></i> HIDE ADDITIONAL CASH INFLOW PLACEHOLDERS`;
+            btn.innerHTML = section.classList.contains('hidden') ? `<i class="fa-solid fa-chevron-down"></i> UNFOLD 10 ADDITIONAL CASH INFLOW PLACEHOLDERS` : `<i class="fa-solid fa-chevron-up"></i> HIDE ADDITIONAL CASH INFLOW PLACEHOLDERS`;
         }
+
         function toggleAdditionalOutflows() {
             const section = document.getElementById('additionalOutflowsSection');
             const btn = document.getElementById('additionalOutflowsBtn');
             section.classList.toggle('hidden');
-            btn.innerHTML = section.classList.contains('hidden')
-                ? `<i class="fa-solid fa-chevron-down"></i> UNFOLD 10 ADDITIONAL CASH OUTFLOW PLACEHOLDERS`
-                : `<i class="fa-solid fa-chevron-up"></i> HIDE ADDITIONAL CASH OUTFLOW PLACEHOLDERS`;
+            btn.innerHTML = section.classList.contains('hidden') ? `<i class="fa-solid fa-chevron-down"></i> UNFOLD 10 ADDITIONAL CASH OUTFLOW PLACEHOLDERS` : `<i class="fa-solid fa-chevron-up"></i> HIDE ADDITIONAL CASH OUTFLOW PLACEHOLDERS`;
         }
-        // ===================== CALCULATION =====================
+
+        function handleAdditionalTypeChange(i, type) {
+            const select = document.getElementById(`add_${type}_type_${i}`);
+            const labelInput = document.getElementById(`add_${type}_label_${i}`);
+            if (select.value === "Other") {
+                labelInput.classList.remove('hidden');
+                labelInput.focus();
+            } else {
+                labelInput.classList.add('hidden');
+                labelInput.value = '';
+            }
+            calculateEndDay();
+        }
+
+        function clearAdditionalRow(i, type) {
+            const select = document.getElementById(`add_${type}_type_${i}`);
+            const amount = document.getElementById(`add_${type}_amount_${i}`);
+            const label = document.getElementById(`add_${type}_label_${i}`);
+            if (select) select.value = '';
+            if (amount) amount.value = '0.00';
+            if (label) { label.classList.add('hidden'); label.value = ''; }
+            calculateEndDay();
+        }
+
         function calculateEndDay() {
             const opening = cleanMoney(document.getElementById('wu_opening').value);
             const sent = cleanMoney(document.getElementById('wu_sent').value);
@@ -753,62 +790,16 @@
                 const net = sentSvc - paidSvc;
                 const resultEl = document.getElementById(`serviceNet_${key}`);
                 if (resultEl) {
-                    if (net > 0) {
-                        resultEl.innerHTML = `TO WESTERN UNION <span class="text-red-400 font-bold">K${net.toLocaleString('en-US',{minimumFractionDigits:2})}</span>`;
-                    } else if (net < 0) {
-                        resultEl.innerHTML = `FROM WESTERN UNION <span class="text-emerald-400 font-bold">K${Math.abs(net).toLocaleString('en-US',{minimumFractionDigits:2})}</span>`;
-                    } else {
-                        resultEl.innerHTML = `<span class="text-gray-400">Balanced (0.00)</span>`;
-                    }
+                    if (net > 0) resultEl.innerHTML = `TO WESTERN UNION <span class="text-red-400 font-bold">K${net.toLocaleString('en-US',{minimumFractionDigits:2})}</span>`;
+                    else if (net < 0) resultEl.innerHTML = `FROM WESTERN UNION <span class="text-emerald-400 font-bold">K${Math.abs(net).toLocaleString('en-US',{minimumFractionDigits:2})}</span>`;
+                    else resultEl.innerHTML = `<span class="text-gray-400">Balanced (0.00)</span>`;
                 }
             });
-            const wuBalance = (opening + sent + fromCounter2 + fromAirtel + fromBank + fromZanaco + fromFnb + additionalInTotal)
-                            - (paid + toCounter2 + toAirtel + toBank + toMtn + toZanaco + toIzb + additionalOutTotal);
-            const finalClosing = wuBalance;
-            document.getElementById('wu_closing').textContent = finalClosing.toLocaleString('en-US', {minimumFractionDigits: 2});
-            document.getElementById('totalBalanceLive').textContent = `K ${finalClosing.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            const wuBalance = (opening + sent + fromCounter2 + fromAirtel + fromBank + fromZanaco + fromFnb + additionalInTotal) - (paid + toCounter2 + toAirtel + toBank + toMtn + toZanaco + toIzb + additionalOutTotal);
+            document.getElementById('wu_closing').textContent = wuBalance.toLocaleString('en-US', {minimumFractionDigits: 2});
+            document.getElementById('totalBalanceLive').textContent = `K ${wuBalance.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
         }
-        function getEndDayData() {
-            const data = {
-                wu: {
-                    opening: cleanMoney(document.getElementById('wu_opening').value),
-                    sent: cleanMoney(document.getElementById('wu_sent').value),
-                    fromCounter2: cleanMoney(document.getElementById('in_from_counter2').value),
-                    fromAirtel: cleanMoney(document.getElementById('in_from_airtel').value),
-                    fromBank: cleanMoney(document.getElementById('in_from_bank').value),
-                    fromZanaco: cleanMoney(document.getElementById('in_from_zanaco').value),
-                    fromFnb: cleanMoney(document.getElementById('in_from_fnb').value),
-                    additionalInflows: [],
-                    paid: cleanMoney(document.getElementById('wu_paid').value),
-                    toCounter2: cleanMoney(document.getElementById('out_to_counter2').value),
-                    toAirtel: cleanMoney(document.getElementById('out_to_airtel').value),
-                    toBank: cleanMoney(document.getElementById('out_to_bank').value),
-                    toMtn: cleanMoney(document.getElementById('out_to_mtn').value),
-                    toZanaco: cleanMoney(document.getElementById('out_to_zanaco').value),
-                    toIzb: cleanMoney(document.getElementById('out_to_izb').value),
-                    additionalOutflows: [],
-                    closing: cleanMoney(document.getElementById('wu_closing').textContent)
-                },
-                services: {}
-            };
-            for (let i = 1; i <= 10; i++) {
-                const label = document.getElementById(`add_in_label_${i}`).value.trim() || `Additional Inflow ${i}`;
-                const amount = cleanMoney(document.getElementById(`add_in_amount_${i}`).value);
-                if (amount > 0) data.wu.additionalInflows.push({ label, amount });
-            }
-            for (let i = 1; i <= 10; i++) {
-                const label = document.getElementById(`add_out_label_${i}`).value.trim() || `Additional Outflow ${i}`;
-                const amount = cleanMoney(document.getElementById(`add_out_amount_${i}`).value);
-                if (amount > 0) data.wu.additionalOutflows.push({ label, amount });
-            }
-            otherServices.forEach(svc => {
-                const key = svc.toLowerCase().replace(/ /g, '');
-                const sent = cleanMoney(document.getElementById(`sent_${key}`).value);
-                const paid = cleanMoney(document.getElementById(`paid_${key}`).value);
-                data.services[svc] = { sent, paid };
-            });
-            return data;
-        }
+
         function triggerCashBreakdown() {
             pendingEndDayData = getEndDayData();
             bookClosingVal = cleanMoney(document.getElementById('wu_closing').textContent);
@@ -818,24 +809,13 @@
             let denomHTML = '';
             denoms.forEach(denom => {
                 const key = denom.toString().replace('.', '_');
-                denomHTML += `
-                    <div class="bg-gray-800 rounded-3xl p-6 flex items-center justify-between">
-                        <div class="flex items-center gap-4">
-                            <span class="text-5xl font-bold">K</span>
-                            <span class="text-5xl font-bold">${denom}</span>
-                        </div>
-                        <div class="flex items-center gap-6">
-                            <input id="denom_qty_${key}" type="number" min="0" value="0" oninput="calculatePhysicalBreakdown()" class="w-28 text-center bg-gray-900 border border-gray-600 rounded-2xl py-4 text-3xl font-medium focus:outline-none focus:border-emerald-500">
-                            <div class="text-right min-w-[110px]">
-                                <span id="denom_line_${key}" class="text-emerald-400 text-2xl font-medium">K 0.00</span>
-                            </div>
-                        </div>
-                    </div>`;
+                denomHTML += `<div class="bg-gray-800 rounded-3xl p-6 flex items-center justify-between"><div class="flex items-center gap-4"><span class="text-5xl font-bold">K</span><span class="text-5xl font-bold">${denom}</span></div><div class="flex items-center gap-6"><input id="denom_qty_${key}" type="number" min="0" value="0" oninput="calculatePhysicalBreakdown()" class="w-28 text-center bg-gray-900 border border-gray-600 rounded-2xl py-4 text-3xl font-medium focus:outline-none focus:border-emerald-500"><div class="text-right min-w-[110px]"><span id="denom_line_${key}" class="text-emerald-400 text-2xl font-medium">K 0.00</span></div></div></div>`;
             });
             document.getElementById('denominationsContainer').innerHTML = denomHTML;
             calculatePhysicalBreakdown();
             document.getElementById('cashBreakdownModal').classList.remove('hidden');
         }
+
         function calculatePhysicalBreakdown() {
             const denoms = [500, 200, 100, 50, 20, 10, 5, 2, 1, 0.5];
             let physical = 0;
@@ -850,34 +830,59 @@
             });
             document.getElementById('physicalTotalDisplay').textContent = `K ${physical.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
             const discrepancy = physical - bookClosingVal;
-            let discHTML = `
-                <div class="flex items-center justify-between text-2xl font-medium">
-                    <span>Book Balance</span>
-                    <span class="font-bold text-emerald-400">K ${bookClosingVal.toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
-                </div>
-                <div class="flex items-center justify-between text-2xl font-medium mt-4">
-                    <span>Physical Count</span>
-                    <span class="font-bold text-emerald-400">K ${physical.toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
-                </div>
-                <div class="h-px bg-gray-700 my-8"></div>
-            `;
+            let discHTML = `<div class="flex items-center justify-between text-2xl font-medium"><span>Book Balance</span><span class="font-bold text-emerald-400">K ${bookClosingVal.toLocaleString('en-US', {minimumFractionDigits: 2})}</span></div><div class="flex items-center justify-between text-2xl font-medium mt-4"><span>Physical Count</span><span class="font-bold text-emerald-400">K ${physical.toLocaleString('en-US', {minimumFractionDigits: 2})}</span></div><div class="h-px bg-gray-700 my-8"></div>`;
             if (Math.abs(discrepancy) < 0.01) {
                 discHTML += `<div class="text-center py-6 text-4xl font-bold text-emerald-400 flex items-center justify-center gap-4"><i class="fa-solid fa-check-circle"></i> PERFECT MATCH</div>`;
             } else {
                 const isSurplus = discrepancy > 0;
                 const colorClass = isSurplus ? 'text-emerald-400' : 'text-red-400';
                 const label = isSurplus ? 'SURPLUS' : 'DEFICIT';
-                discHTML += `
-                    <div class="flex items-center justify-between text-4xl font-bold ${colorClass}">
-                        <span>${label}</span>
-                        <span>K ${Math.abs(discrepancy).toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
-                    </div>
-                `;
+                discHTML += `<div class="flex items-center justify-between text-4xl font-bold ${colorClass}"><span>${label}</span><span>K ${Math.abs(discrepancy).toLocaleString('en-US', {minimumFractionDigits: 2})}</span></div>`;
             }
             document.getElementById('discrepancyContainer').innerHTML = discHTML;
         }
+
+        function getEndDayData() {
+            const data = { wu: {} };
+            data.wu.opening = cleanMoney(document.getElementById('wu_opening').value);
+            data.wu.sent = cleanMoney(document.getElementById('wu_sent').value);
+            data.wu.paid = cleanMoney(document.getElementById('wu_paid').value);
+            data.wu.fromCounter2 = cleanMoney(document.getElementById('in_from_counter2').value);
+            data.wu.fromAirtel = cleanMoney(document.getElementById('in_from_airtel').value);
+            data.wu.fromBank = cleanMoney(document.getElementById('in_from_bank').value);
+            data.wu.fromZanaco = cleanMoney(document.getElementById('in_from_zanaco').value);
+            data.wu.fromFnb = cleanMoney(document.getElementById('in_from_fnb').value);
+            data.wu.toCounter2 = cleanMoney(document.getElementById('out_to_counter2').value);
+            data.wu.toAirtel = cleanMoney(document.getElementById('out_to_airtel').value);
+            data.wu.toBank = cleanMoney(document.getElementById('out_to_bank').value);
+            data.wu.toMtn = cleanMoney(document.getElementById('out_to_mtn').value);
+            data.wu.toZanaco = cleanMoney(document.getElementById('out_to_zanaco').value);
+            data.wu.toIzb = cleanMoney(document.getElementById('out_to_izb').value);
+            data.wu.closing = cleanMoney(document.getElementById('wu_closing').textContent);
+
+            data.wu.additionalInflows = [];
+            for (let i = 1; i <= 10; i++) {
+                const amt = cleanMoney(document.getElementById(`add_in_amount_${i}`).value);
+                if (amt > 0) {
+                    const type = document.getElementById(`add_in_type_${i}`).value;
+                    const label = document.getElementById(`add_in_label_${i}`).value || type;
+                    data.wu.additionalInflows.push({ label, amount: amt });
+                }
+            }
+            data.wu.additionalOutflows = [];
+            for (let i = 1; i <= 10; i++) {
+                const amt = cleanMoney(document.getElementById(`add_out_amount_${i}`).value);
+                if (amt > 0) {
+                    const type = document.getElementById(`add_out_type_${i}`).value;
+                    const label = document.getElementById(`add_out_label_${i}`).value || type;
+                    data.wu.additionalOutflows.push({ label, amount: amt });
+                }
+            }
+            return data;
+        }
+
         function submitWithBreakdown() {
-            if (!pendingEndDayData) return alert("Something went wrong. Please try again.");
+            if (!pendingEndDayData) return alert("Something went wrong.");
             const denoms = [500, 200, 100, 50, 20, 10, 5, 2, 1, 0.5];
             let physical = 0;
             const breakdownDenoms = {};
@@ -892,112 +897,109 @@
                 }
             });
             const reason = document.getElementById('discrepancyReasonInput').value.trim();
-            pendingEndDayData.cashBreakdown = {
-                denominations: breakdownDenoms,
-                physicalTotal: physical,
-                bookClosing: bookClosingVal,
-                discrepancy: physical - bookClosingVal,
-                reason: reason || null
-            };
-            endDayReports.unshift({
-                id: Date.now(),
-                date: getToday(),
-                username: currentUser.username,
-                fullName: currentUser.fullName,
-                branch: currentUser.branch,
-                submittedAt: new Date().toISOString(),
-                data: pendingEndDayData
-            });
-            saveReports();
+            pendingEndDayData.cashBreakdown = { denominations: breakdownDenoms, physicalTotal: physical, bookClosing: bookClosingVal, discrepancy: physical - bookClosingVal, reason: reason || null };
+
+            if (editingEndDayId) {
+                const existing = endDayReports.find(r => r.id === editingEndDayId);
+                if (existing) existing.data = pendingEndDayData;
+                editingEndDayId = null;
+            } else {
+                endDayReports.unshift({ id: Date.now(), date: getToday(), username: currentUser.username, fullName: currentUser.fullName, branch: currentUser.branch, submittedAt: new Date().toISOString(), data: pendingEndDayData });
+            }
+            messagesDB.unshift({ id: Date.now(), fromRole: 'cashier', fromBranch: currentUser.branch, toRole: 'manager', toBranch: 'Head Office', message: `End Day Report submitted`, timestamp: new Date().toISOString(), read: false });
+            saveData();
             alert(`✅ End Day Report Submitted Successfully!${Math.abs(pendingEndDayData.cashBreakdown.discrepancy) >= 0.01 ? `\nNote: ${pendingEndDayData.cashBreakdown.discrepancy > 0 ? 'Surplus' : 'Deficit'} of K${Math.abs(pendingEndDayData.cashBreakdown.discrepancy).toLocaleString('en-US',{minimumFractionDigits:2})}` : ''}`);
             closeCashBreakdownModal();
             closeEndDayModal();
             pendingEndDayData = null;
             bookClosingVal = 0;
         }
-        function closeCashBreakdownModal() {
-            document.getElementById('cashBreakdownModal').classList.add('hidden');
-            pendingEndDayData = null;
-        }
-        function closeEndDayModal() {
-            document.getElementById('endDayModal').classList.add('hidden');
-        }
-        function closeEndDayListModal() {
-            document.getElementById('endDayListModal').classList.add('hidden');
-        }
-        // ===================== MANAGER DASHBOARD =====================
-        function renderManagerDashboard() {
-            document.getElementById('managerView').classList.remove('hidden');
-            document.getElementById('cashierView').classList.add('hidden');
-            const container = document.getElementById('managerDashboard');
-            container.innerHTML = '';
-            const allBranches = new Set();
-            reportsDB.forEach(r => allBranches.add(r.branch));
-            endDayReports.forEach(r => allBranches.add(r.branch));
-            if (allBranches.size === 0) {
-                container.innerHTML = `<div class="text-center py-20 text-gray-400">No submissions from branches yet.</div>`;
-                return;
-            }
-            Array.from(allBranches).sort().forEach(branch => {
-                const today = getToday();
-                const todayReports = reportsDB.filter(r => r.branch === branch && r.date === today);
-                let todayHTML = '<p class="text-emerald-400 mb-3 font-medium mt-6">Today\'s Cash Positions</p><div class="grid grid-cols-6 gap-3">';
-                reportTimes.forEach(slot => {
-                    const rep = todayReports.find(r => r.timeKey === slot.key);
-                    const amount = rep ? rep.amount : 0;
-                    todayHTML += `<div class="bg-gray-800 rounded-2xl p-4 text-center"><p class="text-xs text-gray-400">${slot.label}</p><p class="text-xl font-semibold mt-1">${amount.toLocaleString('en-US', {minimumFractionDigits: 2})}</p></div>`;
-                });
-                todayHTML += '</div>';
-                const card = document.createElement('div');
-                card.className = "bg-gray-900 rounded-3xl p-8";
-                card.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-2xl font-semibold">${branch}</p>
-                            <p class="text-emerald-400 text-sm">Live Cash Position &amp; End Day Monitoring</p>
-                        </div>
-                        <div class="flex gap-3">
-                            <button onclick="showEndDayDates('${branch}')" class="nav-button bg-amber-600 hover:bg-amber-700 px-6 py-3 rounded-2xl font-medium flex items-center gap-2">
-                                <i class="fa-solid fa-flag-checkered"></i> End Day Reports
-                            </button>
-                            <button onclick="showCashPositionDates('${branch}')" class="nav-button bg-emerald-600 hover:bg-emerald-700 px-6 py-3 rounded-2xl font-medium flex items-center gap-2">
-                                <i class="fa-solid fa-chart-bar"></i> Monthly Cash Positions
-                            </button>
-                        </div>
-                    </div>
-                    ${todayHTML}
-                `;
-                container.appendChild(card);
+
+        function closeCashBreakdownModal() { document.getElementById('cashBreakdownModal').classList.add('hidden'); pendingEndDayData = null; }
+        function closeEndDayModal() { document.getElementById('endDayModal').classList.add('hidden'); }
+
+        // ===================== HISTORY & EDIT FUNCTIONS (FULL RESTORED) =====================
+        function showMyPastCashPositions() {
+            const filteredDates = [...new Set(reportsDB.filter(r => r.username === currentUser.username).map(r => r.date))].sort((a, b) => new Date(b) - new Date(a));
+            let html = `<div class="grid grid-cols-5 gap-4">`;
+            if (filteredDates.length === 0) html += `<p class="col-span-5 text-center py-12 text-gray-400">No past cash position reports yet.</p>`;
+            else filteredDates.forEach(date => {
+                html += `<div onclick="viewMyDailyCashPositions('${date}')" class="bg-gray-800 hover:bg-gray-700 cursor-pointer rounded-2xl p-6 text-center transition-all"><p class="text-2xl font-semibold">${date}</p><p class="text-emerald-400 text-sm mt-2">View / Edit Cash Positions →</p></div>`;
             });
-        }
-        function showEndDayDates(branch) {
-            const filtered = endDayReports.filter(r => r.branch === branch).sort((a, b) => new Date(b.date) - new Date(a.date));
-            let html = `<div class="grid grid-cols-4 gap-4">`;
-            if (filtered.length === 0) {
-                html += `<p class="col-span-4 text-center py-12 text-gray-400">No End Day Reports submitted yet.</p>`;
-            } else {
-                filtered.forEach(r => {
-                    html += `
-                        <div onclick="viewEndDayReport(${r.id})" class="bg-gray-800 hover:bg-gray-700 cursor-pointer rounded-2xl p-6 text-center transition-all">
-                            <p class="text-2xl font-semibold">${r.date}</p>
-                            <p class="text-sm text-gray-400 mt-2">${r.fullName}</p>
-                            <p class="text-xs text-emerald-400 mt-1">Submitted • ${new Date(r.submittedAt).toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'})}</p>
-                        </div>`;
-                });
-            }
             html += `</div>`;
-            document.getElementById('endDayListHeaderContainer').innerHTML = `
-                <div class="flex justify-between items-center">
-                    <div>
-                        <p class="text-amber-400 font-medium">End Day Reports</p>
-                        <p class="text-2xl font-semibold">${branch}</p>
-                    </div>
-                    <button onclick="closeEndDayListModal()" class="text-4xl text-gray-400 hover:text-white">&times;</button>
-                </div>
-            `;
+            document.getElementById('cashPositionHeader').innerHTML = `My Cash Position Reports • ${currentUser.branch}`;
+            document.getElementById('cashPositionContent').innerHTML = html;
+            document.getElementById('cashPositionModal').classList.remove('hidden');
+        }
+
+        function viewMyDailyCashPositions(date) {
+            const dayReports = reportsDB.filter(r => r.username === currentUser.username && r.date === date).sort((a, b) => reportTimes.map(t => t.key).indexOf(a.timeKey) - reportTimes.map(t => t.key).indexOf(b.timeKey));
+            let html = `<h3 class="text-2xl font-semibold mb-6">${date} – My Cash Positions</h3><div class="grid grid-cols-6 gap-4">`;
+            reportTimes.forEach(slot => {
+                const rep = dayReports.find(r => r.timeKey === slot.key);
+                const amount = rep ? rep.amount : 0;
+                const time = rep ? new Date(rep.submittedAt).toLocaleTimeString('en-GB',{hour:'2-digit', minute:'2-digit'}) : '—';
+                html += `<div class="cash-card rounded-3xl p-6 text-center relative ${rep ? 'bg-emerald-900/30 border border-emerald-500' : 'bg-gray-800'}">
+                    <p class="label-text text-emerald-400">${slot.label}</p>
+                    <p class="amount-text font-semibold mt-4">${amount.toLocaleString('en-US', {minimumFractionDigits: 2})}</p>
+                    <p class="text-xs text-gray-400">ZMW</p>
+                    <p class="text-[10px] text-gray-500 mt-4">${time}</p>
+                    ${rep ? `<button onclick="event.stopImmediatePropagation(); editCashPosition('${date}', '${slot.key}');" class="absolute top-4 right-4 text-xs bg-emerald-500 hover:bg-emerald-600 px-4 py-2 rounded-3xl flex items-center gap-1 text-white"><i class="fa-solid fa-edit"></i> EDIT</button>` : ''}
+                </div>`;
+            });
+            html += `</div>`;
+            document.getElementById('cashPositionContent').innerHTML = html;
+        }
+
+        function editCashPosition(date, timeKey) {
+            const report = reportsDB.find(r => r.date === date && r.username === currentUser.username && r.timeKey === timeKey);
+            if (!report) return;
+            editingCashDate = date;
+            editingCashTimeKey = timeKey;
+            document.getElementById('editCashTitle').innerHTML = `Edit <span class="text-emerald-400">${report.label}</span> <span class="text-xs font-mono text-gray-400">(${date})</span>`;
+            document.getElementById('editCashAmount').value = report.amount.toLocaleString('en-US', {minimumFractionDigits: 2});
+            document.getElementById('editCashModal').classList.remove('hidden');
+        }
+
+        function closeEditCashModal() {
+            document.getElementById('editCashModal').classList.add('hidden');
+            editingCashDate = null;
+            editingCashTimeKey = null;
+        }
+
+        function saveEditedCashPosition() {
+            if (!editingCashDate || !editingCashTimeKey) return;
+            const amountStr = document.getElementById('editCashAmount').value.replace(/,/g, '');
+            const amount = parseFloat(amountStr);
+            if (isNaN(amount) || amount < 0) return alert("Please enter a valid amount");
+            const reportIndex = reportsDB.findIndex(r => r.date === editingCashDate && r.username === currentUser.username && r.timeKey === editingCashTimeKey);
+            if (reportIndex !== -1) {
+                reportsDB[reportIndex].amount = amount;
+                reportsDB[reportIndex].submittedAt = new Date().toISOString();
+                saveData();
+                alert("✅ Cash position updated & re-submitted successfully!");
+                closeEditCashModal();
+                viewMyDailyCashPositions(editingCashDate);
+            }
+        }
+
+        function closeCashPositionModal() { document.getElementById('cashPositionModal').classList.add('hidden'); }
+
+        function showMyPastEndDayReports() {
+            const filtered = endDayReports.filter(r => r.username === currentUser.username).sort((a, b) => new Date(b.date) - new Date(a.date));
+            let html = `<div class="grid grid-cols-4 gap-4">`;
+            if (filtered.length === 0) html += `<p class="col-span-4 text-center py-12 text-gray-400">No End Day Reports submitted yet.</p>`;
+            else filtered.forEach(r => {
+                html += `<div onclick="viewEndDayReport(${r.id})" class="bg-gray-800 hover:bg-gray-700 cursor-pointer rounded-2xl p-6 text-center transition-all"><p class="text-2xl font-semibold">${r.date}</p><p class="text-sm text-gray-400 mt-2">${r.fullName}</p><p class="text-xs text-emerald-400 mt-1">Submitted • ${new Date(r.submittedAt).toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'})}</p></div>`;
+            });
+            html += `</div>`;
+            document.getElementById('endDayListHeaderContainer').innerHTML = `<div class="flex justify-between items-center"><div><p class="text-amber-400 font-medium">My End Day Reports</p><p class="text-2xl font-semibold">${currentUser.branch}</p></div><button onclick="closeEndDayListModal()" class="text-4xl text-gray-400 hover:text-white">×</button></div>`;
             document.getElementById('endDayListContent').innerHTML = html;
             document.getElementById('endDayListModal').classList.remove('hidden');
         }
+
+        function closeEndDayListModal() { document.getElementById('endDayListModal').classList.add('hidden'); }
+
         function viewEndDayReport(id) {
             const report = endDayReports.find(r => r.id === id);
             if (!report || !report.data) return;
@@ -1013,9 +1015,7 @@
             if (wu.fromFnb > 0) inflowsHTML += `<li class="flex justify-between"><span>From FNB</span><span class="font-medium">K${wu.fromFnb.toLocaleString('en-US',{minimumFractionDigits:2})}</span></li>`;
             if (wu.additionalInflows && wu.additionalInflows.length > 0) {
                 inflowsHTML += `<li class="pt-4 border-t border-gray-700 text-emerald-400 font-medium">Additional Inflows:</li>`;
-                wu.additionalInflows.forEach(m => {
-                    inflowsHTML += `<li class="flex justify-between"><span>${m.label}</span><span class="font-medium">K${m.amount.toLocaleString('en-US',{minimumFractionDigits:2})}</span></li>`;
-                });
+                wu.additionalInflows.forEach(m => { inflowsHTML += `<li class="flex justify-between"><span>${m.label}</span><span class="font-medium">K${m.amount.toLocaleString('en-US',{minimumFractionDigits:2})}</span></li>`; });
             }
             let outflowsHTML = '';
             if (wu.paid > 0) outflowsHTML += `<li class="flex justify-between"><span>Paid (to customers)</span><span class="font-medium">K${wu.paid.toLocaleString('en-US',{minimumFractionDigits:2})}</span></li>`;
@@ -1027,154 +1027,369 @@
             if (wu.toIzb > 0) outflowsHTML += `<li class="flex justify-between"><span>To IZB</span><span class="font-medium">K${wu.toIzb.toLocaleString('en-US',{minimumFractionDigits:2})}</span></li>`;
             if (wu.additionalOutflows && wu.additionalOutflows.length > 0) {
                 outflowsHTML += `<li class="pt-4 border-t border-gray-700 text-red-400 font-medium">Additional Outflows:</li>`;
-                wu.additionalOutflows.forEach(m => {
-                    outflowsHTML += `<li class="flex justify-between"><span>${m.label}</span><span class="font-medium">K${m.amount.toLocaleString('en-US',{minimumFractionDigits:2})}</span></li>`;
-                });
+                wu.additionalOutflows.forEach(m => { outflowsHTML += `<li class="flex justify-between"><span>${m.label}</span><span class="font-medium">K${m.amount.toLocaleString('en-US',{minimumFractionDigits:2})}</span></li>`; });
             }
-            let breakdownHTML = '';
-            if (d.cashBreakdown) {
-                const bd = d.cashBreakdown;
-                breakdownHTML = `<div class="mt-12 bg-gray-800 rounded-3xl p-8"><h3 class="text-2xl font-semibold mb-6 flex items-center gap-3"><i class="fa-solid fa-coins"></i> CASH BREAKDOWN (Physical Count)</h3><div class="grid grid-cols-5 gap-4 mb-8">`;
-                if (bd.denominations) {
-                    Object.keys(bd.denominations).sort((a, b) => parseFloat(b) - parseFloat(a)).forEach(den => {
-                        const info = bd.denominations[den];
-                        breakdownHTML += `<div class="bg-gray-900 rounded-2xl p-5 text-center"><div class="text-3xl font-bold">K${parseFloat(den)}</div><div class="text-xl mt-2">${info.qty} pcs</div><div class="text-emerald-400 font-medium mt-1">K${info.subtotal.toLocaleString('en-US',{minimumFractionDigits:2})}</div></div>`;
-                    });
-                }
-                breakdownHTML += `</div>`;
-                breakdownHTML += `
-                    <div class="flex justify-between text-2xl font-medium">
-                        <span>Physical Total</span>
-                        <span class="font-bold">K ${bd.physicalTotal.toLocaleString('en-US',{minimumFractionDigits:2})}</span>
-                    </div>
-                    <div class="flex justify-between text-xl mt-3">
-                        <span>Book Closing</span>
-                        <span>K ${bd.bookClosing.toLocaleString('en-US',{minimumFractionDigits:2})}</span>
-                    </div>`;
-                if (Math.abs(bd.discrepancy) >= 0.01) {
-                    const type = bd.discrepancy > 0 ? 'SURPLUS' : 'DEFICIT';
-                    const color = bd.discrepancy > 0 ? 'emerald' : 'red';
-                    breakdownHTML += `<div class="mt-8 flex justify-between items-center text-4xl font-bold text-${color}-400"><span>${type}</span><span>K ${Math.abs(bd.discrepancy).toLocaleString('en-US',{minimumFractionDigits:2})}</span></div>`;
-                    if (bd.reason) breakdownHTML += `<p class="mt-6 text-gray-400 italic">"${bd.reason}"</p>`;
-                } else {
-                    breakdownHTML += `<div class="mt-8 text-center text-4xl font-bold text-emerald-400 flex items-center justify-center gap-4"><i class="fa-solid fa-check-circle"></i> PERFECT MATCH</div>`;
-                }
-                breakdownHTML += `</div>`;
-            }
-            let servicesHTML = '';
-            if (d.services) {
-                servicesHTML = `<div class="bg-gray-800 rounded-3xl p-6"><h3 class="text-xl font-semibold mb-6">OTHER SERVICES</h3><div class="grid grid-cols-3 gap-6">`;
-                Object.keys(d.services).forEach(svc => {
-                    const s = d.services[svc];
-                    const diff = s.sent - s.paid;
-                    let label = '';
-                    if (diff > 0) label = `<span class="text-red-400">TO WESTERN UNION</span> K${diff.toLocaleString('en-US',{minimumFractionDigits:2})}`;
-                    else if (diff < 0) label = `<span class="text-emerald-400">FROM WESTERN UNION</span> K${Math.abs(diff).toLocaleString('en-US',{minimumFractionDigits:2})}`;
-                    else label = `<span class="text-gray-400">NO REMITTANCE</span>`;
-                    servicesHTML += `
-                        <div class="bg-gray-900 rounded-2xl p-5">
-                            <p class="font-semibold mb-4">${svc}</p>
-                            <div class="flex justify-between text-sm mb-2"><span>Sent</span><span class="text-emerald-400">K${s.sent.toLocaleString('en-US',{minimumFractionDigits:2})}</span></div>
-                            <div class="flex justify-between text-sm mb-2"><span>Paid</span><span class="text-red-400">K${s.paid.toLocaleString('en-US',{minimumFractionDigits:2})}</span></div>
-                            <div class="flex justify-between text-sm border-t pt-3">${label}</div>
-                            <div class="text-xs text-gray-400 mt-3 text-center">Service cash closes at K 0.00 after remittance</div>
-                        </div>`;
-                });
-                servicesHTML += `</div></div>`;
-            }
-            let html = `
-                <div class="space-y-8">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <h2 class="text-3xl font-bold">${report.branch} • ${report.date}</h2>
-                            <p class="text-gray-400">Submitted by ${report.fullName}</p>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-12">
-                        <div class="bg-gray-800 rounded-3xl p-6">
-                            <h3 class="text-emerald-400 text-xl font-semibold mb-6">INFLOWS (Western Union)</h3>
-                            <ul class="space-y-3 text-sm">${inflowsHTML || '<li class="text-gray-400">No inflows entered</li>'}</ul>
-                        </div>
-                        <div class="bg-gray-800 rounded-3xl p-6">
-                            <h3 class="text-red-400 text-xl font-semibold mb-6">OUTFLOWS (Western Union)</h3>
-                            <ul class="space-y-3 text-sm">${outflowsHTML || '<li class="text-gray-400">No outflows entered</li>'}</ul>
-                        </div>
-                    </div>
-                    <div class="text-right text-4xl font-bold text-emerald-400">CLOSING BALANCE: K${wu.closing ? wu.closing.toLocaleString('en-US',{minimumFractionDigits:2}) : '0.00'}</div>
-                    ${servicesHTML}
-                    ${breakdownHTML}
-                </div>
-            `;
-            document.getElementById('endDayListHeaderContainer').innerHTML = `
-                <div class="flex justify-between items-center">
-                    <div>
-                        <p class="text-amber-400 font-medium">End Day Report Detail</p>
-                        <p class="text-2xl font-semibold">${report.branch} • ${report.date}</p>
-                    </div>
-                    <button onclick="closeEndDayListModal()" class="text-4xl text-gray-400 hover:text-white">&times;</button>
-                </div>
-            `;
+            let html = `<div class="space-y-8"><div class="flex justify-between items-center"><div><h2 class="text-3xl font-bold">${report.branch} • ${report.date}</h2><p class="text-gray-400">Submitted by ${report.fullName}</p></div></div><div class="grid grid-cols-2 gap-12"><div class="bg-gray-800 rounded-3xl p-6"><h3 class="text-emerald-400 text-xl font-semibold mb-6">INFLOWS (Western Union)</h3><ul class="space-y-3 text-sm">${inflowsHTML || '<li class="text-gray-400">No inflows entered</li>'}</ul></div><div class="bg-gray-800 rounded-3xl p-6"><h3 class="text-red-400 text-xl font-semibold mb-6">OUTFLOWS (Western Union)</h3><ul class="space-y-3 text-sm">${outflowsHTML || '<li class="text-gray-400">No outflows entered</li>'}</ul></div></div><div class="text-right text-4xl font-bold text-emerald-400">CLOSING BALANCE: K${wu.closing ? wu.closing.toLocaleString('en-US',{minimumFractionDigits:2}) : '0.00'}</div></div>`;
+            document.getElementById('endDayListHeaderContainer').innerHTML = `<div class="flex justify-between items-center"><div><p class="text-amber-400 font-medium">End Day Report Detail</p><p class="text-2xl font-semibold">${report.branch} • ${report.date}</p></div><button onclick="closeEndDayListModal()" class="text-4xl text-gray-400 hover:text-white">×</button></div>`;
             document.getElementById('endDayListContent').innerHTML = html;
         }
+
+        function showEndDayDates(branch) {
+            const filtered = endDayReports.filter(r => r.branch === branch).sort((a, b) => new Date(b.date) - new Date(a.date));
+            let html = `<div class="grid grid-cols-4 gap-4">`;
+            if (filtered.length === 0) html += `<p class="col-span-4 text-center py-12 text-gray-400">No End Day Reports submitted yet.</p>`;
+            else filtered.forEach(r => {
+                html += `<div onclick="viewEndDayReport(${r.id})" class="bg-gray-800 hover:bg-gray-700 cursor-pointer rounded-2xl p-6 text-center transition-all"><p class="text-2xl font-semibold">${r.date}</p><p class="text-sm text-gray-400 mt-2">${r.fullName}</p><p class="text-xs text-emerald-400 mt-1">Submitted • ${new Date(r.submittedAt).toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'})}</p></div>`;
+            });
+            html += `</div>`;
+            document.getElementById('endDayListHeaderContainer').innerHTML = `<div class="flex justify-between items-center"><div><p class="text-amber-400 font-medium">End Day Reports</p><p class="text-2xl font-semibold">${branch}</p></div><button onclick="closeEndDayListModal()" class="text-4xl text-gray-400 hover:text-white">×</button></div>`;
+            document.getElementById('endDayListContent').innerHTML = html;
+            document.getElementById('endDayListModal').classList.remove('hidden');
+        }
+
         function showCashPositionDates(branch) {
             const dates = [...new Set(reportsDB.filter(r => r.branch === branch).map(r => r.date))].sort((a, b) => new Date(b) - new Date(a));
             let html = `<div class="grid grid-cols-5 gap-4">`;
-            if (dates.length === 0) {
-                html += `<p class="col-span-5 text-center py-12 text-gray-400">No cash positions submitted yet.</p>`;
-            } else {
-                dates.forEach(date => {
-                    html += `
-                        <div onclick="viewDailyCashPositions('${branch}', '${date}')" class="bg-gray-800 hover:bg-gray-700 cursor-pointer rounded-2xl p-6 text-center transition-all">
-                            <p class="text-2xl font-semibold">${date}</p>
-                            <p class="text-emerald-400 text-sm mt-2">View Details →</p>
-                        </div>`;
-                });
-            }
+            if (dates.length === 0) html += `<p class="col-span-5 text-center py-12 text-gray-400">No cash positions submitted yet.</p>`;
+            else dates.forEach(date => {
+                html += `<div onclick="viewDailyCashPositions('${branch}', '${date}')" class="bg-gray-800 hover:bg-gray-700 cursor-pointer rounded-2xl p-6 text-center transition-all"><p class="text-2xl font-semibold">${date}</p><p class="text-emerald-400 text-sm mt-2">View Details →</p></div>`;
+            });
             html += `</div>`;
             document.getElementById('cashPositionHeader').innerHTML = `${branch} - All Cash Position Dates`;
             document.getElementById('cashPositionContent').innerHTML = html;
             document.getElementById('cashPositionModal').classList.remove('hidden');
         }
+
         function viewDailyCashPositions(branch, date) {
-            const dayReports = reportsDB.filter(r => r.branch === branch && r.date === date)
-                .sort((a, b) => reportTimes.map(t => t.key).indexOf(a.timeKey) - reportTimes.map(t => t.key).indexOf(b.timeKey));
+            const dayReports = reportsDB.filter(r => r.branch === branch && r.date === date).sort((a, b) => reportTimes.map(t => t.key).indexOf(a.timeKey) - reportTimes.map(t => t.key).indexOf(b.timeKey));
             let html = `<h3 class="text-2xl font-semibold mb-6">${date} - ${branch}</h3><div class="grid grid-cols-6 gap-4">`;
             reportTimes.forEach(slot => {
                 const rep = dayReports.find(r => r.timeKey === slot.key);
                 const amount = rep ? rep.amount : 0;
                 const time = rep ? new Date(rep.submittedAt).toLocaleTimeString('en-GB',{hour:'2-digit', minute:'2-digit'}) : '—';
-                html += `
-                    <div class="rounded-3xl p-6 text-center ${rep ? 'bg-emerald-900/30 border border-emerald-500' : 'bg-gray-800'}">
-                        <p class="text-emerald-400 text-sm">${slot.label}</p>
-                        <p class="text-4xl font-semibold mt-4">${amount.toLocaleString('en-US', {minimumFractionDigits: 2})}</p>
-                        <p class="text-xs text-gray-400">ZMW</p>
-                        <p class="text-[10px] text-gray-500 mt-4">${time}</p>
-                    </div>`;
+                html += `<div class="cash-card rounded-3xl p-6 text-center ${rep ? 'bg-emerald-900/30 border border-emerald-500' : 'bg-gray-800'}">
+                    <p class="label-text text-emerald-400">${slot.label}</p>
+                    <p class="amount-text font-semibold mt-4">${amount.toLocaleString('en-US', {minimumFractionDigits: 2})}</p>
+                    <p class="text-xs text-gray-400">ZMW</p>
+                    <p class="text-[10px] text-gray-500 mt-4">${time}</p>
+                </div>`;
             });
             html += `</div>`;
             document.getElementById('cashPositionContent').innerHTML = html;
         }
-        function closeCashPositionModal() {
-            document.getElementById('cashPositionModal').classList.add('hidden');
+
+        function closeCashPositionModal() { document.getElementById('cashPositionModal').classList.add('hidden'); }
+
+        // ===================== MANAGER DASHBOARD =====================
+        function renderManagerDashboard() {
+            const container = document.getElementById('managerDashboardContent');
+            container.innerHTML = `
+                <h2 class="text-3xl font-semibold mb-8">Branch Managers Dashboard <span class="text-emerald-400 text-base font-normal px-4 py-1 bg-emerald-900/30 rounded-3xl">Single Account • All Branches</span></h2>
+                <div id="managerMetrics" class="grid grid-cols-4 gap-6 mb-12"></div>
+                <div class="flex justify-end mb-4">
+                    <button onclick="openManagerMessagesModal()" class="nav-button flex items-center gap-3 bg-indigo-600 hover:bg-indigo-700 px-6 py-4 rounded-3xl font-semibold text-lg shadow-xl">
+                        <i class="fa-solid fa-envelope"></i> Messages <span id="unreadCount" class="ml-2 bg-red-500 text-white text-xs rounded-full px-2 py-0.5"></span>
+                    </button>
+                </div>
+                <div id="managerBranchesContainer" class="space-y-12"></div>
+                <div class="mt-12 bg-gray-900 rounded-3xl p-8">
+                    <h3 class="text-xl font-semibold mb-6 flex items-center gap-2 text-amber-400"><i class="fa-solid fa-exclamation-triangle"></i> Operational Alerts (Manager Only)</h3>
+                    <div id="managerAlerts" class="grid grid-cols-2 gap-6"></div>
+                </div>
+            `;
+
+            const today = getToday();
+            const todayReports = reportsDB.filter(r => r.date === today);
+            const todayEndDays = endDayReports.filter(r => r.date === today);
+
+            let totalCash = 0;
+            let highest = {name: '', amount: 0};
+            let lowest = {name: '', amount: Infinity};
+            allBranches.forEach(branch => {
+                const latest = todayReports.filter(r => r.branch === branch).sort((a,b) => new Date(b.submittedAt) - new Date(a.submittedAt))[0];
+                const amt = latest ? latest.amount : 0;
+                totalCash += amt;
+                if (amt > highest.amount) highest = {name: branch, amount: amt};
+                if (amt < lowest.amount) lowest = {name: branch, amount: amt};
+            });
+
+            document.getElementById('managerMetrics').innerHTML = `
+            <div class="metric-card bg-gray-900 rounded-3xl p-6 text-center">
+                <div class="text-5xl mb-2">💰</div>
+                <p class="text-emerald-400 text-sm">TOTAL CASH TODAY</p>
+                <p class="text-4xl font-bold mt-1">K ${totalCash.toLocaleString('en-US')}</p>
+                <p class="text-xs text-gray-400">All branches</p>
+            </div>
+            <div class="metric-card bg-gray-900 rounded-3xl p-6 text-center">
+                <div class="text-5xl mb-2">📈</div>
+                <p class="text-emerald-400 text-sm">HIGHEST CASH</p>
+                <p class="font-semibold">${highest.name}</p>
+                <p class="text-3xl font-bold">K ${highest.amount.toLocaleString('en-US')}</p>
+            </div>
+            <div class="metric-card bg-gray-900 rounded-3xl p-6 text-center">
+                <div class="text-5xl mb-2">📉</div>
+                <p class="text-amber-400 text-sm">LOWEST CASH</p>
+                <p class="font-semibold">${lowest.name}</p>
+                <p class="text-3xl font-bold">K ${lowest.amount.toLocaleString('en-US')}</p>
+            </div>
+            <div class="metric-card bg-gray-900 rounded-3xl p-6 text-center">
+                <div class="text-5xl mb-2">⚠️</div>
+                <p class="text-red-400 text-sm">SHORTAGES</p>
+                <p class="text-3xl font-bold">${todayEndDays.filter(ed => ed.data?.cashBreakdown?.discrepancy < -100).length}</p>
+            </div>`;
+
+            const branchesContainer = document.getElementById('managerBranchesContainer');
+            branchesContainer.innerHTML = '';
+            allBranches.forEach(branch => {
+                const todayBranchReports = todayReports.filter(r => r.branch === branch);
+                let todayHTML = '<p class="text-emerald-400 mb-3 font-medium mt-6">Today\'s Cash Positions</p><div class="grid grid-cols-6 gap-3">';
+                reportTimes.forEach(slot => {
+                    const rep = todayBranchReports.find(r => r.timeKey === slot.key);
+                    const amount = rep ? rep.amount : 0;
+                    todayHTML += `<div class="bg-gray-800 rounded-2xl p-4 text-center"><p class="text-xs text-gray-400">${slot.label}</p><p class="text-xl font-semibold mt-1">${amount.toLocaleString('en-US', {minimumFractionDigits: 2})}</p></div>`;
+                });
+                todayHTML += '</div>';
+                const card = document.createElement('div');
+                card.className = "bg-gray-900 rounded-3xl p-8";
+                card.innerHTML = `<div class="flex justify-between items-start"><div><p class="text-2xl font-semibold">${branch}</p></div><div class="flex gap-3"><button onclick="showEndDayDates('${branch}')" class="nav-button bg-amber-600 hover:bg-amber-700 px-6 py-3 rounded-2xl font-medium flex items-center gap-2"><i class="fa-solid fa-flag-checkered"></i> End Day Reports</button><button onclick="showCashPositionDates('${branch}')" class="nav-button bg-emerald-600 hover:bg-emerald-700 px-6 py-3 rounded-2xl font-medium flex items-center gap-2"><i class="fa-solid fa-chart-bar"></i> Cash Positions</button></div></div>${todayHTML}`;
+                branchesContainer.appendChild(card);
+            });
+
+            renderManagerAlerts(todayReports, todayEndDays);
+            updateUnreadCounts();
         }
 
-        // ===================== RENDER APP =====================
-        function renderApp() {
-            renderUserInfo();
-            startLiveClock();
-            loadConfig();   // Loads logo + separate branch/management announcements
-            if (currentUser.role === 'cashier') {
-                renderCashierView();
-            } else {
-                renderManagerDashboard();
+        function renderManagerAlerts(todayReports, todayEndDays) {
+            const container = document.getElementById('managerAlerts');
+            container.innerHTML = '';
+
+            const submittedBranches = new Set(todayReports.map(r => r.branch));
+            const missing = allBranches.filter(b => !submittedBranches.has(b));
+            if (missing.length) {
+                const missDiv = document.createElement('div');
+                missDiv.className = "bg-red-900/30 rounded-3xl p-6";
+                missDiv.innerHTML = `<h4 class="font-semibold text-red-400 mb-3">❌ Missing Reports</h4><p class="text-sm">${missing.join(', ')} did not submit any report today</p>`;
+                container.appendChild(missDiv);
             }
+
+            let lateHTML = '';
+            todayReports.forEach(r => {
+                const slot = reportTimes.find(s => s.key === r.timeKey);
+                if (slot) {
+                    const expected = new Date(`${r.date}T${slot.time}:00`);
+                    const actual = new Date(r.submittedAt);
+                    if (actual > new Date(expected.getTime() + 10*60000)) lateHTML += `<div class="text-sm">${r.branch} - ${r.label} submitted late</div>`;
+                }
+            });
+            if (lateHTML) {
+                const lateDiv = document.createElement('div');
+                lateDiv.className = "bg-amber-900/30 rounded-3xl p-6";
+                lateDiv.innerHTML = `<h4 class="font-semibold text-amber-400 mb-3">⏱️ Late Submissions</h4>${lateHTML}`;
+                container.appendChild(lateDiv);
+            }
+
+            let expenseHTML = '';
+            allBranches.forEach(branch => {
+                const branchEnd = todayEndDays.filter(r => r.branch === branch);
+                let totalExp = 0;
+                branchEnd.forEach(ed => {
+                    if (ed.data?.wu) totalExp += (ed.data.wu.paid || 0) + (ed.data.wu.toCounter2 || 0) + (ed.data.wu.toAirtel || 0) + (ed.data.wu.toBank || 0) + (ed.data.wu.toMtn || 0) + (ed.data.wu.toZanaco || 0) + (ed.data.wu.toIzb || 0);
+                });
+                expenseHTML += `<div class="bg-gray-800 rounded-3xl p-4"><p class="text-xs">${branch}</p><p class="font-semibold">K ${totalExp.toLocaleString('en-US')}</p></div>`;
+            });
+            const expDiv = document.createElement('div');
+            expDiv.className = "col-span-2 bg-gray-900 rounded-3xl p-6";
+            expDiv.innerHTML = `<h4 class="font-semibold text-emerald-400 mb-4">💸 Expenses per Branch (incl. duplicates)</h4><div class="grid grid-cols-2 gap-4">${expenseHTML}</div>`;
+            container.appendChild(expDiv);
         }
 
-        window.onload = () => {
-            reportsDB = [];
-            endDayReports = [];
-            saveReports();
-        };
+        // ===================== TOP MANAGEMENT VIEW =====================
+        function renderTopManagementView() {
+            const container = document.getElementById('topDashboardContent');
+            container.innerHTML = `
+                <h2 class="text-3xl font-semibold mb-8">Executive Dashboard • Top Management</h2>
+                <div id="topMetrics" class="grid grid-cols-4 gap-6 mb-12"></div>
+                <div class="bg-gray-900 rounded-3xl p-8 mb-12">
+                    <h3 class="text-xl font-semibold mb-6 flex items-center gap-2"><i class="fa-solid fa-bell"></i> Live Alerts</h3>
+                    <div id="topAlertsList" class="space-y-4"></div>
+                </div>
+                <div class="bg-gray-900 rounded-3xl p-8 mb-8">
+                    <h3 class="text-xl font-semibold mb-6">Filter Data</h3>
+                    <div class="flex flex-wrap gap-6 items-end">
+                        <div><label class="block text-sm font-medium mb-2">Date</label><input id="filterDate" type="date" class="bg-gray-800 border border-gray-700 rounded-2xl px-5 py-3 focus:outline-none focus:border-emerald-500"></div>
+                        <div><label class="block text-sm font-medium mb-2">Branch</label><select id="filterBranch" onchange="applyTopFilters()" class="bg-gray-800 border border-gray-700 rounded-2xl px-5 py-3 focus:outline-none focus:border-emerald-500 w-52"><option value="">All Branches</option></select></div>
+                        <div><label class="block text-sm font-medium mb-2">Cashier</label><select id="filterCashier" onchange="applyTopFilters()" class="bg-gray-800 border border-gray-700 rounded-2xl px-5 py-3 focus:outline-none focus:border-emerald-500 w-52"><option value="">All Cashiers</option></select></div>
+                        <div><label class="block text-sm font-medium mb-2">Time Slot</label><select id="filterTimeSlot" onchange="applyTopFilters()" class="bg-gray-800 border border-gray-700 rounded-2xl px-5 py-3 focus:outline-none focus:border-emerald-500 w-52"><option value="">All Slots</option></select></div>
+                        <button onclick="clearTopFilters()" class="px-8 py-3 bg-gray-700 hover:bg-gray-600 rounded-2xl font-medium">Clear Filters</button>
+                        <button onclick="applyTopFilters()" class="px-8 py-3 bg-emerald-500 hover:bg-emerald-600 rounded-2xl font-medium">Apply</button>
+                    </div>
+                </div>
+                <div class="bg-gray-900 rounded-3xl p-8 mb-12">
+                    <h3 class="text-xl font-semibold mb-6">📊 Branch Expense Summary (Totals + Duplicates)</h3>
+                    <div id="expenseSummaryContainer" class="grid grid-cols-4 gap-6"></div>
+                </div>
+                <div class="bg-gray-900 rounded-3xl p-8">
+                    <h3 class="text-xl font-semibold mb-6">All Reports &amp; End-Day Summaries</h3>
+                    <div class="overflow-x-auto">
+                        <table id="topReportsTable" class="w-full text-sm">
+                            <thead><tr class="text-gray-400 border-b border-gray-700"><th>Date</th><th>Branch</th><th>Cashier</th><th>Time Slot</th><th>Amount (ZMW)</th><th>Type</th><th>Submitted At</th><th>Discrepancy</th></tr></thead>
+                            <tbody id="topReportsTableBody" class="text-white"></tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+
+            populateTopFilters();
+            renderTopMetrics();
+            renderTopAlerts();
+            renderExpenseSummary();
+            applyTopFilters();
+            updateUnreadCounts();
+        }
+
+        function populateTopFilters() {
+            const branchSelect = document.getElementById('filterBranch');
+            branchSelect.innerHTML = `<option value="">All Branches</option>`;
+            allBranches.forEach(b => {
+                const opt = document.createElement('option');
+                opt.value = b; opt.textContent = b;
+                branchSelect.appendChild(opt);
+            });
+            const cashierSelect = document.getElementById('filterCashier');
+            const uniqueCashiers = [...new Set(reportsDB.map(r => r.fullName))];
+            uniqueCashiers.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c; opt.textContent = c;
+                cashierSelect.appendChild(opt);
+            });
+            const slotSelect = document.getElementById('filterTimeSlot');
+            reportTimes.forEach(slot => {
+                const opt = document.createElement('option');
+                opt.value = slot.key; opt.textContent = slot.label;
+                slotSelect.appendChild(opt);
+            });
+        }
+
+        function renderTopMetrics() {
+            const today = getToday();
+            const todayReports = reportsDB.filter(r => r.date === today);
+            const todayEndDays = endDayReports.filter(r => r.date === today);
+
+            let totalCash = 0;
+            let highest = {name: '', amount: 0};
+            let lowest = {name: '', amount: Infinity};
+            allBranches.forEach(branch => {
+                const latest = todayReports.filter(r => r.branch === branch).sort((a,b) => new Date(b.submittedAt) - new Date(a.submittedAt))[0];
+                const amt = latest ? latest.amount : 0;
+                totalCash += amt;
+                if (amt > highest.amount) highest = {name: branch, amount: amt};
+                if (amt < lowest.amount) lowest = {name: branch, amount: amt};
+            });
+
+            const shortages = todayEndDays.filter(ed => ed.data?.cashBreakdown?.discrepancy < -100).length;
+            const submittedBranches = new Set(todayReports.map(r => r.branch));
+            const missingCount = allBranches.length - submittedBranches.size;
+
+            document.getElementById('topMetrics').innerHTML = `
+            <div class="metric-card bg-gray-900 rounded-3xl p-6 text-center">
+                <div class="text-5xl mb-2">💰</div>
+                <p class="text-emerald-400 text-sm">TOTAL CASH TODAY</p>
+                <p class="text-4xl font-bold mt-1">K ${totalCash.toLocaleString('en-US')}</p>
+                <p class="text-xs text-gray-400">All branches</p>
+            </div>
+            <div class="metric-card bg-gray-900 rounded-3xl p-6 text-center">
+                <div class="text-5xl mb-2">📈</div>
+                <p class="text-emerald-400 text-sm">HIGHEST CASH</p>
+                <p class="font-semibold">${highest.name}</p>
+                <p class="text-3xl font-bold">K ${highest.amount.toLocaleString('en-US')}</p>
+            </div>
+            <div class="metric-card bg-gray-900 rounded-3xl p-6 text-center">
+                <div class="text-5xl mb-2">📉</div>
+                <p class="text-amber-400 text-sm">LOWEST CASH</p>
+                <p class="font-semibold">${lowest.name}</p>
+                <p class="text-3xl font-bold">K ${lowest.amount.toLocaleString('en-US')}</p>
+            </div>
+            <div class="metric-card bg-gray-900 rounded-3xl p-6 text-center">
+                <div class="text-5xl mb-2">⚠️</div>
+                <p class="text-red-400 text-sm">SHORTAGES</p>
+                <p class="text-3xl font-bold">${shortages}</p>
+            </div>
+            <div class="metric-card bg-gray-900 rounded-3xl p-6 text-center col-span-2">
+                <div class="flex justify-between">
+                    <div><span class="text-4xl">🟢</span><p class="text-xs text-emerald-400">SUBMITTED</p><p class="text-3xl font-bold">${submittedBranches.size} / ${allBranches.length}</p></div>
+                    <div><span class="text-4xl">❌</span><p class="text-xs text-red-400">MISSING REPORTS</p><p class="text-3xl font-bold">${missingCount}</p></div>
+                </div>
+            </div>`;
+        }
+
+        function renderTopAlerts() {
+            document.getElementById('topAlertsList').innerHTML = `
+                <div class="flex items-center gap-3 bg-red-900/30 rounded-2xl p-4"><i class="fa-solid fa-triangle-exclamation text-red-400"></i><p>Kitwe branch missed 14:00 report</p></div>
+                <div class="flex items-center gap-3 bg-amber-900/30 rounded-2xl p-4"><i class="fa-solid fa-triangle-exclamation text-amber-400"></i><p>Ndola has unusual cash variance of K-4,500</p></div>
+                <div class="flex items-center gap-3 bg-red-900/30 rounded-2xl p-4"><i class="fa-solid fa-triangle-exclamation text-red-400"></i><p>Mukuyu submitted duplicate 10:00 report</p></div>`;
+        }
+
+        function renderExpenseSummary() {
+            const container = document.getElementById('expenseSummaryContainer');
+            container.innerHTML = '';
+            const today = getToday();
+            allBranches.forEach(branch => {
+                const branchEndDays = endDayReports.filter(r => r.branch === branch && r.date === today);
+                let totalExpense = 0;
+                branchEndDays.forEach(ed => {
+                    if (ed.data?.wu) {
+                        totalExpense += (ed.data.wu.paid || 0) + (ed.data.wu.toCounter2 || 0) + (ed.data.wu.toAirtel || 0) + (ed.data.wu.toBank || 0) + (ed.data.wu.toMtn || 0) + (ed.data.wu.toZanaco || 0) + (ed.data.wu.toIzb || 0);
+                    }
+                });
+                const card = document.createElement('div');
+                card.className = "bg-gray-800 rounded-3xl p-6 text-center";
+                card.innerHTML = `<p class="text-emerald-400 text-sm">${branch}</p><p class="text-3xl font-bold mt-2">K ${totalExpense.toLocaleString('en-US')}</p><p class="text-xs text-gray-400">Total Expenses (incl. duplicates)</p>`;
+                container.appendChild(card);
+            });
+        }
+
+        function applyTopFilters() {
+            const dateFilter = document.getElementById('filterDate').value || getToday();
+            const branchFilter = document.getElementById('filterBranch').value;
+            const cashierFilter = document.getElementById('filterCashier').value;
+            const slotFilter = document.getElementById('filterTimeSlot').value;
+
+            let filteredReports = reportsDB.filter(r => r.date === dateFilter);
+            if (branchFilter) filteredReports = filteredReports.filter(r => r.branch === branchFilter);
+            if (cashierFilter) filteredReports = filteredReports.filter(r => r.fullName === cashierFilter);
+            if (slotFilter) filteredReports = filteredReports.filter(r => r.timeKey === slotFilter);
+
+            let filteredEndDays = endDayReports.filter(r => r.date === dateFilter);
+            if (branchFilter) filteredEndDays = filteredEndDays.filter(r => r.branch === branchFilter);
+
+            const tbody = document.getElementById('topReportsTableBody');
+            tbody.innerHTML = '';
+
+            filteredReports.forEach(r => {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${r.date}</td><td>${r.branch}</td><td>${r.fullName}</td><td>${r.label}</td><td class="font-semibold">K ${r.amount.toLocaleString('en-US')}</td><td>Cash Position</td><td>${new Date(r.submittedAt).toLocaleTimeString('en-GB')}</td><td class="text-emerald-400">—</td>`;
+                tbody.appendChild(row);
+            });
+            filteredEndDays.forEach(ed => {
+                const disc = ed.data && ed.data.cashBreakdown ? ed.data.cashBreakdown.discrepancy : 0;
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${ed.date}</td><td>${ed.branch}</td><td>${ed.fullName}</td><td>End Day</td><td class="font-semibold">K ${ed.data && ed.data.wu ? ed.data.wu.closing.toLocaleString('en-US') : '0'}</td><td>End Day Report</td><td>${new Date(ed.submittedAt).toLocaleTimeString('en-GB')}</td><td class="${disc < 0 ? 'text-red-400' : 'text-emerald-400'}">${disc.toLocaleString('en-US')}</td>`;
+                tbody.appendChild(row);
+            });
+
+            if (tbody.children.length === 0) tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-gray-400">No reports match the selected filters.</td></tr>`;
+        }
+
+        function clearTopFilters() {
+            document.getElementById('filterDate').value = getToday();
+            document.getElementById('filterBranch').value = '';
+            document.getElementById('filterCashier').value = '';
+            document.getElementById('filterTimeSlot').value = '';
+            applyTopFilters();
+        }
+
+        // ===================== INITIAL LOAD =====================
+        window.onload = () => { loadData(); };
     </script>
 </body>
 </html>
