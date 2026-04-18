@@ -24,7 +24,7 @@
         .chat-bubble.me { background: #10b981; color: white; border-bottom-right-radius: 4px; align-self: flex-end; }
         .chat-bubble.them { background: #374151; color: white; border-bottom-left-radius: 4px; align-self: flex-start; }
         .metric-card { transition: all 0.3s ease; }
-        .metric-card:hover { transform: translateY(-3px); }
+        .metric-card:hover { transform: translateY(-3px); cursor: pointer; }
         .sidebar-link { transition: all 0.2s ease; }
         .sidebar-link:hover { background: #10b981; color: white; }
         table { border-collapse: collapse; }
@@ -59,9 +59,8 @@
     <!-- MAIN APP -->
     <div id="mainApp" class="hidden min-h-screen flex">
 
-        <!-- FIXED NON-SCROLLABLE SIDEBAR -->
+        <!-- FIXED SIDEBAR -->
         <div id="sidebar" class="hidden w-72 bg-gray-900 border-r border-gray-800 flex flex-col h-screen overflow-hidden">
-            <!-- Company Header -->
             <div class="px-6 py-8 flex items-center gap-3 border-b border-gray-800">
                 <div class="cactus-icon w-10 h-10"></div>
                 <div>
@@ -70,7 +69,6 @@
                 </div>
             </div>
 
-            <!-- Navigation -->
             <div onclick="switchSection('dashboard')" class="sidebar-link flex items-center gap-3 px-6 py-5 text-white cursor-pointer">
                 <i class="fa-solid fa-gauge-high w-5"></i>
                 <span class="font-medium">Dashboard</span>
@@ -93,22 +91,15 @@
             </div>
 
             <div class="flex-1"></div>
-            <div class="px-6 py-6 text-xs text-gray-500 border-t border-gray-800 text-center">
-                Real-time Western Union Monitoring
-            </div>
         </div>
 
-        <!-- MAIN CONTENT AREA -->
+        <!-- MAIN CONTENT -->
         <div class="flex-1 flex flex-col overflow-hidden">
-            <!-- Top Bar -->
             <nav class="bg-gray-900 border-b border-gray-800 sticky top-0 z-50">
                 <div class="max-w-screen-2xl mx-auto px-8 py-5 flex justify-between items-center">
                     <div class="flex items-center gap-3">
                         <div id="navLogo" class="cactus-icon w-9 h-9"></div>
-                        <div>
-                            <h1 id="appName" class="text-2xl font-bold">Cactus Money Transfers</h1>
-                            <p id="appTagline" class="text-xs text-emerald-400">Western Union • Real-time Branch Monitoring</p>
-                        </div>
+                        <h1 id="appName" class="text-2xl font-bold">Cactus</h1>
                     </div>
                     <div class="flex items-center gap-8">
                         <div id="liveClock" class="live-clock text-xl font-mono bg-gray-800 px-5 py-2 rounded-2xl text-emerald-400"></div>
@@ -120,11 +111,9 @@
                 </div>
             </nav>
 
-            <!-- Scrollable Content -->
             <div class="flex-1 overflow-auto max-w-screen-2xl mx-auto px-8 py-8">
                 <!-- CASHIER VIEW -->
                 <div id="cashierView" class="hidden">
-                    <!-- Full cashier view restored -->
                     <div class="flex justify-between items-center mb-8">
                         <div>
                             <h2 class="text-3xl font-semibold">Welcome FLAs</h2>
@@ -215,7 +204,7 @@
         </div>
     </div>
 
-    <!-- END DAY MODAL (FULL RESTORED) -->
+    <!-- END DAY MODAL -->
     <div id="endDayModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[100]">
         <div class="modal bg-gray-900 rounded-3xl w-full max-w-7xl max-h-[95vh] overflow-hidden flex flex-col">
             <div class="p-6 border-b border-gray-700 flex justify-between items-center">
@@ -241,7 +230,7 @@
         </div>
     </div>
 
-    <!-- CASH BREAKDOWN MODAL (FULL) -->
+    <!-- CASH BREAKDOWN MODAL -->
     <div id="cashBreakdownModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[110]">
         <div class="modal bg-gray-900 rounded-3xl w-full max-w-4xl max-h-[92vh] overflow-hidden flex flex-col">
             <div class="p-6 border-b border-gray-700 flex justify-between items-center">
@@ -354,9 +343,6 @@
         ];
 
         const otherServices = ["ZOONA", "AIRTEL MONEY", "ZAMTEL MONEY", "MTN MONEY", "MTN BULK", "AIRTEL BULK", "ZANACO", "INDO", "FNB"];
-        const commonInflowSources = ["Counter 2 Transfer","Airtel Receipt","Bank Deposit","Zanaco Transfer","FNB Credit","Mobile Money Receipt","Customer Refund","Service Adjustment","Other"];
-        const commonOutflowSources = ["To Counter 2","To Airtel","To Bank","To MTN","To Zanaco","To IZB","Customer Payout","Bank Withdrawal","Expense","Other"];
-
         const allBranches = ["Kabwe Main", "Mukuyu Branch", "Kitwe Branch", "Ndola Branch"];
 
         // ===================== DATA =====================
@@ -376,8 +362,8 @@
                     { id: Date.now()-500000, date: today, username: "dummy", fullName: "Ndola Cashier", branch: "Ndola Branch", timeKey: "14hrs", time: "14:00", label: "14:00 hrs", amount: 112000, submittedAt: new Date(Date.now()-900000).toISOString() }
                 ];
                 endDayReports = [
-                    { id: Date.now()-300000, date: today, username: "amos01", fullName: "Amos Banda", branch: "Kabwe Main", submittedAt: new Date().toISOString(), data: { wu: { closing: 158000, paid: 45000, sent: 12000, toBank: 8000 }, cashBreakdown: { discrepancy: 1200, reason: "Counting error" } } },
-                    { id: Date.now()-200000, date: today, username: "dummy", fullName: "Ndola Cashier", branch: "Ndola Branch", submittedAt: new Date().toISOString(), data: { wu: { closing: 89000, paid: 32000 }, cashBreakdown: { discrepancy: -4500, reason: "Short payment" } } }
+                    { id: Date.now()-300000, date: today, username: "amos01", fullName: "Amos Banda", branch: "Kabwe Main", submittedAt: new Date().toISOString(), data: { wu: { closing: 158000, paid: 45000, sent: 12000, toBank: 8000, expenses: [{description:"Fuel",amount:2500},{description:"Stationery",amount:800}] }, cashBreakdown: { discrepancy: 1200, reason: "Counting error" } } },
+                    { id: Date.now()-200000, date: today, username: "dummy", fullName: "Ndola Cashier", branch: "Ndola Branch", submittedAt: new Date().toISOString(), data: { wu: { closing: 89000, paid: 32000, expenses: [{description:"Transport",amount:1500}] }, cashBreakdown: { discrepancy: -4500, reason: "Short payment" } } }
                 ];
             }
             saveData();
@@ -422,14 +408,12 @@
             setInterval(() => clockEl.textContent = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' }), 1000);
         }
 
-        // ===================== SIDEBAR NAVIGATION =====================
         function switchSection(section) {
             currentSection = section;
             if (currentUser.role === 'manager') renderManagerContent();
             else if (currentUser.role === 'topmanagement') renderTopContent();
         }
 
-        // ===================== RENDER APP =====================
         function renderApp() {
             renderUserInfo();
             startLiveClock();
@@ -493,7 +477,6 @@
             const slot = reportTimes.find(t => t.key === selectedTimeKey);
             reportsDB = reportsDB.filter(r => !(r.date === today && r.username === currentUser.username && r.timeKey === selectedTimeKey));
             reportsDB.unshift({ id: Date.now(), date: today, username: currentUser.username, fullName: currentUser.fullName, branch: currentUser.branch, timeKey: selectedTimeKey, time: slot.time, label: slot.label, amount: amount, submittedAt: new Date().toISOString() });
-            messagesDB.unshift({ id: Date.now(), fromRole: 'cashier', fromBranch: currentUser.branch, toRole: 'manager', toBranch: 'Head Office', message: `Cash position submitted for ${slot.label}`, timestamp: new Date().toISOString(), read: false });
             saveData();
             renderTimeButtons();
             renderTodayReports();
@@ -653,7 +636,7 @@
             updateUnreadCounts();
         }
 
-        // ===================== FULL END DAY REPORT (RESTORED) =====================
+        // ===================== END DAY MODAL =====================
         function openEndDayModal(editId = null) {
             if (currentUser.role !== 'cashier') return alert("Only cashiers can submit End Day reports.");
             editingEndDayId = editId;
@@ -691,6 +674,8 @@
                                     <div class="flex justify-between items-center"><span class="font-medium">To IZB</span><div class="relative w-64"><span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span><input id="out_to_izb" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-900 border border-gray-700 rounded-2xl pl-12 py-4 text-right text-2xl font-medium"></div></div>
                                     <button id="additionalOutflowsBtn" onclick="toggleAdditionalOutflows()" class="nav-button w-full mt-8 bg-gray-700 hover:bg-red-600 text-white py-4 rounded-3xl font-semibold flex items-center justify-center gap-3 text-lg"><i class="fa-solid fa-chevron-down"></i> UNFOLD 10 ADDITIONAL CASH OUTFLOW PLACEHOLDERS</button>
                                     <div id="additionalOutflowsSection" class="hidden mt-4 space-y-4 max-h-96 overflow-y-auto border border-gray-700 rounded-3xl p-6"></div>
+                                    <button id="expensesBtn" onclick="toggleExpenses()" class="nav-button w-full mt-4 bg-rose-700 hover:bg-rose-600 text-white py-4 rounded-3xl font-semibold flex items-center justify-center gap-3 text-lg"><i class="fa-solid fa-chevron-down"></i> EXPENSES</button>
+                                    <div id="expensesSection" class="hidden mt-4 space-y-4 max-h-96 overflow-y-auto border border-gray-700 rounded-3xl p-6"></div>
                                 </div>
                             </div>
                         </div>
@@ -705,6 +690,7 @@
                     </div>
                 </div>
             `;
+
             let servicesHTML = '';
             otherServices.forEach(svc => {
                 const key = svc.toLowerCase().replace(/ /g, '');
@@ -714,15 +700,21 @@
 
             let addInHTML = '';
             for (let i = 1; i <= 10; i++) {
-                addInHTML += `<div class="flex items-center gap-4 bg-gray-900 rounded-3xl p-5"><select id="add_in_type_${i}" onchange="handleAdditionalTypeChange(${i}, 'in')" class="flex-1 bg-gray-900 border border-gray-700 rounded-3xl px-5 py-4"><option value="">Select source...</option>${commonInflowSources.map(opt => `<option value="${opt}">${opt}</option>`).join('')}</select><input id="add_in_label_${i}" type="text" placeholder="Custom description" class="hidden flex-1 bg-transparent border-0 focus:outline-none text-white placeholder-gray-400 font-medium"><div class="relative w-52"><span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span><input id="add_in_amount_${i}" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-800 border border-gray-700 rounded-3xl pl-12 py-4 text-right text-2xl font-medium"></div><button onclick="clearAdditionalRow(${i}, 'in')" class="text-gray-400 hover:text-red-400 p-2"><i class="fa-solid fa-trash"></i></button></div>`;
+                addInHTML += `<div class="flex items-center gap-4 bg-gray-900 rounded-3xl p-5"><input id="add_in_desc_${i}" type="text" placeholder="Description" class="flex-1 bg-transparent border-0 focus:outline-none text-white placeholder-gray-400 font-medium"><div class="relative w-52"><span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span><input id="add_in_amount_${i}" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-800 border border-gray-700 rounded-3xl pl-12 py-4 text-right text-2xl font-medium"></div><button onclick="clearAdditionalRow(${i}, 'in')" class="text-gray-400 hover:text-red-400 p-2"><i class="fa-solid fa-trash"></i></button></div>`;
             }
             document.getElementById('additionalInflowsSection').innerHTML = addInHTML;
 
             let addOutHTML = '';
             for (let i = 1; i <= 10; i++) {
-                addOutHTML += `<div class="flex items-center gap-4 bg-gray-900 rounded-3xl p-5"><select id="add_out_type_${i}" onchange="handleAdditionalTypeChange(${i}, 'out')" class="flex-1 bg-gray-900 border border-gray-700 rounded-3xl px-5 py-4"><option value="">Select destination...</option>${commonOutflowSources.map(opt => `<option value="${opt}">${opt}</option>`).join('')}</select><input id="add_out_label_${i}" type="text" placeholder="Custom description" class="hidden flex-1 bg-transparent border-0 focus:outline-none text-white placeholder-gray-400 font-medium"><div class="relative w-52"><span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span><input id="add_out_amount_${i}" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-800 border border-gray-700 rounded-3xl pl-12 py-4 text-right text-2xl font-medium"></div><button onclick="clearAdditionalRow(${i}, 'out')" class="text-gray-400 hover:text-red-400 p-2"><i class="fa-solid fa-trash"></i></button></div>`;
+                addOutHTML += `<div class="flex items-center gap-4 bg-gray-900 rounded-3xl p-5"><input id="add_out_desc_${i}" type="text" placeholder="Description" class="flex-1 bg-transparent border-0 focus:outline-none text-white placeholder-gray-400 font-medium"><div class="relative w-52"><span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span><input id="add_out_amount_${i}" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-800 border border-gray-700 rounded-3xl pl-12 py-4 text-right text-2xl font-medium"></div><button onclick="clearAdditionalRow(${i}, 'out')" class="text-gray-400 hover:text-red-400 p-2"><i class="fa-solid fa-trash"></i></button></div>`;
             }
             document.getElementById('additionalOutflowsSection').innerHTML = addOutHTML;
+
+            let expensesHTML = '';
+            for (let i = 1; i <= 10; i++) {
+                expensesHTML += `<div class="flex items-center gap-4 bg-gray-900 rounded-3xl p-5"><input id="expense_desc_${i}" type="text" placeholder="Expense description" class="flex-1 bg-transparent border-0 focus:outline-none text-white placeholder-gray-400 font-medium"><div class="relative w-52"><span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">K</span><input id="expense_amount_${i}" type="text" value="0.00" oninput="formatMoneyInput(event)" onblur="applyCommaFormat(event); calculateEndDay()" class="w-full bg-gray-800 border border-gray-700 rounded-3xl pl-12 py-4 text-right text-2xl font-medium"></div><button onclick="clearExpenseRow(${i})" class="text-gray-400 hover:text-red-400 p-2"><i class="fa-solid fa-trash"></i></button></div>`;
+            }
+            document.getElementById('expensesSection').innerHTML = expensesHTML;
 
             if (editId) populateEndDayForm(editId); else calculateEndDay();
             document.getElementById('endDayModal').classList.remove('hidden');
@@ -742,26 +734,26 @@
             btn.innerHTML = section.classList.contains('hidden') ? `<i class="fa-solid fa-chevron-down"></i> UNFOLD 10 ADDITIONAL CASH OUTFLOW PLACEHOLDERS` : `<i class="fa-solid fa-chevron-up"></i> HIDE ADDITIONAL CASH OUTFLOW PLACEHOLDERS`;
         }
 
-        function handleAdditionalTypeChange(i, type) {
-            const select = document.getElementById(`add_${type}_type_${i}`);
-            const labelInput = document.getElementById(`add_${type}_label_${i}`);
-            if (select.value === "Other") {
-                labelInput.classList.remove('hidden');
-                labelInput.focus();
-            } else {
-                labelInput.classList.add('hidden');
-                labelInput.value = '';
-            }
-            calculateEndDay();
+        function toggleExpenses() {
+            const section = document.getElementById('expensesSection');
+            const btn = document.getElementById('expensesBtn');
+            section.classList.toggle('hidden');
+            btn.innerHTML = section.classList.contains('hidden') ? `<i class="fa-solid fa-chevron-down"></i> EXPENSES` : `<i class="fa-solid fa-chevron-up"></i> HIDE EXPENSES`;
         }
 
         function clearAdditionalRow(i, type) {
-            const select = document.getElementById(`add_${type}_type_${i}`);
+            const desc = document.getElementById(`add_${type}_desc_${i}`);
             const amount = document.getElementById(`add_${type}_amount_${i}`);
-            const label = document.getElementById(`add_${type}_label_${i}`);
-            if (select) select.value = '';
+            if (desc) desc.value = '';
             if (amount) amount.value = '0.00';
-            if (label) { label.classList.add('hidden'); label.value = ''; }
+            calculateEndDay();
+        }
+
+        function clearExpenseRow(i) {
+            const desc = document.getElementById(`expense_desc_${i}`);
+            const amt = document.getElementById(`expense_amount_${i}`);
+            if (desc) desc.value = '';
+            if (amt) amt.value = '0.00';
             calculateEndDay();
         }
 
@@ -790,6 +782,12 @@
                 const el = document.getElementById(`add_out_amount_${i}`);
                 if (el) additionalOutTotal += cleanMoney(el.value);
             }
+            let expensesTotal = 0;
+            for (let i = 1; i <= 10; i++) {
+                const el = document.getElementById(`expense_amount_${i}`);
+                if (el) expensesTotal += cleanMoney(el.value);
+            }
+
             otherServices.forEach(svc => {
                 const key = svc.toLowerCase().replace(/ /g, '');
                 const sentSvc = cleanMoney(document.getElementById(`sent_${key}`).value);
@@ -802,7 +800,8 @@
                     else resultEl.innerHTML = `<span class="text-gray-400">Balanced (0.00)</span>`;
                 }
             });
-            const wuBalance = (opening + sent + fromCounter2 + fromAirtel + fromBank + fromZanaco + fromFnb + additionalInTotal) - (paid + toCounter2 + toAirtel + toBank + toMtn + toZanaco + toIzb + additionalOutTotal);
+
+            const wuBalance = (opening + sent + fromCounter2 + fromAirtel + fromBank + fromZanaco + fromFnb + additionalInTotal) - (paid + toCounter2 + toAirtel + toBank + toMtn + toZanaco + toIzb + additionalOutTotal + expensesTotal);
             document.getElementById('wu_closing').textContent = wuBalance.toLocaleString('en-US', {minimumFractionDigits: 2});
             document.getElementById('totalBalanceLive').textContent = `K ${wuBalance.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
         }
@@ -871,18 +870,24 @@
             for (let i = 1; i <= 10; i++) {
                 const amt = cleanMoney(document.getElementById(`add_in_amount_${i}`).value);
                 if (amt > 0) {
-                    const type = document.getElementById(`add_in_type_${i}`).value;
-                    const label = document.getElementById(`add_in_label_${i}`).value || type;
-                    data.wu.additionalInflows.push({ label, amount: amt });
+                    const desc = document.getElementById(`add_in_desc_${i}`).value || 'Additional Inflow';
+                    data.wu.additionalInflows.push({ label: desc, amount: amt });
                 }
             }
             data.wu.additionalOutflows = [];
             for (let i = 1; i <= 10; i++) {
                 const amt = cleanMoney(document.getElementById(`add_out_amount_${i}`).value);
                 if (amt > 0) {
-                    const type = document.getElementById(`add_out_type_${i}`).value;
-                    const label = document.getElementById(`add_out_label_${i}`).value || type;
-                    data.wu.additionalOutflows.push({ label, amount: amt });
+                    const desc = document.getElementById(`add_out_desc_${i}`).value || 'Additional Outflow';
+                    data.wu.additionalOutflows.push({ label: desc, amount: amt });
+                }
+            }
+            data.wu.expenses = [];
+            for (let i = 1; i <= 10; i++) {
+                const amt = cleanMoney(document.getElementById(`expense_amount_${i}`).value);
+                if (amt > 0) {
+                    const desc = document.getElementById(`expense_desc_${i}`).value || 'Expense';
+                    data.wu.expenses.push({ description: desc, amount: amt });
                 }
             }
             return data;
@@ -913,7 +918,7 @@
             } else {
                 endDayReports.unshift({ id: Date.now(), date: getToday(), username: currentUser.username, fullName: currentUser.fullName, branch: currentUser.branch, submittedAt: new Date().toISOString(), data: pendingEndDayData });
             }
-            messagesDB.unshift({ id: Date.now(), fromRole: 'cashier', fromBranch: currentUser.branch, toRole: 'manager', toBranch: 'Head Office', message: `End Day Report submitted`, timestamp: new Date().toISOString(), read: false });
+            // NO MESSAGE SENT TO MANAGER FOR END DAY REPORT
             saveData();
             alert(`✅ End Day Report Submitted Successfully!${Math.abs(pendingEndDayData.cashBreakdown.discrepancy) >= 0.01 ? `\nNote: ${pendingEndDayData.cashBreakdown.discrepancy > 0 ? 'Surplus' : 'Deficit'} of K${Math.abs(pendingEndDayData.cashBreakdown.discrepancy).toLocaleString('en-US',{minimumFractionDigits:2})}` : ''}`);
             closeCashBreakdownModal();
@@ -925,7 +930,7 @@
         function closeCashBreakdownModal() { document.getElementById('cashBreakdownModal').classList.add('hidden'); pendingEndDayData = null; }
         function closeEndDayModal() { document.getElementById('endDayModal').classList.add('hidden'); }
 
-        // ===================== HISTORY FUNCTIONS =====================
+        // ===================== HISTORY & DETAIL VIEWS =====================
         function showMyPastCashPositions() {
             const filteredDates = [...new Set(reportsDB.filter(r => r.username === currentUser.username).map(r => r.date))].sort((a, b) => new Date(b) - new Date(a));
             let html = `<div class="grid grid-cols-5 gap-4">`;
@@ -1036,8 +1041,15 @@
                 outflowsHTML += `<li class="pt-4 border-t border-gray-700 text-red-400 font-medium">Additional Outflows:</li>`;
                 wu.additionalOutflows.forEach(m => { outflowsHTML += `<li class="flex justify-between"><span>${m.label}</span><span class="font-medium">K${m.amount.toLocaleString('en-US',{minimumFractionDigits:2})}</span></li>`; });
             }
-            let html = `<div class="space-y-8"><div class="flex justify-between items-center"><div><h2 class="text-3xl font-bold">${report.branch} • ${report.date}</h2><p class="text-gray-400">Submitted by ${report.fullName}</p></div></div><div class="grid grid-cols-2 gap-12"><div class="bg-gray-800 rounded-3xl p-6"><h3 class="text-emerald-400 text-xl font-semibold mb-6">INFLOWS (Western Union)</h3><ul class="space-y-3 text-sm">${inflowsHTML || '<li class="text-gray-400">No inflows entered</li>'}</ul></div><div class="bg-gray-800 rounded-3xl p-6"><h3 class="text-red-400 text-xl font-semibold mb-6">OUTFLOWS (Western Union)</h3><ul class="space-y-3 text-sm">${outflowsHTML || '<li class="text-gray-400">No outflows entered</li>'}</ul></div></div><div class="text-right text-4xl font-bold text-emerald-400">CLOSING BALANCE: K${wu.closing ? wu.closing.toLocaleString('en-US',{minimumFractionDigits:2}) : '0.00'}</div></div>`;
-            document.getElementById('endDayListHeaderContainer').innerHTML = `<div class="flex justify-between items-center"><div><p class="text-amber-400 font-medium">End Day Report Detail</p><p class="text-2xl font-semibold">${report.branch} • ${report.date}</p></div><button onclick="closeEndDayListModal()" class="text-4xl text-gray-400 hover:text-white">×</button></div>`;
+            let expensesHTML = '';
+            if (wu.expenses && wu.expenses.length > 0) {
+                expensesHTML += `<li class="pt-4 border-t border-gray-700 text-rose-400 font-medium">Custom Expenses:</li>`;
+                wu.expenses.forEach(e => {
+                    expensesHTML += `<li class="flex justify-between"><span>${e.description}</span><span class="font-medium text-rose-400">-K${e.amount.toLocaleString('en-US',{minimumFractionDigits:2})}</span></li>`;
+                });
+            }
+            let html = `<div class="space-y-8"><div class="flex justify-between items-center"><div><h2 class="text-3xl font-bold">${report.branch} • ${report.date}</h2><p class="text-gray-400">Submitted by ${report.fullName}</p></div></div><div class="grid grid-cols-2 gap-12"><div class="bg-gray-800 rounded-3xl p-6"><h3 class="text-emerald-400 text-xl font-semibold mb-6">INFLOWS (Western Union)</h3><ul class="space-y-3 text-sm">${inflowsHTML || '<li class="text-gray-400">No inflows entered</li>'}</ul></div><div class="bg-gray-800 rounded-3xl p-6"><h3 class="text-red-400 text-xl font-semibold mb-6">OUTFLOWS & EXPENSES</h3><ul class="space-y-3 text-sm">${outflowsHTML || '<li class="text-gray-400">No outflows entered</li>'}</ul><ul class="space-y-3 text-sm">${expensesHTML}</ul></div></div><div class="text-right text-4xl font-bold text-emerald-400">CLOSING BALANCE: K${wu.closing ? wu.closing.toLocaleString('en-US',{minimumFractionDigits:2}) : '0.00'}</div></div>`;
+            document.getElementById('endDayListHeaderContainer').innerHTML = `<div class="flex justify-between items-center"><div><p class="text-amber-400 font-medium">Full End Day Report</p><p class="text-2xl font-semibold">${report.branch} • ${report.date}</p></div><button onclick="closeEndDayListModal()" class="text-4xl text-gray-400 hover:text-white">×</button></div>`;
             document.getElementById('endDayListContent').innerHTML = html;
         }
 
@@ -1046,10 +1058,10 @@
             let html = `<div class="grid grid-cols-4 gap-4">`;
             if (filtered.length === 0) html += `<p class="col-span-4 text-center py-12 text-gray-400">No End Day Reports submitted yet.</p>`;
             else filtered.forEach(r => {
-                html += `<div onclick="viewEndDayReport(${r.id})" class="bg-gray-800 hover:bg-gray-700 cursor-pointer rounded-2xl p-6 text-center transition-all"><p class="text-2xl font-semibold">${r.date}</p><p class="text-sm text-gray-400 mt-2">${r.fullName}</p><p class="text-xs text-emerald-400 mt-1">Submitted • ${new Date(r.submittedAt).toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'})}</p></div>`;
+                html += `<div onclick="viewEndDayReport(${r.id})" class="bg-gray-800 hover:bg-gray-700 cursor-pointer rounded-2xl p-6 text-center transition-all"><p class="text-2xl font-semibold">${r.date}</p><p class="text-sm text-gray-400 mt-2">${r.fullName}</p><p class="text-xs text-emerald-400 mt-1">Submitted • ${new Date(r.submittedAt).toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'})}</p><button onclick="event.stopImmediatePropagation(); viewEndDayReport(${r.id});" class="mt-3 text-xs bg-emerald-500 hover:bg-emerald-600 px-4 py-1 rounded-2xl">View Full Report</button></div>`;
             });
             html += `</div>`;
-            document.getElementById('endDayListHeaderContainer').innerHTML = `<div class="flex justify-between items-center"><div><p class="text-amber-400 font-medium">End Day Reports</p><p class="text-2xl font-semibold">${branch}</p></div><button onclick="closeEndDayListModal()" class="text-4xl text-gray-400 hover:text-white">×</button></div>`;
+            document.getElementById('endDayListHeaderContainer').innerHTML = `<div class="flex justify-between items-center"><div><p class="text-amber-400 font-medium">End Day Reports - ${branch}</p></div><button onclick="closeEndDayListModal()" class="text-4xl text-gray-400 hover:text-white">×</button></div>`;
             document.getElementById('endDayListContent').innerHTML = html;
             document.getElementById('endDayListModal').classList.remove('hidden');
         }
@@ -1087,7 +1099,7 @@
 
         function closeCashPositionModal() { document.getElementById('cashPositionModal').classList.add('hidden'); }
 
-        // ===================== MANAGER CONTENT =====================
+        // ===================== MANAGER & TOP MANAGEMENT =====================
         function renderManagerContent() {
             const container = document.getElementById('managerContent');
             if (currentSection === 'dashboard') {
@@ -1095,19 +1107,30 @@
                     <h2 class="flex items-center gap-3 text-3xl font-semibold mb-8"><i class="fa-solid fa-cactus text-emerald-400"></i> Dashboard</h2>
                     <div id="managerMetrics" class="grid grid-cols-4 gap-6 mb-12"></div>
                     <div id="managerBranchesContainer" class="space-y-12"></div>
-                    <div class="mt-12 bg-gray-900 rounded-3xl p-8">
-                        <h3 class="text-xl font-semibold mb-6 flex items-center gap-2 text-amber-400"><i class="fa-solid fa-exclamation-triangle"></i> Operational Alerts (Manager Only)</h3>
-                        <div id="managerAlerts" class="grid grid-cols-2 gap-6"></div>
-                    </div>
                 `;
                 renderManagerDashboard();
             } else if (currentSection === 'reports') {
-                container.innerHTML = `<h2 class="flex items-center gap-3 text-3xl font-semibold mb-8"><i class="fa-solid fa-cactus text-emerald-400"></i> All Reports</h2><div class="bg-gray-900 rounded-3xl p-8 text-gray-400">Full reports table would go here (same as Top Management).</div>`;
+                container.innerHTML = `
+                    <h2 class="flex items-center gap-3 text-3xl font-semibold mb-8"><i class="fa-solid fa-cactus text-emerald-400"></i> All Reports & History</h2>
+                    <div class="bg-gray-900 rounded-3xl p-8 overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead><tr class="text-gray-400 border-b border-gray-700"><th>Date</th><th>Branch</th><th>Cashier</th><th>Time Slot</th><th>Amount (ZMW)</th><th>Type</th><th>Submitted At</th><th>Discrepancy</th></tr></thead>
+                            <tbody id="managerReportsBody" class="text-white"></tbody>
+                        </table>
+                    </div>
+                `;
+                renderManagerReportsTable();
             } else if (currentSection === 'expenses') {
-                container.innerHTML = `<h2 class="flex items-center gap-3 text-3xl font-semibold mb-8"><i class="fa-solid fa-cactus text-emerald-400"></i> Expenses Summary</h2><div id="managerExpenseSummary" class="grid grid-cols-4 gap-6"></div>`;
+                container.innerHTML = `
+                    <h2 class="flex items-center gap-3 text-3xl font-semibold mb-8"><i class="fa-solid fa-cactus text-emerald-400"></i> Expenses Summary</h2>
+                    <div id="managerExpenseSummary" class="grid grid-cols-4 gap-6"></div>
+                `;
                 renderManagerExpenseSummary();
             } else if (currentSection === 'alerts') {
-                container.innerHTML = `<h2 class="flex items-center gap-3 text-3xl font-semibold mb-8"><i class="fa-solid fa-cactus text-emerald-400"></i> Alerts & Missing Reports</h2><div id="managerAlertsFull" class="space-y-6"></div>`;
+                container.innerHTML = `
+                    <h2 class="flex items-center gap-3 text-3xl font-semibold mb-8"><i class="fa-solid fa-cactus text-emerald-400"></i> Alerts & Missing Reports</h2>
+                    <div id="managerAlertsFull" class="space-y-6"></div>
+                `;
                 renderManagerAlertsFull();
             }
         }
@@ -1135,19 +1158,19 @@
                 <p class="text-4xl font-bold mt-1">K ${totalCash.toLocaleString('en-US')}</p>
                 <p class="text-xs text-gray-400">All branches</p>
             </div>
-            <div class="metric-card bg-gray-900 rounded-3xl p-6 text-center">
+            <div onclick="viewBranchDetail('${highest.name}')" class="metric-card bg-gray-900 rounded-3xl p-6 text-center">
                 <div class="text-5xl mb-2">📈</div>
                 <p class="text-emerald-400 text-sm">HIGHEST CASH</p>
                 <p class="font-semibold">${highest.name}</p>
                 <p class="text-3xl font-bold">K ${highest.amount.toLocaleString('en-US')}</p>
             </div>
-            <div class="metric-card bg-gray-900 rounded-3xl p-6 text-center">
+            <div onclick="viewBranchDetail('${lowest.name}')" class="metric-card bg-gray-900 rounded-3xl p-6 text-center">
                 <div class="text-5xl mb-2">📉</div>
                 <p class="text-amber-400 text-sm">LOWEST CASH</p>
                 <p class="font-semibold">${lowest.name}</p>
                 <p class="text-3xl font-bold">K ${lowest.amount.toLocaleString('en-US')}</p>
             </div>
-            <div class="metric-card bg-gray-900 rounded-3xl p-6 text-center">
+            <div onclick="showShortageBranches()" class="metric-card bg-gray-900 rounded-3xl p-6 text-center">
                 <div class="text-5xl mb-2">⚠️</div>
                 <p class="text-red-400 text-sm">SHORTAGES</p>
                 <p class="text-3xl font-bold">${todayEndDays.filter(ed => ed.data?.cashBreakdown?.discrepancy < -100).length}</p>
@@ -1170,52 +1193,28 @@
                 branchesContainer.appendChild(card);
             });
 
-            renderManagerAlerts(todayReports, todayEndDays);
             updateUnreadCounts();
         }
 
-        function renderManagerAlerts(todayReports, todayEndDays) {
-            const container = document.getElementById('managerAlerts');
-            container.innerHTML = '';
-
-            const submittedBranches = new Set(todayReports.map(r => r.branch));
-            const missing = allBranches.filter(b => !submittedBranches.has(b));
-            if (missing.length) {
-                const missDiv = document.createElement('div');
-                missDiv.className = "bg-red-900/30 rounded-3xl p-6";
-                missDiv.innerHTML = `<h4 class="font-semibold text-red-400 mb-3">❌ Missing Reports</h4><p class="text-sm">${missing.join(', ')} did not submit any report today</p>`;
-                container.appendChild(missDiv);
-            }
-
-            let lateHTML = '';
-            todayReports.forEach(r => {
-                const slot = reportTimes.find(s => s.key === r.timeKey);
-                if (slot) {
-                    const expected = new Date(`${r.date}T${slot.time}:00`);
-                    const actual = new Date(r.submittedAt);
-                    if (actual > new Date(expected.getTime() + 10*60000)) lateHTML += `<div class="text-sm">${r.branch} - ${r.label} submitted late</div>`;
-                }
-            });
-            if (lateHTML) {
-                const lateDiv = document.createElement('div');
-                lateDiv.className = "bg-amber-900/30 rounded-3xl p-6";
-                lateDiv.innerHTML = `<h4 class="font-semibold text-amber-400 mb-3">⏱️ Late Submissions</h4>${lateHTML}`;
-                container.appendChild(lateDiv);
-            }
-
-            let expenseHTML = '';
-            allBranches.forEach(branch => {
-                const branchEnd = todayEndDays.filter(r => r.branch === branch);
-                let totalExp = 0;
-                branchEnd.forEach(ed => {
-                    if (ed.data?.wu) totalExp += (ed.data.wu.paid || 0) + (ed.data.wu.toCounter2 || 0) + (ed.data.wu.toAirtel || 0) + (ed.data.wu.toBank || 0) + (ed.data.wu.toMtn || 0) + (ed.data.wu.toZanaco || 0) + (ed.data.wu.toIzb || 0);
+        function showShortageBranches() {
+            const today = getToday();
+            const shortageReports = endDayReports.filter(r => r.date === today && r.data?.cashBreakdown?.discrepancy < -100);
+            let html = `<div class="grid grid-cols-3 gap-6">`;
+            if (shortageReports.length === 0) {
+                html += `<p class="col-span-3 text-center py-12 text-gray-400">No branches with shortages today.</p>`;
+            } else {
+                shortageReports.forEach(r => {
+                    html += `<div onclick="viewEndDayReport(${r.id})" class="bg-red-900/30 hover:bg-red-900/50 cursor-pointer rounded-3xl p-8 text-center transition-all">
+                        <p class="text-xl font-semibold">${r.branch}</p>
+                        <p class="text-3xl font-bold text-red-400 mt-4">K ${Math.abs(r.data.cashBreakdown.discrepancy).toLocaleString('en-US', {minimumFractionDigits: 2})} deficit</p>
+                        <p class="text-xs text-gray-400 mt-6">Click to view full End Day Report</p>
+                    </div>`;
                 });
-                expenseHTML += `<div class="bg-gray-800 rounded-3xl p-4"><p class="text-xs">${branch}</p><p class="font-semibold">K ${totalExp.toLocaleString('en-US')}</p></div>`;
-            });
-            const expDiv = document.createElement('div');
-            expDiv.className = "col-span-2 bg-gray-900 rounded-3xl p-6";
-            expDiv.innerHTML = `<h4 class="font-semibold text-emerald-400 mb-4">💸 Expenses per Branch (incl. duplicates)</h4><div class="grid grid-cols-2 gap-4">${expenseHTML}</div>`;
-            container.appendChild(expDiv);
+            }
+            html += `</div>`;
+            document.getElementById('endDayListHeaderContainer').innerHTML = `<div class="flex justify-between items-center"><div><p class="text-red-400 font-medium">Branches with Shortages</p></div><button onclick="closeEndDayListModal()" class="text-4xl text-gray-400 hover:text-white">×</button></div>`;
+            document.getElementById('endDayListContent').innerHTML = html;
+            document.getElementById('endDayListModal').classList.remove('hidden');
         }
 
         function renderManagerExpenseSummary() {
@@ -1226,7 +1225,10 @@
                 const branchEnd = endDayReports.filter(r => r.branch === branch && r.date === today);
                 let totalExp = 0;
                 branchEnd.forEach(ed => {
-                    if (ed.data?.wu) totalExp += (ed.data.wu.paid || 0) + (ed.data.wu.toCounter2 || 0) + (ed.data.wu.toAirtel || 0) + (ed.data.wu.toBank || 0) + (ed.data.wu.toMtn || 0) + (ed.data.wu.toZanaco || 0) + (ed.data.wu.toIzb || 0);
+                    if (ed.data?.wu) {
+                        totalExp += (ed.data.wu.paid || 0) + (ed.data.wu.toCounter2 || 0) + (ed.data.wu.toAirtel || 0) + (ed.data.wu.toBank || 0) + (ed.data.wu.toMtn || 0) + (ed.data.wu.toZanaco || 0) + (ed.data.wu.toIzb || 0);
+                        if (ed.data.wu.expenses) ed.data.wu.expenses.forEach(e => totalExp += e.amount || 0);
+                    }
                 });
                 const card = document.createElement('div');
                 card.className = "bg-gray-800 rounded-3xl p-6 text-center";
@@ -1235,38 +1237,41 @@
             });
         }
 
-        function renderManagerAlertsFull() {
-            const container = document.getElementById('managerAlertsFull');
-            container.innerHTML = `<div class="bg-gray-900 rounded-3xl p-8 text-gray-400">Full detailed alerts view (missing reports, late submissions, shortages) - same logic as dashboard alerts.</div>`;
+        function renderManagerReportsTable() {
+            const tbody = document.getElementById('managerReportsBody');
+            tbody.innerHTML = '';
+            const today = getToday();
+            reportsDB.filter(r => r.date === today).forEach(r => {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${r.date}</td><td>${r.branch}</td><td>${r.fullName}</td><td>${r.label}</td><td class="font-semibold">K ${r.amount.toLocaleString('en-US')}</td><td>Cash Position</td><td>${new Date(r.submittedAt).toLocaleTimeString('en-GB')}</td><td class="text-emerald-400">—</td>`;
+                tbody.appendChild(row);
+            });
+            endDayReports.filter(r => r.date === today).forEach(ed => {
+                const disc = ed.data?.cashBreakdown?.discrepancy || 0;
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${ed.date}</td><td>${ed.branch}</td><td>${ed.fullName}</td><td>End Day</td><td class="font-semibold">K ${ed.data?.wu?.closing?.toLocaleString('en-US') || '0'}</td><td>End Day Report</td><td>${new Date(ed.submittedAt).toLocaleTimeString('en-GB')}</td><td class="${disc < 0 ? 'text-red-400' : 'text-emerald-400'}">${disc.toLocaleString('en-US')}</td>`;
+                tbody.appendChild(row);
+            });
         }
 
-        // ===================== TOP MANAGEMENT CONTENT =====================
         function renderTopContent() {
             const container = document.getElementById('topContent');
             if (currentSection === 'dashboard') {
                 container.innerHTML = `
                     <h2 class="flex items-center gap-3 text-3xl font-semibold mb-8"><i class="fa-solid fa-cactus text-emerald-400"></i> Dashboard</h2>
                     <div id="topMetrics" class="grid grid-cols-4 gap-6 mb-12"></div>
-                    <div class="bg-gray-900 rounded-3xl p-8 mb-12">
-                        <h3 class="text-xl font-semibold mb-6 flex items-center gap-2"><i class="fa-solid fa-bell"></i> Live Alerts</h3>
-                        <div id="topAlertsList" class="space-y-4"></div>
-                    </div>
                 `;
                 renderTopMetrics();
-                renderTopAlerts();
             } else if (currentSection === 'reports') {
                 container.innerHTML = `
-                    <h2 class="flex items-center gap-3 text-3xl font-semibold mb-8"><i class="fa-solid fa-cactus text-emerald-400"></i> All Reports</h2>
-                    <div class="bg-gray-900 rounded-3xl p-8">
-                        <div class="overflow-x-auto">
-                            <table id="topReportsTable" class="w-full text-sm">
-                                <thead><tr class="text-gray-400 border-b border-gray-700"><th>Date</th><th>Branch</th><th>Cashier</th><th>Time Slot</th><th>Amount (ZMW)</th><th>Type</th><th>Submitted At</th><th>Discrepancy</th></tr></thead>
-                                <tbody id="topReportsTableBody" class="text-white"></tbody>
-                            </table>
-                        </div>
+                    <h2 class="flex items-center gap-3 text-3xl font-semibold mb-8"><i class="fa-solid fa-cactus text-emerald-400"></i> All Reports & History</h2>
+                    <div class="bg-gray-900 rounded-3xl p-8 overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead><tr class="text-gray-400 border-b border-gray-700"><th>Date</th><th>Branch</th><th>Cashier</th><th>Time Slot</th><th>Amount (ZMW)</th><th>Type</th><th>Submitted At</th><th>Discrepancy</th></tr></thead>
+                            <tbody id="topReportsTableBody" class="text-white"></tbody>
+                        </table>
                     </div>
                 `;
-                populateTopFilters();
                 applyTopFilters();
             } else if (currentSection === 'expenses') {
                 container.innerHTML = `
@@ -1299,10 +1304,6 @@
                 if (amt < lowest.amount) lowest = {name: branch, amount: amt};
             });
 
-            const shortages = todayEndDays.filter(ed => ed.data?.cashBreakdown?.discrepancy < -100).length;
-            const submittedBranches = new Set(todayReports.map(r => r.branch));
-            const missingCount = allBranches.length - submittedBranches.size;
-
             document.getElementById('topMetrics').innerHTML = `
             <div class="metric-card bg-gray-900 rounded-3xl p-6 text-center">
                 <div class="text-5xl mb-2">💰</div>
@@ -1310,36 +1311,55 @@
                 <p class="text-4xl font-bold mt-1">K ${totalCash.toLocaleString('en-US')}</p>
                 <p class="text-xs text-gray-400">All branches</p>
             </div>
-            <div class="metric-card bg-gray-900 rounded-3xl p-6 text-center">
+            <div onclick="viewBranchDetail('${highest.name}')" class="metric-card bg-gray-900 rounded-3xl p-6 text-center">
                 <div class="text-5xl mb-2">📈</div>
-                <p class="text-emerald-400 text-sm">HIGHEST CASH</p>
+                <p class="text-emerald-400 text-sm">BRANCH WITH MOST CASH</p>
                 <p class="font-semibold">${highest.name}</p>
                 <p class="text-3xl font-bold">K ${highest.amount.toLocaleString('en-US')}</p>
             </div>
-            <div class="metric-card bg-gray-900 rounded-3xl p-6 text-center">
+            <div onclick="viewBranchDetail('${lowest.name}')" class="metric-card bg-gray-900 rounded-3xl p-6 text-center">
                 <div class="text-5xl mb-2">📉</div>
-                <p class="text-amber-400 text-sm">LOWEST CASH</p>
+                <p class="text-amber-400 text-sm">BRANCH WITH LEAST CASH</p>
                 <p class="font-semibold">${lowest.name}</p>
                 <p class="text-3xl font-bold">K ${lowest.amount.toLocaleString('en-US')}</p>
             </div>
-            <div class="metric-card bg-gray-900 rounded-3xl p-6 text-center">
+            <div onclick="showShortageBranches()" class="metric-card bg-gray-900 rounded-3xl p-6 text-center">
                 <div class="text-5xl mb-2">⚠️</div>
                 <p class="text-red-400 text-sm">SHORTAGES</p>
-                <p class="text-3xl font-bold">${shortages}</p>
-            </div>
-            <div class="metric-card bg-gray-900 rounded-3xl p-6 text-center col-span-2">
-                <div class="flex justify-between">
-                    <div><span class="text-4xl">🟢</span><p class="text-xs text-emerald-400">SUBMITTED</p><p class="text-3xl font-bold">${submittedBranches.size} / ${allBranches.length}</p></div>
-                    <div><span class="text-4xl">❌</span><p class="text-xs text-red-400">MISSING REPORTS</p><p class="text-3xl font-bold">${missingCount}</p></div>
-                </div>
+                <p class="text-3xl font-bold">${todayEndDays.filter(ed => ed.data?.cashBreakdown?.discrepancy < -100).length}</p>
             </div>`;
         }
 
-        function renderTopAlerts() {
-            document.getElementById('topAlertsList').innerHTML = `
-                <div class="flex items-center gap-3 bg-red-900/30 rounded-2xl p-4"><i class="fa-solid fa-triangle-exclamation text-red-400"></i><p>Kitwe branch missed 14:00 report</p></div>
-                <div class="flex items-center gap-3 bg-amber-900/30 rounded-2xl p-4"><i class="fa-solid fa-triangle-exclamation text-amber-400"></i><p>Ndola has unusual cash variance of K-4,500</p></div>
+        function viewBranchDetail(branch) {
+            let html = `
+                <h2 class="text-3xl font-semibold mb-8">Branch Detail: ${branch}</h2>
+                <div class="bg-gray-900 rounded-3xl p-8 mb-8">
+                    <h3 class="text-xl font-semibold mb-6">Cash Positions</h3>
+                    <div class="grid grid-cols-6 gap-4" id="branchCashPositions"></div>
+                </div>
+                <div class="bg-gray-900 rounded-3xl p-8">
+                    <h3 class="text-xl font-semibold mb-6">End Day Reports</h3>
+                    <div id="branchEndDayReports"></div>
+                </div>
             `;
+            document.getElementById('topContent').innerHTML = html;
+
+            const today = getToday();
+            const cashPositions = reportsDB.filter(r => r.branch === branch && r.date === today);
+            let cashHTML = '';
+            reportTimes.forEach(slot => {
+                const rep = cashPositions.find(r => r.timeKey === slot.key);
+                const amount = rep ? rep.amount : 0;
+                cashHTML += `<div class="cash-card rounded-3xl p-6 text-center ${rep ? 'bg-emerald-900/30 border border-emerald-500' : 'bg-gray-800'}"><p class="label-text text-emerald-400">${slot.label}</p><p class="amount-text font-semibold mt-3">${amount.toLocaleString('en-US', {minimumFractionDigits: 2})}</p><p class="text-xs text-gray-400 mt-1">ZMW</p></div>`;
+            });
+            document.getElementById('branchCashPositions').innerHTML = cashHTML;
+
+            const endDays = endDayReports.filter(r => r.branch === branch && r.date === today);
+            let endHTML = '';
+            endDays.forEach(ed => {
+                endHTML += `<div onclick="viewEndDayReport(${ed.id})" class="bg-gray-800 hover:bg-gray-700 cursor-pointer rounded-2xl p-6 mb-4 flex justify-between items-center"><div><p class="font-semibold">${ed.date}</p><p class="text-sm text-gray-400">${ed.fullName}</p></div><button class="text-xs bg-emerald-500 hover:bg-emerald-600 px-4 py-2 rounded-2xl">View Full Report</button></div>`;
+            });
+            document.getElementById('branchEndDayReports').innerHTML = endHTML || '<p class="text-gray-400">No End Day reports for this branch today.</p>';
         }
 
         function renderExpenseSummary() {
@@ -1350,61 +1370,40 @@
                 const branchEnd = endDayReports.filter(r => r.branch === branch && r.date === today);
                 let totalExpense = 0;
                 branchEnd.forEach(ed => {
-                    if (ed.data?.wu) totalExpense += (ed.data.wu.paid || 0) + (ed.data.wu.toCounter2 || 0) + (ed.data.wu.toAirtel || 0) + (ed.data.wu.toBank || 0) + (ed.data.wu.toMtn || 0) + (ed.data.wu.toZanaco || 0) + (ed.data.wu.toIzb || 0);
+                    if (ed.data?.wu) {
+                        totalExpense += (ed.data.wu.paid || 0) + (ed.data.wu.toCounter2 || 0) + (ed.data.wu.toAirtel || 0) + (ed.data.wu.toBank || 0) + (ed.data.wu.toMtn || 0) + (ed.data.wu.toZanaco || 0) + (ed.data.wu.toIzb || 0);
+                        if (ed.data.wu.expenses) ed.data.wu.expenses.forEach(e => totalExpense += e.amount || 0);
+                    }
                 });
                 const card = document.createElement('div');
-                card.className = "bg-gray-800 rounded-3xl p-6 text-center";
-                card.innerHTML = `<p class="text-emerald-400 text-sm">${branch}</p><p class="text-3xl font-bold mt-2">K ${totalExpense.toLocaleString('en-US')}</p><p class="text-xs text-gray-400">Total Expenses (incl. duplicates)</p>`;
+                card.className = "bg-gray-800 rounded-3xl p-6 text-center cursor-pointer";
+                card.onclick = () => viewBranchDetail(branch);
+                card.innerHTML = `<p class="text-emerald-400 text-sm">${branch}</p><p class="text-3xl font-bold mt-2">K ${totalExpense.toLocaleString('en-US')}</p><p class="text-xs text-gray-400">Total Expenses</p>`;
                 container.appendChild(card);
             });
         }
 
-        function populateTopFilters() {
-            const branchSelect = document.getElementById('filterBranch');
-            branchSelect.innerHTML = `<option value="">All Branches</option>`;
-            allBranches.forEach(b => {
-                const opt = document.createElement('option');
-                opt.value = b; opt.textContent = b;
-                branchSelect.appendChild(opt);
-            });
+        function renderTopAlertsFull() {
+            const container = document.getElementById('topAlertsFull');
+            container.innerHTML = `<div class="bg-gray-900 rounded-3xl p-8 text-gray-400">Full alerts and missing reports list for Top Management.</div>`;
         }
 
         function applyTopFilters() {
-            const dateFilter = document.getElementById('filterDate') ? document.getElementById('filterDate').value || getToday() : getToday();
-            const branchFilter = document.getElementById('filterBranch') ? document.getElementById('filterBranch').value : '';
-            const cashierFilter = document.getElementById('filterCashier') ? document.getElementById('filterCashier').value : '';
-            const slotFilter = document.getElementById('filterTimeSlot') ? document.getElementById('filterTimeSlot').value : '';
-
-            let filteredReports = reportsDB.filter(r => r.date === dateFilter);
-            if (branchFilter) filteredReports = filteredReports.filter(r => r.branch === branchFilter);
-            if (cashierFilter) filteredReports = filteredReports.filter(r => r.fullName === cashierFilter);
-            if (slotFilter) filteredReports = filteredReports.filter(r => r.timeKey === slotFilter);
-
-            let filteredEndDays = endDayReports.filter(r => r.date === dateFilter);
-            if (branchFilter) filteredEndDays = filteredEndDays.filter(r => r.branch === branchFilter);
-
             const tbody = document.getElementById('topReportsTableBody');
             if (!tbody) return;
             tbody.innerHTML = '';
-
-            filteredReports.forEach(r => {
+            const today = getToday();
+            reportsDB.filter(r => r.date === today).forEach(r => {
                 const row = document.createElement('tr');
                 row.innerHTML = `<td>${r.date}</td><td>${r.branch}</td><td>${r.fullName}</td><td>${r.label}</td><td class="font-semibold">K ${r.amount.toLocaleString('en-US')}</td><td>Cash Position</td><td>${new Date(r.submittedAt).toLocaleTimeString('en-GB')}</td><td class="text-emerald-400">—</td>`;
                 tbody.appendChild(row);
             });
-            filteredEndDays.forEach(ed => {
-                const disc = ed.data && ed.data.cashBreakdown ? ed.data.cashBreakdown.discrepancy : 0;
+            endDayReports.filter(r => r.date === today).forEach(ed => {
+                const disc = ed.data?.cashBreakdown?.discrepancy || 0;
                 const row = document.createElement('tr');
-                row.innerHTML = `<td>${ed.date}</td><td>${ed.branch}</td><td>${ed.fullName}</td><td>End Day</td><td class="font-semibold">K ${ed.data && ed.data.wu ? ed.data.wu.closing.toLocaleString('en-US') : '0'}</td><td>End Day Report</td><td>${new Date(ed.submittedAt).toLocaleTimeString('en-GB')}</td><td class="${disc < 0 ? 'text-red-400' : 'text-emerald-400'}">${disc.toLocaleString('en-US')}</td>`;
+                row.innerHTML = `<td>${ed.date}</td><td>${ed.branch}</td><td>${ed.fullName}</td><td>End Day</td><td class="font-semibold">K ${ed.data?.wu?.closing?.toLocaleString('en-US') || '0'}</td><td>End Day Report</td><td>${new Date(ed.submittedAt).toLocaleTimeString('en-GB')}</td><td class="${disc < 0 ? 'text-red-400' : 'text-emerald-400'}">${disc.toLocaleString('en-US')}</td>`;
                 tbody.appendChild(row);
             });
-
-            if (tbody.children.length === 0) tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-gray-400">No reports match the selected filters.</td></tr>`;
-        }
-
-        function renderTopAlertsFull() {
-            const container = document.getElementById('topAlertsFull');
-            container.innerHTML = `<div class="bg-gray-900 rounded-3xl p-8 text-gray-400">Full alerts list for Top Management (missing reports, shortages, etc.).</div>`;
         }
 
         // ===================== INITIAL LOAD =====================
