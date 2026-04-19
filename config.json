@@ -4,24 +4,36 @@
     "tagline": "Western Union • Real-time Branch Monitoring",
     "logoUrl": "https://raw.githubusercontent.com/bandaamos98-create/cash/main/images/cactus.png"
   },
-  "branchAnnouncements": [
-    {
-      "id": 1,
-      "enabled": true,
-      "title": "Branch Staff Notice",
-      "message": "All branches that do not open on public holidays to deposit the remaining float into the main account.",
-      "type": "info",
-      "date": "2026-04-18"
-    }
-  ],
-  "managementAnnouncements": [
-    {
-      "id": 1,
-      "enabled": true,
-      "title": "Management Update",
-      "message": "Head Office: System reconciliation will be done at 18:00 today. Please submit all End Day reports on time.",
-      "type": "warning",
-      "date": "2026-04-18"
-    }
-  ]
+  "announcements": {
+    "topmanagement": [
+      {
+        "id": 1,
+        "enabled": true,
+        "title": "Management Update",
+        "message": "Head Office: System reconciliation will be done at 18:00 today.",
+        "type": "warning",
+        "date": "2026-04-19"
+      }
+    ],
+    "manager": [
+      {
+        "id": 1,
+        "enabled": true,
+        "title": "Branch Performance",
+        "message": "Kabwe Main is currently leading in daily transactions.",
+        "type": "info",
+        "date": "2026-04-19"
+      }
+    ],
+    "cashier": [
+      {
+        "id": 1,
+        "enabled": true,
+        "title": "Branch Staff Notice",
+        "message": "All branches that do not open on public holidays must deposit remaining float into main account.",
+        "type": "info",
+        "date": "2026-04-19"
+      }
+    ]
+  }
 }
