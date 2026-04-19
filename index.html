@@ -29,6 +29,19 @@
         .sidebar-link:hover { background: #10b981; color: white; }
         table { border-collapse: collapse; }
         th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #374151; }
+        .sidebar-container { overflow-y: auto; scrollbar-width: thin; scrollbar-color: #10b981 #374151; }
+        .sidebar-container::-webkit-scrollbar { width: 6px; }
+        .sidebar-container::-webkit-scrollbar-thumb { background: #10b981; border-radius: 3px; }
+        .top-nav { background: #111827; border-bottom: 1px solid #1f2937; box-shadow: 0 4px 6px -1px rgb(16 185 129 / 0.1); position: sticky; top: 0; z-index: 50; }
+        .top-nav-content { display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; height: 68px; }
+        .tab-button { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; }
+        .tab-button.active { border-bottom: 4px solid #10b981; color: #10b981; font-weight: 600; }
+        .announcement-banner { animation: slideDown 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        .folder-card { transition: all 0.2s ease; }
+        .folder-card:hover { transform: scale(1.03); }
+        /* FIXED SIDEBAR - DOES NOT SCROLL WITH PAGE */
+        #sidebar { position: sticky; top: 0; height: 100vh; overflow-y: auto; flex-shrink: 0; }
     </style>
 </head>
 <body class="bg-gradient-to-br from-gray-950 via-emerald-950 to-gray-950 text-white">
@@ -37,69 +50,44 @@
     <div id="loginScreen" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-900 to-gray-950">
         <div class="max-w-md w-full bg-gray-900 rounded-3xl shadow-2xl p-8">
             <div class="flex items-center justify-center gap-3 mb-8">
-                <div id="loginLogo" class="cactus-icon w-12 h-12"></div>
+                <div class="cactus-icon w-12 h-12"></div>
                 <h1 class="text-4xl font-bold">Cactus</h1>
             </div>
             <p class="text-center text-emerald-400 text-xl mb-8">Western Union • Staff Portal</p>
             <div class="space-y-6">
                 <div>
                     <label class="block text-sm font-medium mb-2">Username / Employee ID</label>
-                    <input id="username" type="text" value="topmgmt" class="w-full bg-gray-800 border border-gray-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-emerald-500">
+                    <input id="username" type="text" value="manager" class="w-full bg-gray-800 border border-gray-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-emerald-500">
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-2">Password</label>
                     <input id="password" type="password" value="1234" class="w-full bg-gray-800 border border-gray-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-emerald-500">
                 </div>
                 <button onclick="handleLogin()" class="w-full bg-emerald-500 hover:bg-emerald-600 py-4 rounded-2xl font-semibold text-lg">SIGN IN</button>
-                <p class="text-center text-xs text-gray-500">Demo accounts (password: 1234):<br>topmgmt (Top Management)<br>manager (Branch Managers)<br>amos01 (Kabwe Main)<br>mukuyu01 (Mukuyu Branch)<br>kabwe01 (Kabwe Main)</p>
+                <p class="text-center text-xs text-gray-500">Demo accounts (password: 1234):<br>manager (Branch Managers)<br>amos01 (Kabwe Main)<br>mukuyu01 (Mukuyu Branch)<br>kabwe01 (Kabwe Main)</p>
             </div>
         </div>
     </div>
 
     <!-- MAIN APP -->
     <div id="mainApp" class="hidden min-h-screen flex">
-
         <!-- FIXED SIDEBAR -->
         <div id="sidebar" class="hidden w-72 bg-gray-900 border-r border-gray-800 flex flex-col h-screen overflow-hidden">
-            <div class="px-6 py-8 flex items-center gap-3 border-b border-gray-800">
-                <div class="cactus-icon w-10 h-10"></div>
-                <div>
-                    <h1 class="text-3xl font-bold text-white">Cactus</h1>
-                    <p class="text-sm text-emerald-400 -mt-1">Money Transfers</p>
-                </div>
-            </div>
-
-            <div onclick="switchSection('dashboard')" class="sidebar-link flex items-center gap-3 px-6 py-5 text-white cursor-pointer">
-                <i class="fa-solid fa-gauge-high w-5"></i>
-                <span class="font-medium">Dashboard</span>
-            </div>
-            <div onclick="switchSection('reports')" class="sidebar-link flex items-center gap-3 px-6 py-5 text-white cursor-pointer">
-                <i class="fa-solid fa-file-lines w-5"></i>
-                <span class="font-medium">All Reports</span>
-            </div>
-            <div onclick="switchSection('expenses')" class="sidebar-link flex items-center gap-3 px-6 py-5 text-white cursor-pointer">
-                <i class="fa-solid fa-sack-dollar w-5"></i>
-                <span class="font-medium">Expenses Summary</span>
-            </div>
-            <div onclick="switchSection('alerts')" class="sidebar-link flex items-center gap-3 px-6 py-5 text-white cursor-pointer">
-                <i class="fa-solid fa-bell w-5"></i>
-                <span class="font-medium">Alerts & Missing Reports</span>
-            </div>
-            <div onclick="openManagerMessagesModal()" class="sidebar-link flex items-center gap-3 px-6 py-5 text-white cursor-pointer">
-                <i class="fa-solid fa-envelope w-5"></i>
-                <span class="font-medium">Messages <span id="sidebarUnread" class="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5"></span></span>
-            </div>
-
-            <div class="flex-1"></div>
+            <div id="sidebarInner" class="flex flex-col h-full"></div>
         </div>
 
         <!-- MAIN CONTENT -->
         <div class="flex-1 flex flex-col overflow-hidden">
-            <nav class="bg-gray-900 border-b border-gray-800 sticky top-0 z-50">
-                <div class="max-w-screen-2xl mx-auto px-8 py-5 flex justify-between items-center">
-                    <div class="flex items-center gap-3">
-                        <div id="navLogo" class="cactus-icon w-9 h-9"></div>
-                        <h1 id="appName" class="text-2xl font-bold">Cactus</h1>
+            <!-- TOP BAR -->
+            <nav class="top-nav">
+                <div class="top-nav-content">
+                    <div class="flex items-center gap-4">
+                        <div class="cactus-icon w-9 h-9"></div>
+                        <h1 class="text-2xl font-bold">Cactus Money Transfers</h1>
+                        <!-- WELCOME MEMBER - EXACTLY IN THE GREEN CIRCLE POSITION -->
+                        <span id="welcomeText" class="ml-8 text-emerald-400 text-2xl font-semibold flex items-center gap-2">
+                            👋 Welcome Member
+                        </span>
                     </div>
                     <div class="flex items-center gap-8">
                         <div id="liveClock" class="live-clock text-xl font-mono bg-gray-800 px-5 py-2 rounded-2xl text-emerald-400"></div>
@@ -111,6 +99,7 @@
                 </div>
             </nav>
 
+            <!-- Scrollable Content -->
             <div class="flex-1 overflow-auto max-w-screen-2xl mx-auto px-8 py-8">
                 <!-- CASHIER VIEW -->
                 <div id="cashierView" class="hidden">
@@ -134,6 +123,7 @@
                             </button>
                         </div>
                     </div>
+                    <div id="cashierAnnouncements" class="mb-8"></div>
                     <div class="bg-gray-900 rounded-3xl p-8 mb-8">
                         <h3 class="text-xl font-semibold mb-6">Today's Cash Positions</h3>
                         <div id="todayReports" class="grid grid-cols-6 gap-4"></div>
@@ -162,11 +152,6 @@
                 <!-- MANAGER VIEW -->
                 <div id="managerView" class="hidden">
                     <div id="managerContent"></div>
-                </div>
-
-                <!-- TOP MANAGEMENT VIEW -->
-                <div id="topManagementView" class="hidden">
-                    <div id="topContent"></div>
                 </div>
             </div>
         </div>
@@ -311,6 +296,20 @@
         </div>
     </div>
 
+    <!-- ALL BRANCHES MODAL -->
+    <div id="allBranchesModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[150]">
+        <div class="modal bg-gray-900 rounded-3xl w-full max-w-7xl max-h-[95vh] overflow-hidden flex flex-col">
+            <div class="p-6 border-b border-gray-700 flex justify-between items-center">
+                <h2 class="text-3xl font-semibold">All Branches</h2>
+                <button onclick="closeAllBranchesModal()" class="text-4xl text-gray-400 hover:text-white">×</button>
+            </div>
+            <div class="p-6">
+                <input id="branchSearchInput" type="text" placeholder="Search branches..." class="w-full bg-gray-800 border border-gray-700 rounded-3xl px-6 py-4 mb-6 focus:outline-none focus:border-emerald-500" onkeyup="filterBranches()">
+                <div id="branchesGrid" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ===================== GLOBAL VARIABLES =====================
         let currentUser = null;
@@ -324,13 +323,14 @@
         let messagesDB = [];
         let selectedTimeKey = null;
         let currentSection = 'dashboard';
+        let selectedBranchForView = null;
+        let selectedViewType = 'cash';
 
         const staffDB = {
             "amos01": { password: "1234", role: "cashier", fullName: "Amos Banda", branch: "Kabwe Main" },
             "mukuyu01": { password: "1234", role: "cashier", fullName: "Mukuyu Operator", branch: "Mukuyu Branch" },
             "kabwe01": { password: "1234", role: "cashier", fullName: "Kabwe Operator", branch: "Kabwe Main" },
-            "manager": { password: "1234", role: "manager", fullName: "Branch Managers", branch: "Head Office" },
-            "topmgmt": { password: "1234", role: "topmanagement", fullName: "Top Management", branch: "Head Office" }
+            "manager": { password: "1234", role: "manager", fullName: "Branch Managers", branch: "Head Office" }
         };
 
         const reportTimes = [
@@ -345,21 +345,23 @@
         const otherServices = ["ZOONA", "AIRTEL MONEY", "ZAMTEL MONEY", "MTN MONEY", "MTN BULK", "AIRTEL BULK", "ZANACO", "INDO", "FNB"];
         const allBranches = ["Kabwe Main", "Mukuyu Branch", "Kitwe Branch", "Ndola Branch"];
 
+        let announcementsDB = {
+            manager: [{ id: 1, enabled: true, title: "Management Update", message: "Head Office: System reconciliation will be done at 18:00 today. Please submit all End Day reports on time.", type: "warning", date: "2026-04-19" }],
+            cashier: [{ id: 1, enabled: true, title: "Branch Staff Notice", message: "All branches that do not open on public holidays to deposit the remaining float into the main account.", type: "info", date: "2026-04-19" }]
+        };
+
         // ===================== DATA =====================
         function loadData() {
             reportsDB = JSON.parse(localStorage.getItem('cactusReports') || '[]');
             endDayReports = JSON.parse(localStorage.getItem('cactusEndDayReports') || '[]');
             messagesDB = JSON.parse(localStorage.getItem('cactusMessages') || '[]');
-
             if (reportsDB.length === 0) {
                 const today = getToday();
                 reportsDB = [
                     { id: Date.now()-1000000, date: today, username: "amos01", fullName: "Amos Banda", branch: "Kabwe Main", timeKey: "opening", time: "08:00", label: "Opening", amount: 125000, submittedAt: new Date(Date.now()-7200000).toISOString() },
                     { id: Date.now()-900000, date: today, username: "amos01", fullName: "Amos Banda", branch: "Kabwe Main", timeKey: "10hrs", time: "10:00", label: "10:00 hrs", amount: 98000, submittedAt: new Date(Date.now()-5400000).toISOString() },
                     { id: Date.now()-800000, date: today, username: "amos01", fullName: "Amos Banda", branch: "Kabwe Main", timeKey: "14hrs", time: "14:00", label: "14:00 hrs", amount: 142000, submittedAt: new Date(Date.now()-1800000).toISOString() },
-                    { id: Date.now()-700000, date: today, username: "mukuyu01", fullName: "Mukuyu Operator", branch: "Mukuyu Branch", timeKey: "opening", time: "08:00", label: "Opening", amount: 67000, submittedAt: new Date(Date.now()-8100000).toISOString() },
-                    { id: Date.now()-600000, date: today, username: "dummy", fullName: "Kitwe Cashier", branch: "Kitwe Branch", timeKey: "10hrs", time: "10:00", label: "10:00 hrs", amount: 45000, submittedAt: new Date(Date.now()-3600000).toISOString() },
-                    { id: Date.now()-500000, date: today, username: "dummy", fullName: "Ndola Cashier", branch: "Ndola Branch", timeKey: "14hrs", time: "14:00", label: "14:00 hrs", amount: 112000, submittedAt: new Date(Date.now()-900000).toISOString() }
+                    { id: Date.now()-700000, date: today, username: "mukuyu01", fullName: "Mukuyu Operator", branch: "Mukuyu Branch", timeKey: "opening", time: "08:00", label: "Opening", amount: 67000, submittedAt: new Date(Date.now()-8100000).toISOString() }
                 ];
                 endDayReports = [
                     { id: Date.now()-300000, date: today, username: "amos01", fullName: "Amos Banda", branch: "Kabwe Main", submittedAt: new Date().toISOString(), data: { wu: { closing: 158000, paid: 45000, sent: 12000, toBank: 8000, expenses: [{description:"Fuel",amount:2500},{description:"Stationery",amount:800}] }, cashBreakdown: { discrepancy: 1200, reason: "Counting error" } } },
@@ -380,6 +382,11 @@
         function applyCommaFormat(e) { let val = e.target.value.replace(/,/g, ''); const num = parseFloat(val); if (!isNaN(num)) e.target.value = num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
         function cleanMoney(val) { return parseFloat(String(val).replace(/,/g, '')) || 0; }
 
+        // ===================== WELCOME MEMBER =====================
+        function renderWelcome() {
+            document.getElementById('welcomeText').innerHTML = `👋 <span class="font-semibold">Welcome Member</span>`;
+        }
+
         // ===================== LOGIN =====================
         function handleLogin() {
             const username = document.getElementById('username').value.trim().toLowerCase();
@@ -390,7 +397,7 @@
                 document.getElementById('mainApp').classList.remove('hidden');
                 loadData();
                 renderApp();
-            } else alert("Invalid credentials.\nDemo accounts (password 1234):\ntopmgmt, manager, amos01, mukuyu01, kabwe01");
+            } else alert("Invalid credentials.");
         }
 
         function logout() {
@@ -408,41 +415,76 @@
             setInterval(() => clockEl.textContent = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' }), 1000);
         }
 
-        function switchSection(section) {
-            currentSection = section;
-            if (currentUser.role === 'manager') renderManagerContent();
-            else if (currentUser.role === 'topmanagement') renderTopContent();
-        }
-
         function renderApp() {
             renderUserInfo();
             startLiveClock();
-            loadData();
-
+            renderWelcome();
             document.getElementById('cashierView').classList.add('hidden');
             document.getElementById('managerView').classList.add('hidden');
-            document.getElementById('topManagementView').classList.add('hidden');
             document.getElementById('sidebar').classList.add('hidden');
 
             if (currentUser.role === 'cashier') {
+                document.getElementById('cashierView').classList.remove('hidden');
                 renderCashierView();
             } else if (currentUser.role === 'manager') {
                 document.getElementById('sidebar').classList.remove('hidden');
                 document.getElementById('managerView').classList.remove('hidden');
+                renderSidebar();
                 renderManagerContent();
-            } else if (currentUser.role === 'topmanagement') {
-                document.getElementById('sidebar').classList.remove('hidden');
-                document.getElementById('topManagementView').classList.remove('hidden');
-                renderTopContent();
             }
+        }
+
+        // ===================== SIDEBAR =====================
+        function renderSidebar() {
+            let html = `
+                <div class="px-6 py-8 flex items-center gap-3 border-b border-gray-800">
+                    <div class="cactus-icon w-10 h-10"></div>
+                </div>
+                <div class="flex-1 overflow-y-auto sidebar-container">
+                    <div onclick="switchSection('dashboard')" class="sidebar-link flex items-center gap-3 px-6 py-5 text-white cursor-pointer">
+                        <i class="fa-solid fa-gauge-high w-5"></i><span class="font-medium">All Reports Summary</span>
+                    </div>
+                    <div onclick="switchSection('allbranches')" class="sidebar-link flex items-center gap-3 px-6 py-5 text-white cursor-pointer">
+                        <i class="fa-solid fa-building w-5"></i><span class="font-medium">All Branches</span>
+                    </div>
+                    <div onclick="switchSection('expenses')" class="sidebar-link flex items-center gap-3 px-6 py-5 text-white cursor-pointer">
+                        <i class="fa-solid fa-sack-dollar w-5"></i><span class="font-medium">Expenses Summary</span>
+                    </div>
+                    <div onclick="switchSection('alerts')" class="sidebar-link flex items-center gap-3 px-6 py-5 text-white cursor-pointer">
+                        <i class="fa-solid fa-bell w-5"></i><span class="font-medium">Alerts & Missing Reports</span>
+                    </div>
+                    <div onclick="openManagerMessagesModal()" class="sidebar-link flex items-center gap-3 px-6 py-5 text-white cursor-pointer">
+                        <i class="fa-solid fa-envelope w-5"></i><span class="font-medium">Messages <span id="sidebarUnread" class="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5"></span></span>
+                    </div>
+                </div>`;
+            document.getElementById('sidebarInner').innerHTML = html;
+        }
+
+        function switchSection(section) {
+            currentSection = section;
+            renderManagerContent();
         }
 
         // ===================== CASHIER VIEW =====================
         function renderCashierView() {
-            document.getElementById('cashierView').classList.remove('hidden');
             document.getElementById('cashierBranch').textContent = currentUser.branch;
+            document.getElementById('cashierAnnouncements').innerHTML = getAnnouncementsHTML();
             renderTimeButtons();
             renderTodayReports();
+        }
+
+        function getAnnouncementsHTML() {
+            if (!currentUser) return '';
+            const anns = announcementsDB[currentUser.role] || [];
+            const enabled = anns.filter(a => a.enabled);
+            if (enabled.length === 0) return '';
+            let html = `<div class="announcement-banner bg-gradient-to-r from-emerald-900/30 to-gray-900 border border-emerald-700 rounded-3xl p-6 mb-8">`;
+            enabled.forEach((ann, i) => {
+                html += `<div class="flex gap-4"><i class="fa-solid ${ann.type==='warning'?'fa-exclamation-triangle text-amber-400':'fa-info-circle text-emerald-400'} text-2xl"></i><div><p class="font-semibold">${ann.title}</p><p class="text-gray-200">${ann.message}</p><p class="text-xs text-gray-400">${ann.date}</p></div></div>`;
+                if (i < enabled.length-1) html += `<hr class="my-4 border-gray-700">`;
+            });
+            html += `</div>`;
+            return html;
         }
 
         function renderTimeButtons() {
@@ -511,17 +553,8 @@
                            (m.fromRole === 'manager' && m.toBranch === branch);
                 }
                 if (role === 'manager') {
-                    if (partner === 'topmanagement') {
-                        return (m.fromRole === 'manager' && m.toRole === 'topmanagement') ||
-                               (m.fromRole === 'topmanagement' && m.toRole === 'manager');
-                    } else {
-                        return (m.fromRole === 'manager' && m.toBranch === partner) ||
-                               (m.fromRole === 'cashier' && m.fromBranch === partner && m.toRole === 'manager');
-                    }
-                }
-                if (role === 'topmanagement') {
-                    return (m.fromRole === 'topmanagement' && m.toRole === 'manager') ||
-                           (m.fromRole === 'manager' && m.toRole === 'topmanagement');
+                    return (m.fromRole === 'manager' && m.toBranch === partner) ||
+                           (m.fromRole === 'cashier' && m.fromBranch === partner && m.toRole === 'manager');
                 }
                 return false;
             });
@@ -566,10 +599,9 @@
         }
 
         function openManagerMessagesModal() {
-            document.getElementById('branchListTitle').textContent = currentUser.role === 'manager' ? "Select Recipient" : "Communicate with Manager";
+            document.getElementById('branchListTitle').textContent = "Select Recipient";
             document.getElementById('managerBranchListModal').classList.remove('hidden');
-            if (currentUser.role === 'manager') renderBranchListForManager();
-            else renderBranchListForTop();
+            renderBranchListForManager();
         }
 
         function closeManagerBranchListModal() {
@@ -587,22 +619,11 @@
                 div.onclick = () => { closeManagerBranchListModal(); openChatWithBranch(branch); };
                 container.appendChild(div);
             });
-            const topDiv = document.createElement('div');
-            topDiv.className = "flex justify-between items-center bg-violet-900 hover:bg-violet-800 rounded-2xl p-4 cursor-pointer";
-            topDiv.innerHTML = `<div><p class="font-medium flex items-center gap-2"><i class="fa-solid fa-crown"></i> Top Management</p></div><div class="flex items-center gap-2"><i class="fa-solid fa-chevron-right"></i></div>`;
-            topDiv.onclick = () => { closeManagerBranchListModal(); openChatWithBranch('topmanagement'); };
-            container.appendChild(topDiv);
-        }
-
-        function renderBranchListForTop() {
-            const container = document.getElementById('branchListContainer');
-            container.innerHTML = `<div onclick="closeManagerBranchListModal(); openChatWithBranch('manager');" class="flex justify-between items-center bg-gray-800 hover:bg-gray-700 rounded-2xl p-4 cursor-pointer"><div><p class="font-medium">Branch Managers (single account)</p></div><div class="flex items-center gap-2"><i class="fa-solid fa-chevron-right"></i></div></div>`;
         }
 
         function openChatWithBranch(partner) {
-            let title = partner === 'topmanagement' ? "Chat with Top Management" : partner === 'manager' ? "Chat with Branch Managers" : `Chat with ${partner}`;
-            document.getElementById('modalChatTitle').textContent = title;
-            document.getElementById('modalChatSubtitle').textContent = partner === 'topmanagement' || partner === 'manager' ? "Head Office" : "Cashier";
+            document.getElementById('modalChatTitle').textContent = `Chat with ${partner}`;
+            document.getElementById('modalChatSubtitle').textContent = "Cashier";
             document.getElementById('modalChatIcon').innerHTML = `<i class="fa-solid fa-building-columns text-emerald-400"></i>`;
             window.currentChatPartner = partner;
             renderChatMessages(partner);
@@ -614,16 +635,7 @@
             const text = input.value.trim();
             if (!text) return;
             const now = new Date().toISOString();
-            let toRole = 'manager';
-            let toBranch = 'Head Office';
-
-            if (currentUser.role === 'cashier') { toRole = 'manager'; toBranch = 'Head Office'; }
-            else if (currentUser.role === 'manager') {
-                if (window.currentChatPartner === 'topmanagement') { toRole = 'topmanagement'; toBranch = 'Head Office'; }
-                else { toRole = 'cashier'; toBranch = window.currentChatPartner; }
-            } else if (currentUser.role === 'topmanagement') { toRole = 'manager'; toBranch = 'Head Office'; }
-
-            const msg = { id: Date.now(), fromRole: currentUser.role, fromBranch: currentUser.branch, toRole: toRole, toBranch: toBranch, message: text, timestamp: now, read: false };
+            const msg = { id: Date.now(), fromRole: currentUser.role, fromBranch: currentUser.branch, toRole: 'manager', toBranch: window.currentChatPartner, message: text, timestamp: now, read: false };
             messagesDB.unshift(msg);
             saveData();
             input.value = '';
@@ -636,7 +648,7 @@
             updateUnreadCounts();
         }
 
-        // ===================== END DAY MODAL =====================
+        // ===================== FULL END DAY =====================
         function openEndDayModal(editId = null) {
             if (currentUser.role !== 'cashier') return alert("Only cashiers can submit End Day reports.");
             editingEndDayId = editId;
@@ -811,6 +823,7 @@
             bookClosingVal = cleanMoney(document.getElementById('wu_closing').textContent);
             document.getElementById('breakdownBranchDate').textContent = `${currentUser.branch} • ${getToday()}`;
             document.getElementById('bookClosingDisplay').innerHTML = `K ${bookClosingVal.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+
             const denoms = [500, 200, 100, 50, 20, 10, 5, 2, 1, 0.5];
             let denomHTML = '';
             denoms.forEach(denom => {
@@ -865,7 +878,6 @@
             data.wu.toZanaco = cleanMoney(document.getElementById('out_to_zanaco').value);
             data.wu.toIzb = cleanMoney(document.getElementById('out_to_izb').value);
             data.wu.closing = cleanMoney(document.getElementById('wu_closing').textContent);
-
             data.wu.additionalInflows = [];
             for (let i = 1; i <= 10; i++) {
                 const amt = cleanMoney(document.getElementById(`add_in_amount_${i}`).value);
@@ -918,7 +930,6 @@
             } else {
                 endDayReports.unshift({ id: Date.now(), date: getToday(), username: currentUser.username, fullName: currentUser.fullName, branch: currentUser.branch, submittedAt: new Date().toISOString(), data: pendingEndDayData });
             }
-            // NO MESSAGE SENT TO MANAGER FOR END DAY REPORT
             saveData();
             alert(`✅ End Day Report Submitted Successfully!${Math.abs(pendingEndDayData.cashBreakdown.discrepancy) >= 0.01 ? `\nNote: ${pendingEndDayData.cashBreakdown.discrepancy > 0 ? 'Surplus' : 'Deficit'} of K${Math.abs(pendingEndDayData.cashBreakdown.discrepancy).toLocaleString('en-US',{minimumFractionDigits:2})}` : ''}`);
             closeCashBreakdownModal();
@@ -930,7 +941,11 @@
         function closeCashBreakdownModal() { document.getElementById('cashBreakdownModal').classList.add('hidden'); pendingEndDayData = null; }
         function closeEndDayModal() { document.getElementById('endDayModal').classList.add('hidden'); }
 
-        // ===================== HISTORY & DETAIL VIEWS =====================
+        function populateEndDayForm(id) {
+            console.log("Edit mode for ID:", id);
+        }
+
+        // ===================== HISTORY =====================
         function showMyPastCashPositions() {
             const filteredDates = [...new Set(reportsDB.filter(r => r.username === currentUser.username).map(r => r.date))].sort((a, b) => new Date(b) - new Date(a));
             let html = `<div class="grid grid-cols-5 gap-4">`;
@@ -973,12 +988,6 @@
             document.getElementById('editCashModal').classList.remove('hidden');
         }
 
-        function closeEditCashModal() {
-            document.getElementById('editCashModal').classList.add('hidden');
-            editingCashDate = null;
-            editingCashTimeKey = null;
-        }
-
         function saveEditedCashPosition() {
             if (!editingCashDate || !editingCashTimeKey) return;
             const amountStr = document.getElementById('editCashAmount').value.replace(/,/g, '');
@@ -993,6 +1002,12 @@
                 closeEditCashModal();
                 viewMyDailyCashPositions(editingCashDate);
             }
+        }
+
+        function closeEditCashModal() {
+            document.getElementById('editCashModal').classList.add('hidden');
+            editingCashDate = null;
+            editingCashTimeKey = null;
         }
 
         function closeCashPositionModal() { document.getElementById('cashPositionModal').classList.add('hidden'); }
@@ -1051,6 +1066,242 @@
             let html = `<div class="space-y-8"><div class="flex justify-between items-center"><div><h2 class="text-3xl font-bold">${report.branch} • ${report.date}</h2><p class="text-gray-400">Submitted by ${report.fullName}</p></div></div><div class="grid grid-cols-2 gap-12"><div class="bg-gray-800 rounded-3xl p-6"><h3 class="text-emerald-400 text-xl font-semibold mb-6">INFLOWS (Western Union)</h3><ul class="space-y-3 text-sm">${inflowsHTML || '<li class="text-gray-400">No inflows entered</li>'}</ul></div><div class="bg-gray-800 rounded-3xl p-6"><h3 class="text-red-400 text-xl font-semibold mb-6">OUTFLOWS & EXPENSES</h3><ul class="space-y-3 text-sm">${outflowsHTML || '<li class="text-gray-400">No outflows entered</li>'}</ul><ul class="space-y-3 text-sm">${expensesHTML}</ul></div></div><div class="text-right text-4xl font-bold text-emerald-400">CLOSING BALANCE: K${wu.closing ? wu.closing.toLocaleString('en-US',{minimumFractionDigits:2}) : '0.00'}</div></div>`;
             document.getElementById('endDayListHeaderContainer').innerHTML = `<div class="flex justify-between items-center"><div><p class="text-amber-400 font-medium">Full End Day Report</p><p class="text-2xl font-semibold">${report.branch} • ${report.date}</p></div><button onclick="closeEndDayListModal()" class="text-4xl text-gray-400 hover:text-white">×</button></div>`;
             document.getElementById('endDayListContent').innerHTML = html;
+            document.getElementById('endDayListModal').classList.remove('hidden');
+        }
+
+        // ===================== MANAGER DASHBOARD =====================
+        function renderManagerContent() {
+            const container = document.getElementById('managerContent');
+            if (currentSection === 'dashboard') {
+                container.innerHTML = `
+                    <h2 class="flex items-center gap-3 text-3xl font-semibold mb-8"><i class="fa-solid fa-cactus text-emerald-400"></i> All Reports Summary</h2>
+                    <div id="managerMetrics" class="grid grid-cols-4 gap-6 mb-12"></div>
+                    <div id="managerBranchesContainer" class="space-y-12"></div>
+                `;
+                renderManagerDashboard();
+            } else if (currentSection === 'allbranches') {
+                renderAllBranchesView();
+            } else if (currentSection === 'expenses') {
+                container.innerHTML = `<h2 class="flex items-center gap-3 text-3xl font-semibold mb-8"><i class="fa-solid fa-cactus text-emerald-400"></i> Expenses Summary</h2><div id="managerExpenseSummary" class="grid grid-cols-4 gap-6"></div>`;
+                renderManagerExpenseSummary();
+            } else if (currentSection === 'alerts') {
+                container.innerHTML = `<h2 class="flex items-center gap-3 text-3xl font-semibold mb-8"><i class="fa-solid fa-cactus text-emerald-400"></i> Alerts & Missing Reports</h2><div id="managerAlertsFull" class="space-y-6"></div>`;
+                renderManagerAlertsFull();
+            }
+        }
+
+        function renderManagerDashboard() {
+            const today = getToday();
+            const todayReports = reportsDB.filter(r => r.date === today);
+            let totalCash = 0;
+            let highest = {name: '', amount: 0};
+            let lowest = {name: '', amount: Infinity};
+            allBranches.forEach(branch => {
+                const latest = todayReports.filter(r => r.branch === branch).sort((a,b) => new Date(b.submittedAt) - new Date(a.submittedAt))[0];
+                const amt = latest ? latest.amount : 0;
+                totalCash += amt;
+                if (amt > highest.amount) highest = {name: branch, amount: amt};
+                if (amt < lowest.amount) lowest = {name: branch, amount: amt};
+            });
+            const shortageCount = endDayReports.filter(ed => ed.date === today && ed.data?.cashBreakdown?.discrepancy < -100).length;
+
+            document.getElementById('managerMetrics').innerHTML = `
+            <div class="metric-card bg-gray-900 rounded-3xl p-6 text-center">
+                <div class="text-5xl mb-2">💰</div>
+                <p class="text-emerald-400 text-sm">TOTAL CASH TODAY</p>
+                <p class="text-4xl font-bold mt-1">K ${totalCash.toLocaleString('en-US')}</p>
+            </div>
+            <div onclick="viewBranchDetail('${highest.name}')" class="metric-card bg-gray-900 rounded-3xl p-6 text-center">
+                <div class="text-5xl mb-2">📈</div>
+                <p class="text-emerald-400 text-sm">HIGHEST CASH</p>
+                <p class="font-semibold">${highest.name}</p>
+                <p class="text-3xl font-bold">K ${highest.amount.toLocaleString('en-US')}</p>
+            </div>
+            <div onclick="viewBranchDetail('${lowest.name}')" class="metric-card bg-gray-900 rounded-3xl p-6 text-center">
+                <div class="text-5xl mb-2">📉</div>
+                <p class="text-amber-400 text-sm">LOWEST CASH</p>
+                <p class="font-semibold">${lowest.name}</p>
+                <p class="text-3xl font-bold">K ${lowest.amount.toLocaleString('en-US')}</p>
+            </div>
+            <div onclick="showShortageBranches()" class="metric-card bg-gray-900 rounded-3xl p-6 text-center">
+                <div class="text-5xl mb-2">⚠️</div>
+                <p class="text-red-400 text-sm">SHORTAGES</p>
+                <p class="text-3xl font-bold">${shortageCount}</p>
+            </div>`;
+
+            const branchesContainer = document.getElementById('managerBranchesContainer');
+            branchesContainer.innerHTML = '';
+            allBranches.forEach(branch => {
+                const todayBranchReports = todayReports.filter(r => r.branch === branch);
+                let todayHTML = '<p class="text-emerald-400 mb-3 font-medium mt-6">Today\'s Cash Positions</p><div class="grid grid-cols-6 gap-3">';
+                reportTimes.forEach(slot => {
+                    const rep = todayBranchReports.find(r => r.timeKey === slot.key);
+                    const amount = rep ? rep.amount : 0;
+                    todayHTML += `<div class="bg-gray-800 rounded-2xl p-4 text-center"><p class="text-xs text-gray-400">${slot.label}</p><p class="text-xl font-semibold mt-1">${amount.toLocaleString('en-US', {minimumFractionDigits: 2})}</p></div>`;
+                });
+                todayHTML += '</div>';
+                const card = document.createElement('div');
+                card.className = "bg-gray-900 rounded-3xl p-8";
+                card.innerHTML = `<div class="flex justify-between items-start"><div><p class="text-2xl font-semibold">${branch}</p></div><div class="flex gap-3"><button onclick="showEndDayDates('${branch}')" class="nav-button bg-amber-600 hover:bg-amber-700 px-6 py-3 rounded-2xl font-medium flex items-center gap-2"><i class="fa-solid fa-flag-checkered"></i> End Day Reports</button><button onclick="showCashPositionDates('${branch}')" class="nav-button bg-emerald-600 hover:bg-emerald-700 px-6 py-3 rounded-2xl font-medium flex items-center gap-2"><i class="fa-solid fa-chart-bar"></i> Cash Positions</button></div></div>${todayHTML}`;
+                branchesContainer.appendChild(card);
+            });
+            updateUnreadCounts();
+        }
+
+        function showShortageBranches() {
+            const today = getToday();
+            const shortageReports = endDayReports.filter(r => r.date === today && r.data?.cashBreakdown?.discrepancy < -100);
+            if (shortageReports.length === 0) {
+                alert("No shortages recorded today.");
+                return;
+            }
+            if (shortageReports.length === 1) {
+                viewEndDayReport(shortageReports[0].id);
+            } else {
+                let html = `<div class="grid grid-cols-3 gap-6">`;
+                shortageReports.forEach(r => {
+                    html += `<div onclick="viewEndDayReport(${r.id}); closeEndDayListModal()" class="bg-red-900/30 hover:bg-red-900/50 cursor-pointer rounded-3xl p-8 text-center transition-all">
+                        <p class="text-xl font-semibold">${r.branch}</p>
+                        <p class="text-3xl font-bold text-red-400 mt-4">K ${Math.abs(r.data.cashBreakdown.discrepancy).toLocaleString('en-US', {minimumFractionDigits: 2})} deficit</p>
+                        <p class="text-xs text-gray-400 mt-6">Click to view full End Day Report</p>
+                    </div>`;
+                });
+                html += `</div>`;
+                document.getElementById('endDayListHeaderContainer').innerHTML = `<div class="flex justify-between items-center"><div><p class="text-red-400 font-medium">Branches with Shortages</p></div><button onclick="closeEndDayListModal()" class="text-4xl text-gray-400 hover:text-white">×</button></div>`;
+                document.getElementById('endDayListContent').innerHTML = html;
+                document.getElementById('endDayListModal').classList.remove('hidden');
+            }
+        }
+
+        // ===================== BRANCH DETAIL WITH 3 TABS (different colors) =====================
+        function viewBranchDetail(branch) {
+            selectedBranchForView = branch;
+            const container = document.getElementById('managerContent');
+            container.innerHTML = `
+                <div class="flex justify-between items-center mb-8">
+                    <div class="flex items-center gap-4">
+                        <button onclick="renderManagerContent()" class="flex items-center gap-2 text-gray-400 hover:text-white"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</button>
+                        <h2 class="text-3xl font-semibold">Branch: ${branch}</h2>
+                    </div>
+                </div>
+                <div class="flex border-b border-gray-700 mb-8">
+                    <button onclick="showBranchTab(0)" id="branchTab0" class="tab-button px-8 py-4 font-semibold">Cash Positions</button>
+                    <button onclick="showBranchTab(1)" id="branchTab1" class="tab-button px-8 py-4 font-semibold">End of Day Reports</button>
+                    <button onclick="showBranchTab(2)" id="branchTab2" class="tab-button px-8 py-4 font-semibold">Expenses Summary</button>
+                </div>
+                <div id="branchFoldersContent" class="space-y-8"></div>
+            `;
+            showBranchTab(0);
+        }
+
+        function showBranchTab(tab) {
+            document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active', 'border-emerald-400', 'text-emerald-400', 'border-amber-400', 'text-amber-400', 'border-violet-400', 'text-violet-400'));
+            if (tab === 0) document.getElementById('branchTab0').classList.add('active', 'border-emerald-400', 'text-emerald-400');
+            if (tab === 1) document.getElementById('branchTab1').classList.add('active', 'border-amber-400', 'text-amber-400');
+            if (tab === 2) document.getElementById('branchTab2').classList.add('active', 'border-violet-400', 'text-violet-400');
+            selectedViewType = ['cash','endday','expenses'][tab];
+            renderBranchFolders();
+        }
+
+        function renderBranchFolders() {
+            const container = document.getElementById('branchFoldersContent');
+            if (selectedViewType === 'expenses') {
+                renderBranchExpenses();
+                return;
+            }
+            const data = selectedViewType === 'cash' ? reportsDB.filter(r => r.branch === selectedBranchForView) : endDayReports.filter(r => r.branch === selectedBranchForView);
+            const groupedByYear = {};
+            data.forEach(item => {
+                const year = item.date.substring(0, 4);
+                if (!groupedByYear[year]) groupedByYear[year] = {};
+                const month = item.date.substring(5, 7);
+                if (!groupedByYear[year][month]) groupedByYear[year][month] = [];
+                groupedByYear[year][month].push(item.date);
+            });
+            let html = `<h3 class="text-2xl font-semibold mb-6">${selectedViewType === 'cash' ? 'Cash Positions' : 'End of Day Reports'} - ${selectedBranchForView}</h3>`;
+            Object.keys(groupedByYear).sort().reverse().forEach(year => {
+                html += `<details class="group bg-gray-900 rounded-3xl p-6 mb-4 open:bg-gray-800"><summary class="flex justify-between items-center cursor-pointer font-medium text-lg"><span>${year}</span><i class="fa-solid fa-chevron-down transition-transform group-open:rotate-180"></i></summary><div class="mt-6 grid grid-cols-4 gap-4">`;
+                Object.keys(groupedByYear[year]).sort().reverse().forEach(month => {
+                    html += `<div onclick="renderMonthDates('${year}', '${month}')" class="folder-card bg-gray-800 rounded-2xl p-6 text-center cursor-pointer"><p class="font-semibold">${month}</p><p class="text-xs text-emerald-400">${groupedByYear[year][month].length} dates</p></div>`;
+                });
+                html += `</div></details>`;
+            });
+            if (Object.keys(groupedByYear).length === 0) html += `<p class="text-gray-400">No reports found for this branch.</p>`;
+            container.innerHTML = html;
+        }
+
+        function renderMonthDates(year, month) {
+            const container = document.getElementById('branchFoldersContent');
+            const fullMonth = `${year}-${month}`;
+            const filteredDates = (selectedViewType === 'cash' ? reportsDB : endDayReports).filter(r => r.branch === selectedBranchForView && r.date.startsWith(fullMonth)).map(r => r.date);
+            let html = `<h3 class="text-2xl font-semibold mb-6">${fullMonth} Dates</h3><div class="grid grid-cols-6 gap-4">`;
+            filteredDates.forEach(date => {
+                html += `<div onclick="${selectedViewType === 'cash' ? `viewDailyCashPositions('${selectedBranchForView}', '${date}')` : `viewEndDayReportForDate('${selectedBranchForView}', '${date}')`}" class="folder-card bg-gray-800 hover:bg-emerald-900/30 rounded-2xl p-6 text-center cursor-pointer"><p class="text-xl font-semibold">${date}</p></div>`;
+            });
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        function viewEndDayReportForDate(branch, date) {
+            const report = endDayReports.find(r => r.branch === branch && r.date === date);
+            if (report) viewEndDayReport(report.id);
+            else alert("No end day report for this date");
+        }
+
+        function viewDailyCashPositions(branch, date) {
+            const dayReports = reportsDB.filter(r => r.branch === branch && r.date === date).sort((a, b) => reportTimes.map(t => t.key).indexOf(a.timeKey) - reportTimes.map(t => t.key).indexOf(b.timeKey));
+            let html = `<h3 class="text-2xl font-semibold mb-6">${date} - ${branch}</h3><div class="grid grid-cols-6 gap-4">`;
+            reportTimes.forEach(slot => {
+                const rep = dayReports.find(r => r.timeKey === slot.key);
+                const amount = rep ? rep.amount : 0;
+                const time = rep ? new Date(rep.submittedAt).toLocaleTimeString('en-GB',{hour:'2-digit', minute:'2-digit'}) : '—';
+                html += `<div class="cash-card rounded-3xl p-6 text-center ${rep ? 'bg-emerald-900/30 border border-emerald-500' : 'bg-gray-800'}">
+                    <p class="label-text text-emerald-400">${slot.label}</p>
+                    <p class="amount-text font-semibold mt-4">${amount.toLocaleString('en-US', {minimumFractionDigits: 2})}</p>
+                    <p class="text-xs text-gray-400">ZMW</p>
+                    <p class="text-[10px] text-gray-500 mt-4">${time}</p>
+                </div>`;
+            });
+            html += `</div>`;
+            document.getElementById('cashPositionContent').innerHTML = html;
+            document.getElementById('cashPositionModal').classList.remove('hidden');
+        }
+
+        // ===================== EXPENSES TAB (monthly with dates) =====================
+        function renderBranchExpenses() {
+            const container = document.getElementById('branchFoldersContent');
+            const branchExpenses = endDayReports.filter(r => r.branch === selectedBranchForView && r.data?.wu?.expenses && r.data.wu.expenses.length > 0);
+
+            let html = `<h3 class="text-2xl font-semibold mb-6">Monthly Expenses Summary - ${selectedBranchForView}</h3>`;
+
+            const grouped = {};
+            branchExpenses.forEach(report => {
+                const date = report.date;
+                const expenses = report.data.wu.expenses || [];
+                if (!grouped[date]) grouped[date] = [];
+                expenses.forEach(exp => grouped[date].push(exp));
+            });
+
+            Object.keys(grouped).sort().reverse().forEach(date => {
+                let total = 0;
+                let listHTML = '';
+                grouped[date].forEach(exp => {
+                    total += exp.amount;
+                    listHTML += `<div class="flex justify-between py-3 border-b border-gray-700 last:border-none"><span class="text-gray-300">${exp.description}</span><span class="font-medium text-red-400">-K${exp.amount.toLocaleString('en-US', {minimumFractionDigits:2})}</span></div>`;
+                });
+
+                html += `
+                <div class="bg-gray-900 rounded-3xl p-6 mb-6">
+                    <div class="flex justify-between items-baseline mb-4">
+                        <p class="text-xl font-semibold">${date}</p>
+                        <p class="text-2xl font-bold text-red-400">Total: K${total.toLocaleString('en-US', {minimumFractionDigits:2})}</p>
+                    </div>
+                    <div class="space-y-1">${listHTML}</div>
+                </div>`;
+            });
+
+            if (Object.keys(grouped).length === 0) html += `<p class="text-gray-400 text-center py-12">No expenses recorded for this branch yet.</p>`;
+            container.innerHTML = html;
         }
 
         function showEndDayDates(branch) {
@@ -1058,7 +1309,7 @@
             let html = `<div class="grid grid-cols-4 gap-4">`;
             if (filtered.length === 0) html += `<p class="col-span-4 text-center py-12 text-gray-400">No End Day Reports submitted yet.</p>`;
             else filtered.forEach(r => {
-                html += `<div onclick="viewEndDayReport(${r.id})" class="bg-gray-800 hover:bg-gray-700 cursor-pointer rounded-2xl p-6 text-center transition-all"><p class="text-2xl font-semibold">${r.date}</p><p class="text-sm text-gray-400 mt-2">${r.fullName}</p><p class="text-xs text-emerald-400 mt-1">Submitted • ${new Date(r.submittedAt).toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'})}</p><button onclick="event.stopImmediatePropagation(); viewEndDayReport(${r.id});" class="mt-3 text-xs bg-emerald-500 hover:bg-emerald-600 px-4 py-1 rounded-2xl">View Full Report</button></div>`;
+                html += `<div onclick="viewEndDayReport(${r.id})" class="bg-gray-800 hover:bg-gray-700 cursor-pointer rounded-2xl p-6 text-center transition-all"><p class="text-2xl font-semibold">${r.date}</p><p class="text-sm text-gray-400 mt-2">${r.fullName}</p><p class="text-xs text-emerald-400 mt-1">Submitted • ${new Date(r.submittedAt).toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'})}</p></div>`;
             });
             html += `</div>`;
             document.getElementById('endDayListHeaderContainer').innerHTML = `<div class="flex justify-between items-center"><div><p class="text-amber-400 font-medium">End Day Reports - ${branch}</p></div><button onclick="closeEndDayListModal()" class="text-4xl text-gray-400 hover:text-white">×</button></div>`;
@@ -1079,144 +1330,65 @@
             document.getElementById('cashPositionModal').classList.remove('hidden');
         }
 
-        function viewDailyCashPositions(branch, date) {
-            const dayReports = reportsDB.filter(r => r.branch === branch && r.date === date).sort((a, b) => reportTimes.map(t => t.key).indexOf(a.timeKey) - reportTimes.map(t => t.key).indexOf(b.timeKey));
-            let html = `<h3 class="text-2xl font-semibold mb-6">${date} - ${branch}</h3><div class="grid grid-cols-6 gap-4">`;
-            reportTimes.forEach(slot => {
-                const rep = dayReports.find(r => r.timeKey === slot.key);
-                const amount = rep ? rep.amount : 0;
-                const time = rep ? new Date(rep.submittedAt).toLocaleTimeString('en-GB',{hour:'2-digit', minute:'2-digit'}) : '—';
-                html += `<div class="cash-card rounded-3xl p-6 text-center ${rep ? 'bg-emerald-900/30 border border-emerald-500' : 'bg-gray-800'}">
-                    <p class="label-text text-emerald-400">${slot.label}</p>
-                    <p class="amount-text font-semibold mt-4">${amount.toLocaleString('en-US', {minimumFractionDigits: 2})}</p>
-                    <p class="text-xs text-gray-400">ZMW</p>
-                    <p class="text-[10px] text-gray-500 mt-4">${time}</p>
-                </div>`;
-            });
-            html += `</div>`;
-            document.getElementById('cashPositionContent').innerHTML = html;
-        }
-
-        function closeCashPositionModal() { document.getElementById('cashPositionModal').classList.add('hidden'); }
-
-        // ===================== MANAGER & TOP MANAGEMENT =====================
-        function renderManagerContent() {
+        // ===================== ALL BRANCHES =====================
+        function renderAllBranchesView() {
             const container = document.getElementById('managerContent');
-            if (currentSection === 'dashboard') {
-                container.innerHTML = `
-                    <h2 class="flex items-center gap-3 text-3xl font-semibold mb-8"><i class="fa-solid fa-cactus text-emerald-400"></i> Dashboard</h2>
-                    <div id="managerMetrics" class="grid grid-cols-4 gap-6 mb-12"></div>
-                    <div id="managerBranchesContainer" class="space-y-12"></div>
-                `;
-                renderManagerDashboard();
-            } else if (currentSection === 'reports') {
-                container.innerHTML = `
-                    <h2 class="flex items-center gap-3 text-3xl font-semibold mb-8"><i class="fa-solid fa-cactus text-emerald-400"></i> All Reports & History</h2>
-                    <div class="bg-gray-900 rounded-3xl p-8 overflow-x-auto">
-                        <table class="w-full text-sm">
-                            <thead><tr class="text-gray-400 border-b border-gray-700"><th>Date</th><th>Branch</th><th>Cashier</th><th>Time Slot</th><th>Amount (ZMW)</th><th>Type</th><th>Submitted At</th><th>Discrepancy</th></tr></thead>
-                            <tbody id="managerReportsBody" class="text-white"></tbody>
-                        </table>
-                    </div>
-                `;
-                renderManagerReportsTable();
-            } else if (currentSection === 'expenses') {
-                container.innerHTML = `
-                    <h2 class="flex items-center gap-3 text-3xl font-semibold mb-8"><i class="fa-solid fa-cactus text-emerald-400"></i> Expenses Summary</h2>
-                    <div id="managerExpenseSummary" class="grid grid-cols-4 gap-6"></div>
-                `;
-                renderManagerExpenseSummary();
-            } else if (currentSection === 'alerts') {
-                container.innerHTML = `
-                    <h2 class="flex items-center gap-3 text-3xl font-semibold mb-8"><i class="fa-solid fa-cactus text-emerald-400"></i> Alerts & Missing Reports</h2>
-                    <div id="managerAlertsFull" class="space-y-6"></div>
-                `;
-                renderManagerAlertsFull();
-            }
+            container.innerHTML = `
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-3xl font-semibold">All Branches</h2>
+                    <input id="branchSearchInput" type="text" placeholder="Search branches..." class="w-96 bg-gray-800 border border-gray-700 rounded-3xl px-6 py-4 focus:outline-none focus:border-emerald-500" onkeyup="filterBranches()">
+                </div>
+                <div id="branchesGrid" class="grid grid-cols-2 md:grid-cols-4 gap-6"></div>
+            `;
+            renderBranchesGrid();
         }
 
-        function renderManagerDashboard() {
-            const today = getToday();
-            const todayReports = reportsDB.filter(r => r.date === today);
-            const todayEndDays = endDayReports.filter(r => r.date === today);
-
-            let totalCash = 0;
-            let highest = {name: '', amount: 0};
-            let lowest = {name: '', amount: Infinity};
-            allBranches.forEach(branch => {
-                const latest = todayReports.filter(r => r.branch === branch).sort((a,b) => new Date(b.submittedAt) - new Date(a.submittedAt))[0];
-                const amt = latest ? latest.amount : 0;
-                totalCash += amt;
-                if (amt > highest.amount) highest = {name: branch, amount: amt};
-                if (amt < lowest.amount) lowest = {name: branch, amount: amt};
-            });
-
-            document.getElementById('managerMetrics').innerHTML = `
-            <div class="metric-card bg-gray-900 rounded-3xl p-6 text-center">
-                <div class="text-5xl mb-2">💰</div>
-                <p class="text-emerald-400 text-sm">TOTAL CASH TODAY</p>
-                <p class="text-4xl font-bold mt-1">K ${totalCash.toLocaleString('en-US')}</p>
-                <p class="text-xs text-gray-400">All branches</p>
-            </div>
-            <div onclick="viewBranchDetail('${highest.name}')" class="metric-card bg-gray-900 rounded-3xl p-6 text-center">
-                <div class="text-5xl mb-2">📈</div>
-                <p class="text-emerald-400 text-sm">HIGHEST CASH</p>
-                <p class="font-semibold">${highest.name}</p>
-                <p class="text-3xl font-bold">K ${highest.amount.toLocaleString('en-US')}</p>
-            </div>
-            <div onclick="viewBranchDetail('${lowest.name}')" class="metric-card bg-gray-900 rounded-3xl p-6 text-center">
-                <div class="text-5xl mb-2">📉</div>
-                <p class="text-amber-400 text-sm">LOWEST CASH</p>
-                <p class="font-semibold">${lowest.name}</p>
-                <p class="text-3xl font-bold">K ${lowest.amount.toLocaleString('en-US')}</p>
-            </div>
-            <div onclick="showShortageBranches()" class="metric-card bg-gray-900 rounded-3xl p-6 text-center">
-                <div class="text-5xl mb-2">⚠️</div>
-                <p class="text-red-400 text-sm">SHORTAGES</p>
-                <p class="text-3xl font-bold">${todayEndDays.filter(ed => ed.data?.cashBreakdown?.discrepancy < -100).length}</p>
-            </div>`;
-
-            const branchesContainer = document.getElementById('managerBranchesContainer');
-            branchesContainer.innerHTML = '';
-            allBranches.forEach(branch => {
-                const todayBranchReports = todayReports.filter(r => r.branch === branch);
-                let todayHTML = '<p class="text-emerald-400 mb-3 font-medium mt-6">Today\'s Cash Positions</p><div class="grid grid-cols-6 gap-3">';
-                reportTimes.forEach(slot => {
-                    const rep = todayBranchReports.find(r => r.timeKey === slot.key);
-                    const amount = rep ? rep.amount : 0;
-                    todayHTML += `<div class="bg-gray-800 rounded-2xl p-4 text-center"><p class="text-xs text-gray-400">${slot.label}</p><p class="text-xl font-semibold mt-1">${amount.toLocaleString('en-US', {minimumFractionDigits: 2})}</p></div>`;
-                });
-                todayHTML += '</div>';
+        function renderBranchesGrid(filteredBranches = allBranches) {
+            const container = document.getElementById('branchesGrid');
+            container.innerHTML = '';
+            filteredBranches.forEach(branch => {
                 const card = document.createElement('div');
-                card.className = "bg-gray-900 rounded-3xl p-8";
-                card.innerHTML = `<div class="flex justify-between items-start"><div><p class="text-2xl font-semibold">${branch}</p></div><div class="flex gap-3"><button onclick="showEndDayDates('${branch}')" class="nav-button bg-amber-600 hover:bg-amber-700 px-6 py-3 rounded-2xl font-medium flex items-center gap-2"><i class="fa-solid fa-flag-checkered"></i> End Day Reports</button><button onclick="showCashPositionDates('${branch}')" class="nav-button bg-emerald-600 hover:bg-emerald-700 px-6 py-3 rounded-2xl font-medium flex items-center gap-2"><i class="fa-solid fa-chart-bar"></i> Cash Positions</button></div></div>${todayHTML}`;
-                branchesContainer.appendChild(card);
+                card.className = "folder-card bg-gray-900 rounded-3xl p-8 text-center cursor-pointer hover:bg-emerald-900/30";
+                card.innerHTML = `
+                    <div class="text-5xl mb-4">🏦</div>
+                    <p class="text-2xl font-semibold">${branch}</p>
+                    <p class="text-emerald-400 text-sm mt-2">Click to view reports</p>
+                `;
+                card.onclick = () => selectBranch(branch);
+                container.appendChild(card);
             });
-
-            updateUnreadCounts();
-        }
-
-        function showShortageBranches() {
-            const today = getToday();
-            const shortageReports = endDayReports.filter(r => r.date === today && r.data?.cashBreakdown?.discrepancy < -100);
-            let html = `<div class="grid grid-cols-3 gap-6">`;
-            if (shortageReports.length === 0) {
-                html += `<p class="col-span-3 text-center py-12 text-gray-400">No branches with shortages today.</p>`;
-            } else {
-                shortageReports.forEach(r => {
-                    html += `<div onclick="viewEndDayReport(${r.id})" class="bg-red-900/30 hover:bg-red-900/50 cursor-pointer rounded-3xl p-8 text-center transition-all">
-                        <p class="text-xl font-semibold">${r.branch}</p>
-                        <p class="text-3xl font-bold text-red-400 mt-4">K ${Math.abs(r.data.cashBreakdown.discrepancy).toLocaleString('en-US', {minimumFractionDigits: 2})} deficit</p>
-                        <p class="text-xs text-gray-400 mt-6">Click to view full End Day Report</p>
-                    </div>`;
-                });
+            if (filteredBranches.length === 0) {
+                container.innerHTML = `<p class="col-span-full text-center py-12 text-gray-400">No branches found.</p>`;
             }
-            html += `</div>`;
-            document.getElementById('endDayListHeaderContainer').innerHTML = `<div class="flex justify-between items-center"><div><p class="text-red-400 font-medium">Branches with Shortages</p></div><button onclick="closeEndDayListModal()" class="text-4xl text-gray-400 hover:text-white">×</button></div>`;
-            document.getElementById('endDayListContent').innerHTML = html;
-            document.getElementById('endDayListModal').classList.remove('hidden');
         }
 
+        function filterBranches() {
+            const search = document.getElementById('branchSearchInput').value.toLowerCase().trim();
+            const filtered = allBranches.filter(b => b.toLowerCase().includes(search));
+            renderBranchesGrid(filtered);
+        }
+
+        function selectBranch(branch) {
+            selectedBranchForView = branch;
+            const container = document.getElementById('managerContent');
+            container.innerHTML = `
+                <div class="flex justify-between items-center mb-8">
+                    <div class="flex items-center gap-4">
+                        <button onclick="renderAllBranchesView()" class="flex items-center gap-2 text-gray-400 hover:text-white"><i class="fa-solid fa-arrow-left"></i> Back to All Branches</button>
+                        <h2 class="text-3xl font-semibold">Branch: ${branch}</h2>
+                    </div>
+                </div>
+                <div class="flex border-b border-gray-700 mb-8">
+                    <button onclick="showBranchTab(0)" id="branchTab0" class="tab-button px-8 py-4 font-semibold">Cash Positions</button>
+                    <button onclick="showBranchTab(1)" id="branchTab1" class="tab-button px-8 py-4 font-semibold">End of Day Reports</button>
+                    <button onclick="showBranchTab(2)" id="branchTab2" class="tab-button px-8 py-4 font-semibold">Expenses Summary</button>
+                </div>
+                <div id="branchFoldersContent" class="space-y-8"></div>
+            `;
+            showBranchTab(0);
+        }
+
+        // ===================== EXPENSES & ALERTS =====================
         function renderManagerExpenseSummary() {
             const container = document.getElementById('managerExpenseSummary');
             container.innerHTML = '';
@@ -1225,185 +1397,18 @@
                 const branchEnd = endDayReports.filter(r => r.branch === branch && r.date === today);
                 let totalExp = 0;
                 branchEnd.forEach(ed => {
-                    if (ed.data?.wu) {
-                        totalExp += (ed.data.wu.paid || 0) + (ed.data.wu.toCounter2 || 0) + (ed.data.wu.toAirtel || 0) + (ed.data.wu.toBank || 0) + (ed.data.wu.toMtn || 0) + (ed.data.wu.toZanaco || 0) + (ed.data.wu.toIzb || 0);
-                        if (ed.data.wu.expenses) ed.data.wu.expenses.forEach(e => totalExp += e.amount || 0);
-                    }
+                    if (ed.data?.wu?.expenses) ed.data.wu.expenses.forEach(e => totalExp += e.amount || 0);
                 });
                 const card = document.createElement('div');
                 card.className = "bg-gray-800 rounded-3xl p-6 text-center";
-                card.innerHTML = `<p class="text-emerald-400 text-sm">${branch}</p><p class="text-3xl font-bold mt-2">K ${totalExp.toLocaleString('en-US')}</p><p class="text-xs text-gray-400">Total Expenses</p>`;
+                card.innerHTML = `<p class="text-emerald-400 text-sm">${branch}</p><p class="text-3xl font-bold mt-2">K ${totalExp.toLocaleString('en-US')}</p><p class="text-xs text-gray-400">Today's Expenses</p>`;
                 container.appendChild(card);
             });
         }
 
-        function renderManagerReportsTable() {
-            const tbody = document.getElementById('managerReportsBody');
-            tbody.innerHTML = '';
-            const today = getToday();
-            reportsDB.filter(r => r.date === today).forEach(r => {
-                const row = document.createElement('tr');
-                row.innerHTML = `<td>${r.date}</td><td>${r.branch}</td><td>${r.fullName}</td><td>${r.label}</td><td class="font-semibold">K ${r.amount.toLocaleString('en-US')}</td><td>Cash Position</td><td>${new Date(r.submittedAt).toLocaleTimeString('en-GB')}</td><td class="text-emerald-400">—</td>`;
-                tbody.appendChild(row);
-            });
-            endDayReports.filter(r => r.date === today).forEach(ed => {
-                const disc = ed.data?.cashBreakdown?.discrepancy || 0;
-                const row = document.createElement('tr');
-                row.innerHTML = `<td>${ed.date}</td><td>${ed.branch}</td><td>${ed.fullName}</td><td>End Day</td><td class="font-semibold">K ${ed.data?.wu?.closing?.toLocaleString('en-US') || '0'}</td><td>End Day Report</td><td>${new Date(ed.submittedAt).toLocaleTimeString('en-GB')}</td><td class="${disc < 0 ? 'text-red-400' : 'text-emerald-400'}">${disc.toLocaleString('en-US')}</td>`;
-                tbody.appendChild(row);
-            });
-        }
-
-        function renderTopContent() {
-            const container = document.getElementById('topContent');
-            if (currentSection === 'dashboard') {
-                container.innerHTML = `
-                    <h2 class="flex items-center gap-3 text-3xl font-semibold mb-8"><i class="fa-solid fa-cactus text-emerald-400"></i> Dashboard</h2>
-                    <div id="topMetrics" class="grid grid-cols-4 gap-6 mb-12"></div>
-                `;
-                renderTopMetrics();
-            } else if (currentSection === 'reports') {
-                container.innerHTML = `
-                    <h2 class="flex items-center gap-3 text-3xl font-semibold mb-8"><i class="fa-solid fa-cactus text-emerald-400"></i> All Reports & History</h2>
-                    <div class="bg-gray-900 rounded-3xl p-8 overflow-x-auto">
-                        <table class="w-full text-sm">
-                            <thead><tr class="text-gray-400 border-b border-gray-700"><th>Date</th><th>Branch</th><th>Cashier</th><th>Time Slot</th><th>Amount (ZMW)</th><th>Type</th><th>Submitted At</th><th>Discrepancy</th></tr></thead>
-                            <tbody id="topReportsTableBody" class="text-white"></tbody>
-                        </table>
-                    </div>
-                `;
-                applyTopFilters();
-            } else if (currentSection === 'expenses') {
-                container.innerHTML = `
-                    <h2 class="flex items-center gap-3 text-3xl font-semibold mb-8"><i class="fa-solid fa-cactus text-emerald-400"></i> Expenses Summary</h2>
-                    <div id="expenseSummaryContainer" class="grid grid-cols-4 gap-6"></div>
-                `;
-                renderExpenseSummary();
-            } else if (currentSection === 'alerts') {
-                container.innerHTML = `
-                    <h2 class="flex items-center gap-3 text-3xl font-semibold mb-8"><i class="fa-solid fa-cactus text-emerald-400"></i> Alerts & Missing Reports</h2>
-                    <div id="topAlertsFull" class="space-y-6"></div>
-                `;
-                renderTopAlertsFull();
-            }
-        }
-
-        function renderTopMetrics() {
-            const today = getToday();
-            const todayReports = reportsDB.filter(r => r.date === today);
-            const todayEndDays = endDayReports.filter(r => r.date === today);
-
-            let totalCash = 0;
-            let highest = {name: '', amount: 0};
-            let lowest = {name: '', amount: Infinity};
-            allBranches.forEach(branch => {
-                const latest = todayReports.filter(r => r.branch === branch).sort((a,b) => new Date(b.submittedAt) - new Date(a.submittedAt))[0];
-                const amt = latest ? latest.amount : 0;
-                totalCash += amt;
-                if (amt > highest.amount) highest = {name: branch, amount: amt};
-                if (amt < lowest.amount) lowest = {name: branch, amount: amt};
-            });
-
-            document.getElementById('topMetrics').innerHTML = `
-            <div class="metric-card bg-gray-900 rounded-3xl p-6 text-center">
-                <div class="text-5xl mb-2">💰</div>
-                <p class="text-emerald-400 text-sm">TOTAL CASH TODAY</p>
-                <p class="text-4xl font-bold mt-1">K ${totalCash.toLocaleString('en-US')}</p>
-                <p class="text-xs text-gray-400">All branches</p>
-            </div>
-            <div onclick="viewBranchDetail('${highest.name}')" class="metric-card bg-gray-900 rounded-3xl p-6 text-center">
-                <div class="text-5xl mb-2">📈</div>
-                <p class="text-emerald-400 text-sm">BRANCH WITH MOST CASH</p>
-                <p class="font-semibold">${highest.name}</p>
-                <p class="text-3xl font-bold">K ${highest.amount.toLocaleString('en-US')}</p>
-            </div>
-            <div onclick="viewBranchDetail('${lowest.name}')" class="metric-card bg-gray-900 rounded-3xl p-6 text-center">
-                <div class="text-5xl mb-2">📉</div>
-                <p class="text-amber-400 text-sm">BRANCH WITH LEAST CASH</p>
-                <p class="font-semibold">${lowest.name}</p>
-                <p class="text-3xl font-bold">K ${lowest.amount.toLocaleString('en-US')}</p>
-            </div>
-            <div onclick="showShortageBranches()" class="metric-card bg-gray-900 rounded-3xl p-6 text-center">
-                <div class="text-5xl mb-2">⚠️</div>
-                <p class="text-red-400 text-sm">SHORTAGES</p>
-                <p class="text-3xl font-bold">${todayEndDays.filter(ed => ed.data?.cashBreakdown?.discrepancy < -100).length}</p>
-            </div>`;
-        }
-
-        function viewBranchDetail(branch) {
-            let html = `
-                <h2 class="text-3xl font-semibold mb-8">Branch Detail: ${branch}</h2>
-                <div class="bg-gray-900 rounded-3xl p-8 mb-8">
-                    <h3 class="text-xl font-semibold mb-6">Cash Positions</h3>
-                    <div class="grid grid-cols-6 gap-4" id="branchCashPositions"></div>
-                </div>
-                <div class="bg-gray-900 rounded-3xl p-8">
-                    <h3 class="text-xl font-semibold mb-6">End Day Reports</h3>
-                    <div id="branchEndDayReports"></div>
-                </div>
-            `;
-            document.getElementById('topContent').innerHTML = html;
-
-            const today = getToday();
-            const cashPositions = reportsDB.filter(r => r.branch === branch && r.date === today);
-            let cashHTML = '';
-            reportTimes.forEach(slot => {
-                const rep = cashPositions.find(r => r.timeKey === slot.key);
-                const amount = rep ? rep.amount : 0;
-                cashHTML += `<div class="cash-card rounded-3xl p-6 text-center ${rep ? 'bg-emerald-900/30 border border-emerald-500' : 'bg-gray-800'}"><p class="label-text text-emerald-400">${slot.label}</p><p class="amount-text font-semibold mt-3">${amount.toLocaleString('en-US', {minimumFractionDigits: 2})}</p><p class="text-xs text-gray-400 mt-1">ZMW</p></div>`;
-            });
-            document.getElementById('branchCashPositions').innerHTML = cashHTML;
-
-            const endDays = endDayReports.filter(r => r.branch === branch && r.date === today);
-            let endHTML = '';
-            endDays.forEach(ed => {
-                endHTML += `<div onclick="viewEndDayReport(${ed.id})" class="bg-gray-800 hover:bg-gray-700 cursor-pointer rounded-2xl p-6 mb-4 flex justify-between items-center"><div><p class="font-semibold">${ed.date}</p><p class="text-sm text-gray-400">${ed.fullName}</p></div><button class="text-xs bg-emerald-500 hover:bg-emerald-600 px-4 py-2 rounded-2xl">View Full Report</button></div>`;
-            });
-            document.getElementById('branchEndDayReports').innerHTML = endHTML || '<p class="text-gray-400">No End Day reports for this branch today.</p>';
-        }
-
-        function renderExpenseSummary() {
-            const container = document.getElementById('expenseSummaryContainer');
-            container.innerHTML = '';
-            const today = getToday();
-            allBranches.forEach(branch => {
-                const branchEnd = endDayReports.filter(r => r.branch === branch && r.date === today);
-                let totalExpense = 0;
-                branchEnd.forEach(ed => {
-                    if (ed.data?.wu) {
-                        totalExpense += (ed.data.wu.paid || 0) + (ed.data.wu.toCounter2 || 0) + (ed.data.wu.toAirtel || 0) + (ed.data.wu.toBank || 0) + (ed.data.wu.toMtn || 0) + (ed.data.wu.toZanaco || 0) + (ed.data.wu.toIzb || 0);
-                        if (ed.data.wu.expenses) ed.data.wu.expenses.forEach(e => totalExpense += e.amount || 0);
-                    }
-                });
-                const card = document.createElement('div');
-                card.className = "bg-gray-800 rounded-3xl p-6 text-center cursor-pointer";
-                card.onclick = () => viewBranchDetail(branch);
-                card.innerHTML = `<p class="text-emerald-400 text-sm">${branch}</p><p class="text-3xl font-bold mt-2">K ${totalExpense.toLocaleString('en-US')}</p><p class="text-xs text-gray-400">Total Expenses</p>`;
-                container.appendChild(card);
-            });
-        }
-
-        function renderTopAlertsFull() {
-            const container = document.getElementById('topAlertsFull');
-            container.innerHTML = `<div class="bg-gray-900 rounded-3xl p-8 text-gray-400">Full alerts and missing reports list for Top Management.</div>`;
-        }
-
-        function applyTopFilters() {
-            const tbody = document.getElementById('topReportsTableBody');
-            if (!tbody) return;
-            tbody.innerHTML = '';
-            const today = getToday();
-            reportsDB.filter(r => r.date === today).forEach(r => {
-                const row = document.createElement('tr');
-                row.innerHTML = `<td>${r.date}</td><td>${r.branch}</td><td>${r.fullName}</td><td>${r.label}</td><td class="font-semibold">K ${r.amount.toLocaleString('en-US')}</td><td>Cash Position</td><td>${new Date(r.submittedAt).toLocaleTimeString('en-GB')}</td><td class="text-emerald-400">—</td>`;
-                tbody.appendChild(row);
-            });
-            endDayReports.filter(r => r.date === today).forEach(ed => {
-                const disc = ed.data?.cashBreakdown?.discrepancy || 0;
-                const row = document.createElement('tr');
-                row.innerHTML = `<td>${ed.date}</td><td>${ed.branch}</td><td>${ed.fullName}</td><td>End Day</td><td class="font-semibold">K ${ed.data?.wu?.closing?.toLocaleString('en-US') || '0'}</td><td>End Day Report</td><td>${new Date(ed.submittedAt).toLocaleTimeString('en-GB')}</td><td class="${disc < 0 ? 'text-red-400' : 'text-emerald-400'}">${disc.toLocaleString('en-US')}</td>`;
-                tbody.appendChild(row);
-            });
+        function renderManagerAlertsFull() {
+            const container = document.getElementById('managerAlertsFull');
+            container.innerHTML = `<div class="bg-gray-900 rounded-3xl p-8 text-gray-400">No active alerts at the moment.</div>`;
         }
 
         // ===================== INITIAL LOAD =====================
