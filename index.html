@@ -27,11 +27,6 @@
         .metric-card:hover { transform: translateY(-3px); cursor: pointer; }
         .sidebar-link { transition: all 0.2s ease; }
         .sidebar-link:hover { background: #10b981; color: white; }
-        table { border-collapse: collapse; }
-        th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #374151; }
-        .sidebar-container { overflow-y: auto; scrollbar-width: thin; scrollbar-color: #10b981 #374151; }
-        .sidebar-container::-webkit-scrollbar { width: 6px; }
-        .sidebar-container::-webkit-scrollbar-thumb { background: #10b981; border-radius: 3px; }
         .top-nav { background: #111827; border-bottom: 1px solid #1f2937; box-shadow: 0 4px 6px -1px rgb(16 185 129 / 0.1); position: sticky; top: 0; z-index: 50; }
         .top-nav-content { display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; height: 68px; }
         .tab-button { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; }
@@ -47,6 +42,7 @@
     </style>
 </head>
 <body class="bg-gradient-to-br from-gray-950 via-emerald-950 to-gray-950 text-white">
+
     <!-- LOGIN SCREEN -->
     <div id="loginScreen" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-900 to-gray-950">
         <div class="max-w-md w-full bg-gray-900 rounded-3xl shadow-2xl p-8">
@@ -65,14 +61,7 @@
                     <input id="password" type="password" value="1234" class="w-full bg-gray-800 border border-gray-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-emerald-500">
                 </div>
                 <button onclick="handleLogin()" class="w-full bg-emerald-500 hover:bg-emerald-600 py-4 rounded-2xl font-semibold text-lg">SIGN IN</button>
-                <p class="text-center text-xs text-gray-500">Demo accounts (password: 1234):<br>
-                manager / manager2 / manager3 (Branch Managers)<br>
-                amos01 (Kabwe Main)<br>
-                mukuyu01 (Mukuyu Branch)<br>
-                kabwe01 (Kabwe Main)<br>
-                ndola01 (Ndola Branch)<br>
-                kitwe01 (Kitwe Branch)<br><br>
-                After login you will be asked for Membership ID</p>
+                <p class="text-center text-xs text-gray-500">Demo accounts (password: 1234):<br>manager, manager2, manager3 (Managers)<br>amos01, mukuyu01, kabwe01, ndola01, kitwe01 (Cashiers)</p>
             </div>
         </div>
     </div>
@@ -85,25 +74,19 @@
                 <h3 class="text-3xl font-bold">Staff Verification</h3>
             </div>
             <p class="text-center text-emerald-400 mb-2">Enter your universal Membership ID</p>
-            <p class="text-center text-sm text-gray-400 mb-8">This identifies you across all branches (cashiers) or the single manager account</p>
-            
-            <input id="membershipInput" type="text" placeholder="e.g. STAFF001 or MANAGER001" 
-                   class="w-full bg-gray-800 border border-gray-700 rounded-3xl px-6 py-4 text-center text-2xl font-medium focus:outline-none focus:border-emerald-500">
-            
-            <button onclick="verifyMembership()" 
-                    class="w-full mt-8 bg-emerald-500 hover:bg-emerald-600 py-5 rounded-3xl font-semibold text-xl flex items-center justify-center gap-2">
+            <p class="text-center text-sm text-gray-400 mb-8">This identifies you across all branches</p>
+            <input id="membershipInput" type="text" placeholder="e.g. STAFF001" class="w-full bg-gray-800 border border-gray-700 rounded-3xl px-6 py-4 text-center text-2xl font-medium focus:outline-none focus:border-emerald-500">
+            <button onclick="verifyMembership()" class="w-full mt-8 bg-emerald-500 hover:bg-emerald-600 py-5 rounded-3xl font-semibold text-xl flex items-center justify-center gap-2">
                 <i class="fa-solid fa-check"></i> VERIFY &amp; CONTINUE
             </button>
-            
             <p id="membershipError" class="text-red-400 text-center mt-6 hidden"></p>
-            
             <div class="mt-8 text-xs text-gray-500 text-center">
                 Demo Membership IDs:<br>
-                STAFF001 → Amos Banda (Kabwe Main)<br>
-                STAFF002 → Mukuyu Operator (Mukuyu)<br>
-                STAFF003 → Kabwe Operator (Kabwe Main)<br>
-                STAFF004 → Ndola Cashier (Ndola)<br>
-                STAFF005 → Kitwe Cashier (Kitwe)<br>
+                STAFF001 → Amos Banda<br>
+                STAFF002 → Mukuyu Operator<br>
+                STAFF003 → Kabwe Operator<br>
+                STAFF004 → Ndola Cashier<br>
+                STAFF005 → Kitwe Cashier<br>
                 MANAGER001 → Senior Manager A<br>
                 MANAGER002 → Senior Manager B<br>
                 MANAGER003 → Senior Manager C
@@ -113,13 +96,11 @@
 
     <!-- MAIN APP -->
     <div id="mainApp" class="hidden min-h-screen flex">
-        <!-- FIXED SIDEBAR -->
         <div id="sidebar" class="hidden w-72 bg-gray-900 border-r border-gray-800 flex flex-col h-screen overflow-hidden">
             <div id="sidebarInner" class="flex flex-col h-full"></div>
         </div>
-        <!-- MAIN CONTENT -->
+
         <div class="flex-1 flex flex-col overflow-hidden">
-            <!-- TOP BAR -->
             <nav class="top-nav">
                 <div class="top-nav-content">
                     <div class="flex items-center gap-4">
@@ -136,7 +117,7 @@
                     </div>
                 </div>
             </nav>
-            <!-- Scrollable Content -->
+
             <div class="flex-1 overflow-auto max-w-screen-2xl mx-auto px-8 py-8">
                 <!-- CASHIER VIEW -->
                 <div id="cashierView" class="hidden">
@@ -186,6 +167,7 @@
                         </div>
                     </div>
                 </div>
+
                 <!-- MANAGER VIEW -->
                 <div id="managerView" class="hidden">
                     <div id="managerContent"></div>
@@ -215,21 +197,19 @@
         </div>
     </div>
 
-    <!-- BRANCH LIST MODAL WITH SEARCH -->
+    <!-- BRANCH LIST MODAL -->
     <div id="managerBranchListModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[140]">
         <div class="modal bg-gray-900 rounded-3xl w-full max-w-lg p-8">
             <div class="flex justify-between items-center mb-6">
                 <h3 id="branchListTitle" class="text-2xl font-semibold">Select Recipient</h3>
                 <button onclick="closeManagerBranchListModal()" class="text-4xl text-gray-400 hover:text-white">×</button>
             </div>
-            <input id="msgSearchInput" type="text" placeholder="Search branch to message..."
-                   class="w-full bg-gray-800 border border-gray-700 rounded-3xl px-6 py-4 mb-4 focus:outline-none focus:border-emerald-500"
-                   onkeyup="filterMsgBranches()">
+            <input id="msgSearchInput" type="text" placeholder="Search branch to message..." class="w-full bg-gray-800 border border-gray-700 rounded-3xl px-6 py-4 mb-4 focus:outline-none focus:border-emerald-500" onkeyup="filterMsgBranches()">
             <div id="branchListContainer" class="space-y-2 max-h-96 overflow-auto"></div>
         </div>
     </div>
 
-    <!-- END DAY MODAL (FULL) -->
+    <!-- END DAY MODAL (FULLY EXPANDED) -->
     <div id="endDayModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[100]">
         <div class="modal bg-gray-900 rounded-3xl w-full max-w-7xl max-h-[95vh] overflow-hidden flex flex-col">
             <div class="p-6 border-b border-gray-700 flex justify-between items-center">
@@ -247,7 +227,7 @@
                 </div>
                 <div class="flex gap-4">
                     <button onclick="closeEndDayModal()" class="px-8 py-4 text-gray-400 hover:text-white">Cancel</button>
-                    <button onclick="triggerCashBreakdown()" id="endDaySubmitBtn" class="bg-emerald-500 hover:bg-emerald-600 px-10 py-4 rounded-3xl font-semibold flex items-center gap-2">
+                    <button onclick="triggerCashBreakdown()" class="bg-emerald-500 hover:bg-emerald-600 px-10 py-4 rounded-3xl font-semibold flex items-center gap-2">
                         <i class="fa-solid fa-paper-plane"></i> SUBMIT REPORT
                     </button>
                 </div>
@@ -336,21 +316,7 @@
         </div>
     </div>
 
-    <!-- ALL BRANCHES MODAL -->
-    <div id="allBranchesModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[150]">
-        <div class="modal bg-gray-900 rounded-3xl w-full max-w-7xl max-h-[95vh] overflow-hidden flex flex-col">
-            <div class="p-6 border-b border-gray-700 flex justify-between items-center">
-                <h2 class="text-3xl font-semibold">All Branches</h2>
-                <button onclick="closeAllBranchesModal()" class="text-4xl text-gray-400 hover:text-white">×</button>
-            </div>
-            <div class="p-6">
-                <input id="branchSearchInput" type="text" placeholder="Search branches..." class="w-full bg-gray-800 border border-gray-700 rounded-3xl px-6 py-4 mb-6 focus:outline-none focus:border-emerald-500" onkeyup="filterBranches()">
-                <div id="branchesGrid" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- TOAST NOTIFICATION -->
+    <!-- TOAST -->
     <div id="toast" class="hidden fixed bottom-6 right-6 bg-emerald-600 text-white px-6 py-4 rounded-3xl shadow-2xl flex items-center gap-3 z-[300]">
         <i class="fa-solid fa-envelope text-2xl"></i>
         <div>
@@ -406,10 +372,12 @@
             { label: "16:00 hrs", time: "16:00", key: "16hrs" },
             { label: "Closing", time: "17:30", key: "closing" }
         ];
+
         const otherServices = ["ZOONA", "AIRTEL MONEY", "ZAMTEL MONEY", "MTN MONEY", "MTN BULK", "AIRTEL BULK", "ZANACO", "INDO", "FNB"];
         const allBranches = ["Kabwe Main", "Mukuyu Branch", "Kitwe Branch", "Ndola Branch"];
+
         let announcementsDB = {
-            manager: [{ id: 1, enabled: true, title: "Management Update", message: "Head Office: System reconciliation will be done at 18:00 today. Please submit all End Day reports on time.", type: "warning", date: "2026-04-19" }],
+            manager: [{ id: 1, enabled: true, title: "Management Update", message: "Head Office: System reconciliation will be done at 18:00 today.", type: "warning", date: "2026-04-19" }],
             cashier: [{ id: 1, enabled: true, title: "Branch Staff Notice", message: "All branches that do not open on public holidays to deposit the remaining float into the main account.", type: "info", date: "2026-04-19" }]
         };
 
@@ -422,33 +390,12 @@
             if (reportsDB.length === 0) {
                 const today = getToday();
                 reportsDB = [
-                    { id: Date.now()-1000000, date: today, username: "amos01", fullName: "Amos Banda", membershipID: "STAFF001", branch: "Kabwe Main", timeKey: "opening", time: "08:00", label: "Opening", amount: 125000, submittedAt: new Date(Date.now()-7200000).toISOString() },
-                    { id: Date.now()-900000, date: today, username: "amos01", fullName: "Amos Banda", membershipID: "STAFF001", branch: "Kabwe Main", timeKey: "10hrs", time: "10:00", label: "10:00 hrs", amount: 98000, submittedAt: new Date(Date.now()-5400000).toISOString() },
-                    { id: Date.now()-800000, date: today, username: "amos01", fullName: "Amos Banda", membershipID: "STAFF001", branch: "Kabwe Main", timeKey: "14hrs", time: "14:00", label: "14:00 hrs", amount: 142000, submittedAt: new Date(Date.now()-1800000).toISOString() },
-                    { id: Date.now()-700000, date: today, username: "mukuyu01", fullName: "Mukuyu Operator", membershipID: "STAFF002", branch: "Mukuyu Branch", timeKey: "opening", time: "08:00", label: "Opening", amount: 67000, submittedAt: new Date(Date.now()-8100000).toISOString() },
-                    { id: Date.now()-600000, date: today, username: "ndola01", fullName: "Ndola Cashier", membershipID: "STAFF004", branch: "Ndola Branch", timeKey: "12hrs", time: "12:00", label: "12:00 hrs", amount: 89000, submittedAt: new Date(Date.now()-3600000).toISOString() },
-                    { id: Date.now()-500000, date: today, username: "kitwe01", fullName: "Kitwe Cashier", membershipID: "STAFF005", branch: "Kitwe Branch", timeKey: "closing", time: "17:30", label: "Closing", amount: 112000, submittedAt: new Date(Date.now()-900000).toISOString() }
+                    { id: Date.now()-1000000, date: today, username: "amos01", fullName: "Amos Banda", membershipID: "STAFF001", branch: "Kabwe Main", timeKey: "opening", time: "08:00", label: "Opening", amount: 125000, submittedAt: new Date().toISOString() },
+                    { id: Date.now()-900000, date: today, username: "amos01", fullName: "Amos Banda", membershipID: "STAFF001", branch: "Kabwe Main", timeKey: "10hrs", time: "10:00", label: "10:00 hrs", amount: 98000, submittedAt: new Date().toISOString() },
+                    { id: Date.now()-800000, date: today, username: "ndola01", fullName: "Ndola Cashier", membershipID: "STAFF004", branch: "Ndola Branch", timeKey: "12hrs", time: "12:00", label: "12:00 hrs", amount: 89000, submittedAt: new Date().toISOString() }
                 ];
                 endDayReports = [
-                    { id: Date.now()-300000, date: today, username: "amos01", fullName: "Amos Banda", membershipID: "STAFF001", branch: "Kabwe Main", submittedAt: new Date().toISOString(), 
-                      data: { 
-                        wu: { closing: 158000, paid: 45000, sent: 12000, toBank: 8000, expenses: [{description:"Fuel",amount:2500},{description:"Stationery",amount:800}] }, 
-                        cashBreakdown: { discrepancy: 1200, reason: "Counting error" },
-                        otherServices: {
-                            "ZOONA": {sent: 4500, paid: 1200},
-                            "AIRTEL MONEY": {sent: 8900, paid: 6700}
-                        }
-                      } 
-                    },
-                    { id: Date.now()-200000, date: today, username: "ndola01", fullName: "Ndola Cashier", membershipID: "STAFF004", branch: "Ndola Branch", submittedAt: new Date().toISOString(), 
-                      data: { 
-                        wu: { closing: 89000, paid: 32000, expenses: [{description:"Transport",amount:1500}] }, 
-                        cashBreakdown: { discrepancy: -4500, reason: "Short payment" },
-                        otherServices: {
-                            "MTN MONEY": {sent: 12000, paid: 8900}
-                        }
-                      } 
-                    }
+                    { id: Date.now()-300000, date: today, username: "amos01", fullName: "Amos Banda", membershipID: "STAFF001", branch: "Kabwe Main", submittedAt: new Date().toISOString(), data: { wu: { closing: 158000, paid: 45000, sent: 12000 }, cashBreakdown: { discrepancy: 1200, reason: "Counting error" }, otherServices: { "ZOONA": {sent: 4500, paid: 1200}, "AIRTEL MONEY": {sent: 8900, paid: 6700} } } }
                 ];
             }
             saveData();
@@ -465,7 +412,6 @@
         function applyCommaFormat(e) { let val = e.target.value.replace(/,/g, ''); const num = parseFloat(val); if (!isNaN(num)) e.target.value = num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
         function cleanMoney(val) { return parseFloat(String(val).replace(/,/g, '')) || 0; }
 
-        // ===================== TOAST NOTIFICATION =====================
         function showToast(message) {
             const toast = document.getElementById('toast');
             document.getElementById('toastMessage').innerHTML = message;
@@ -473,28 +419,23 @@
             setTimeout(() => toast.classList.add('hidden'), 4500);
         }
 
-        // ===================== MESSAGE POLLER =====================
         function startMessagePoller() {
             if (messagePollerInterval) clearInterval(messagePollerInterval);
-            let prevUnread = messagesDB.filter(m => m.toRole === currentUser.role && !m.read).length;
+            let prevUnread = 0;
             messagePollerInterval = setInterval(() => {
                 const fresh = JSON.parse(localStorage.getItem('cactusMessages') || '[]');
                 if (JSON.stringify(fresh) !== JSON.stringify(messagesDB)) messagesDB = fresh;
                 updateUnreadCounts();
                 const currentUnread = messagesDB.filter(m => m.toRole === currentUser.role && !m.read).length;
-                if (currentUnread > prevUnread) {
-                    showToast(`📨 You have <strong>${currentUnread - prevUnread}</strong> new message${(currentUnread - prevUnread) > 1 ? 's' : ''}!`);
-                }
+                if (currentUnread > prevUnread) showToast(`📨 You have <strong>${currentUnread - prevUnread}</strong> new message${currentUnread - prevUnread > 1 ? 's' : ''}!`);
                 prevUnread = currentUnread;
             }, 2500);
         }
 
-        // ===================== WELCOME =====================
         function renderWelcome() {
             document.getElementById('welcomeText').innerHTML = `👋 <span class="font-semibold">Welcome ${currentUser.fullName}</span>`;
         }
 
-        // ===================== LOGIN + MEMBERSHIP =====================
         function handleLogin() {
             const username = document.getElementById('username').value.trim().toLowerCase();
             const password = document.getElementById('password').value;
@@ -507,30 +448,24 @@
         }
 
         function verifyMembership() {
-            const input = document.getElementById('membershipInput');
-            const id = input.value.trim().toUpperCase();
+            const id = document.getElementById('membershipInput').value.trim().toUpperCase();
             const errorEl = document.getElementById('membershipError');
             errorEl.classList.add('hidden');
-
             if (!membershipDB[id]) {
-                errorEl.textContent = "Invalid Membership ID. Please try again.";
+                errorEl.textContent = "Invalid Membership ID.";
                 errorEl.classList.remove('hidden');
                 return;
             }
-
             const mem = membershipDB[id];
             if (mem.role !== currentUser.role) {
                 errorEl.textContent = `Membership ID is for ${mem.role.toUpperCase()} only.`;
                 errorEl.classList.remove('hidden');
                 return;
             }
-
             currentUser.membershipID = id;
             currentUser.fullName = mem.fullName;
-
             document.getElementById('membershipModal').classList.add('hidden');
             document.getElementById('mainApp').classList.remove('hidden');
-
             loadData();
             renderApp();
             startMessagePoller();
@@ -545,14 +480,7 @@
         }
 
         function renderUserInfo() {
-            document.getElementById('userInfo').innerHTML = `
-                <div class="bg-gray-800 rounded-3xl px-5 py-2 flex items-center gap-3">
-                    <div class="cactus-icon w-8 h-8"></div>
-                    <div>
-                        <p class="font-semibold">${currentUser.fullName}</p>
-                        <p class="text-xs text-gray-400">${currentUser.branch} • ${currentUser.role.toUpperCase()} • ID: ${currentUser.membershipID}</p>
-                    </div>
-                </div>`;
+            document.getElementById('userInfo').innerHTML = `<div class="bg-gray-800 rounded-3xl px-5 py-2 flex items-center gap-3"><div class="cactus-icon w-8 h-8"></div><div><p class="font-semibold">${currentUser.fullName}</p><p class="text-xs text-gray-400">${currentUser.branch} • ${currentUser.role.toUpperCase()}</p></div></div>`;
         }
 
         function startLiveClock() {
@@ -619,14 +547,11 @@
         }
 
         function getAnnouncementsHTML() {
-            if (!currentUser) return '';
             const anns = announcementsDB[currentUser.role] || [];
-            const enabled = anns.filter(a => a.enabled);
-            if (enabled.length === 0) return '';
+            if (anns.length === 0) return '';
             let html = `<div class="announcement-banner bg-gradient-to-r from-emerald-900/30 to-gray-900 border border-emerald-700 rounded-3xl p-6 mb-8">`;
-            enabled.forEach((ann, i) => {
-                html += `<div class="flex gap-4"><i class="fa-solid ${ann.type==='warning'?'fa-exclamation-triangle text-amber-400':'fa-info-circle text-emerald-400'} text-2xl"></i><div><p class="font-semibold">${ann.title}</p><p class="text-gray-200">${ann.message}</p><p class="text-xs text-gray-400">${ann.date}</p></div></div>`;
-                if (i < enabled.length-1) html += `<hr class="my-4 border-gray-700">`;
+            anns.forEach(ann => {
+                html += `<div class="flex gap-4"><i class="fa-solid ${ann.type==='warning'?'fa-exclamation-triangle text-amber-400':'fa-info-circle text-emerald-400'} text-2xl"></i><div><p class="font-semibold">${ann.title}</p><p class="text-gray-200">${ann.message}</p></div></div>`;
             });
             html += `</div>`;
             return html;
@@ -695,30 +620,18 @@
                 const submittedTime = report ? new Date(report.submittedAt).toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'}) : 'Not submitted';
                 const div = document.createElement('div');
                 div.className = `cash-card rounded-3xl p-6 text-center ${report ? 'bg-emerald-900/30 border border-emerald-500' : 'bg-gray-800'}`;
-                div.innerHTML = `
-                    <p class="label-text text-emerald-400">${slot.label}</p>
-                    <p class="amount-text font-semibold mt-3">${amount.toLocaleString('en-US', {minimumFractionDigits: 2})}</p>
-                    <p class="text-xs text-gray-400 mt-1">ZMW</p>
-                    <p class="text-[10px] text-gray-500 mt-2">Submitted: ${submittedTime}</p>
-                    ${report && report.membershipID ? `<p class="text-[10px] text-emerald-300 mt-1">ID: ${report.membershipID}</p>` : ''}
-                `;
+                div.innerHTML = `<p class="label-text text-emerald-400">${slot.label}</p><p class="amount-text font-semibold mt-3">${amount.toLocaleString('en-US', {minimumFractionDigits: 2})}</p><p class="text-xs text-gray-400 mt-1">ZMW</p><p class="text-[10px] text-gray-500 mt-2">Submitted: ${submittedTime}</p>`;
                 container.appendChild(div);
             });
         }
 
-        // ===================== MESSAGE SYSTEM =====================
+        // ===================== MESSAGE SYSTEM (ONLY NAME SHOWN) =====================
         function getConversationFilter(partner) {
             const role = currentUser.role;
             const branch = currentUser.branch;
             return messagesDB.filter(m => {
-                if (role === 'cashier') {
-                    return (m.fromRole === 'cashier' && m.fromBranch === branch && m.toRole === 'manager') ||
-                           (m.fromRole === 'manager' && m.toBranch === branch);
-                }
-                if (role === 'manager') {
-                    return (m.fromRole === 'manager' && m.toBranch === partner) ||
-                           (m.fromRole === 'cashier' && m.fromBranch === partner && m.toRole === 'manager');
-                }
+                if (role === 'cashier') return (m.fromRole === 'cashier' && m.fromBranch === branch && m.toRole === 'manager') || (m.fromRole === 'manager' && m.toBranch === branch);
+                if (role === 'manager') return (m.fromRole === 'manager' && m.toBranch === partner) || (m.fromRole === 'cashier' && m.fromBranch === partner && m.toRole === 'manager');
                 return false;
             });
         }
@@ -737,8 +650,7 @@
                 const isMe = msg.fromMembershipID === currentUser.membershipID;
                 const bubble = document.createElement('div');
                 bubble.className = `chat-bubble ${isMe ? 'me' : 'them'}`;
-                let header = '';
-                if (!isMe) header = `<div class="text-xs opacity-70 mb-1 flex items-center gap-2"><i class="fa-solid fa-user"></i> ${msg.fromFullName} <span class="font-mono">(${msg.fromMembershipID})</span></div>`;
+                let header = !isMe ? `<div class="text-xs opacity-70 mb-1">${msg.fromFullName}</div>` : '';
                 bubble.innerHTML = `${header}<p>${msg.message}</p><p class="text-[10px] opacity-70 mt-1">${new Date(msg.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</p>`;
                 container.appendChild(bubble);
             });
@@ -792,7 +704,7 @@
         }
 
         function filterMsgBranches() {
-            const search = (document.getElementById('msgSearchInput') ? document.getElementById('msgSearchInput').value : '').toLowerCase().trim();
+            const search = document.getElementById('msgSearchInput').value.toLowerCase().trim();
             const container = document.getElementById('branchListContainer');
             container.innerHTML = '';
             allBranches.filter(b => b.toLowerCase().includes(search)).forEach(branch => {
@@ -815,10 +727,8 @@
         }
 
         function sendMessage() {
-            const input = document.getElementById('messageInput');
-            const text = input.value.trim();
+            const text = document.getElementById('messageInput').value.trim();
             if (!text) return;
-            const now = new Date().toISOString();
             const msg = {
                 id: Date.now(),
                 fromRole: currentUser.role,
@@ -828,12 +738,12 @@
                 toRole: currentUser.role === 'cashier' ? 'manager' : 'cashier',
                 toBranch: window.currentChatPartner,
                 message: text,
-                timestamp: now,
+                timestamp: new Date().toISOString(),
                 read: false
             };
             messagesDB.unshift(msg);
             saveData();
-            input.value = '';
+            document.getElementById('messageInput').value = '';
             renderChatMessages(window.currentChatPartner);
             updateUnreadCounts();
         }
@@ -844,7 +754,7 @@
             updateUnreadCounts();
         }
 
-        // ===================== END DAY MODAL FULL =====================
+        // ===================== END DAY FULL =====================
         function openEndDayModal(editId = null) {
             if (currentUser.role !== 'cashier') return alert("Only cashiers can submit End Day reports.");
             editingEndDayId = editId;
@@ -1074,11 +984,9 @@
             data.otherServices = {};
             otherServices.forEach(svc => {
                 const key = svc.toLowerCase().replace(/ /g, '');
-                const sentEl = document.getElementById(`sent_${key}`);
-                const paidEl = document.getElementById(`paid_${key}`);
                 data.otherServices[svc] = {
-                    sent: sentEl ? cleanMoney(sentEl.value) : 0,
-                    paid: paidEl ? cleanMoney(paidEl.value) : 0
+                    sent: cleanMoney(document.getElementById(`sent_${key}`).value),
+                    paid: cleanMoney(document.getElementById(`paid_${key}`).value)
                 };
             });
 
@@ -1284,7 +1192,7 @@
                 });
             }
 
-            let html = `<div class="space-y-8"><div class="flex justify-between items-center"><div><h2 class="text-3xl font-bold">${report.branch} • ${report.date}</h2><p class="text-gray-400">Submitted by ${report.fullName} (ID: ${report.membershipID || '—'})</p></div></div><div class="grid grid-cols-2 gap-12"><div class="bg-gray-800 rounded-3xl p-6"><h3 class="text-emerald-400 text-xl font-semibold mb-6">INFLOWS (Western Union)</h3><ul class="space-y-3 text-sm">${inflowsHTML || '<li class="text-gray-400">No inflows entered</li>'}</ul></div><div class="bg-gray-800 rounded-3xl p-6"><h3 class="text-red-400 text-xl font-semibold mb-6">OUTFLOWS & EXPENSES</h3><ul class="space-y-3 text-sm">${outflowsHTML || '<li class="text-gray-400">No outflows entered</li>'}</ul><ul class="space-y-3 text-sm">${expensesHTML}</ul></div></div>`;
+            let html = `<div class="space-y-8"><div class="flex justify-between items-center"><div><h2 class="text-3xl font-bold">${report.branch} • ${report.date}</h2><p class="text-gray-400">Submitted by ${report.fullName}</p></div></div><div class="grid grid-cols-2 gap-12"><div class="bg-gray-800 rounded-3xl p-6"><h3 class="text-emerald-400 text-xl font-semibold mb-6">INFLOWS (Western Union)</h3><ul class="space-y-3 text-sm">${inflowsHTML || '<li class="text-gray-400">No inflows entered</li>'}</ul></div><div class="bg-gray-800 rounded-3xl p-6"><h3 class="text-red-400 text-xl font-semibold mb-6">OUTFLOWS & EXPENSES</h3><ul class="space-y-3 text-sm">${outflowsHTML || '<li class="text-gray-400">No outflows entered</li>'}</ul><ul class="space-y-3 text-sm">${expensesHTML}</ul></div></div>`;
 
             if (d.otherServices) {
                 html += `<div class="mt-12 bg-gray-900 rounded-3xl p-8"><h3 class="text-2xl font-bold mb-8 flex items-center gap-2"><i class="fa-solid fa-handshake"></i> OTHER SERVICES</h3><div class="grid grid-cols-3 gap-6">`;
@@ -1305,7 +1213,7 @@
 
         function closeEndDayListModal() { document.getElementById('endDayListModal').classList.add('hidden'); }
 
-        // ===================== MANAGER DASHBOARD =====================
+        // ===================== MANAGER DASHBOARD (FULLY CLICKABLE) =====================
         function renderManagerContent() {
             const container = document.getElementById('managerContent');
             if (currentSection === 'dashboard') {
@@ -1581,9 +1489,7 @@
                 card.onclick = () => selectBranch(branch);
                 container.appendChild(card);
             });
-            if (filteredBranches.length === 0) {
-                container.innerHTML = `<p class="col-span-full text-center py-12 text-gray-400">No branches found.</p>`;
-            }
+            if (filteredBranches.length === 0) container.innerHTML = `<p class="col-span-full text-center py-12 text-gray-400">No branches found.</p>`;
         }
 
         function filterBranches() {
@@ -1678,7 +1584,6 @@
             container.innerHTML = html;
         }
 
-        // ===================== INITIAL LOAD =====================
         window.onload = () => { loadData(); };
     </script>
 </body>
